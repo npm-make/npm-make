@@ -2,90 +2,70 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 
 export default class {
-    static #ignoreDir = /^node_modules|^npm_make|^\./
-
     static async search(base, pattern) {
         let result = []
-        let patternList = pattern.split(/[/\\]+/)
-        await this.#searchNext(base, result, patternList, 0)
+        let patternSplit = pattern.split(/[/\\]+/)
+        let patternMap = patternSplit.map(this.#patternMap)
+        await this.#searchNext(base, result, ...patternMap)
         return result
     }
 
-    static async #searchNext(base, result, patternList, index) {
-        if (patternList.length > index + 1) {
-            if (patternList[index].includes('*')) {
-                if (patternList[index] === '**') {
+    static async #searchNext(base, result, patternFirst, ...patternOther) {
+        try {
+            if (patternFirst === undefined) {
+                result.push(base)
+            } else if (patternFirst instanceof RegExp) {
+                await this.#searchDir(base, result, false, patternFirst, ...patternOther)
+            } else if (patternFirst === '**') {
+                await this.#searchNext(base, result, ...patternOther)
+                await this.#searchDir(base, result, true, null, ...patternOther)
+            } else {
+                let next = path.join(base, patternFirst)
+                await this.#searchNext(next, result, ...patternOther)
+            }
+        } catch {
+        }
+    }
 
-                } else {
-                    let regex = this.#makeRegex(patternList[index])
-                    let dir = await fs.opendir(base)
-                    for await (let item of dir) {
-                        if (item.isDirectory()) {
-                            if (!this.#ignoreDir.test(item.name)) {
-                                if (regex.test(item.name)) {
-                                    let temp = path.join(base, item.name)
-                                    await this.#searchNext(temp, result, patternList, index + 1)
-                                }
+    static async #searchDir(base, result, includeChild, patternFirst, ...patternOther) {
+        let dir = await fs.opendir(base)
+        for await (let item of dir) {
+            let isMatch = includeChild || patternFirst.test(item.name)
+            if (isMatch) {
+                let next = path.join(base, item.name)
+                if (patternOther.length > 0) {
+                    let isDir = item.isDirectory()
+                    if (isDir) {
+                        let isIgnore = /^node_modules|^npm_make|^\./.test(item.name)
+                        if (!isIgnore) {
+                            await this.#searchNext(next, result, ...patternOther)
+                            if (includeChild) {
+                                await this.#searchDir(next, result, true, null, ...patternOther)
                             }
                         }
                     }
+                } else {
+                    let isFile = item.isFile()
+                    if (isFile) {
+                        result.push(next)
+                    }
                 }
+            }
+        }
+    }
+
+    static #patternMap(input) {
+        let hasStar = input.includes('*')
+        if (hasStar) {
+            if (input === '**') {
+                return input
             } else {
-                let temp = path.join(base, patternList[index])
-                await this.#searchNext(temp, result, patternList, index + 1)
+                let temp1 = input.replaceAll('.', '\\.')
+                let temp2 = temp1.replaceAll('*', '.*')
+                return new RegExp('^' + temp2 + '$')
             }
         } else {
-            if (patternList[index].includes('*')) {
-                if (patternList[index] === '**') {
-                    await this.#searchDoubleLast(base, result)
-                } else {
-                    let regex = this.#makeRegex(patternList[index])
-                    let dir = await fs.opendir(base)
-                    for await (let item of dir) {
-                        if (item.isFile()) {
-                            if (regex.test(item.name)) {
-                                let temp = path.join(base, item.name)
-                                result.push(temp)
-                            }
-                        }
-                    }
-                }
-            } else {
-                let temp = path.join(base, patternList[index])
-                result.push(temp)
-            }
+            return input
         }
-    }
-
-    static async #searchDoubleNext(base, result, patternList, index) {
-        let dir = await fs.opendir(base)
-        for await (let item of dir) {
-            if (item.isDirectory()) {
-                if (!this.#ignoreDir.test(item.name)) {
-                }
-            } else if (item.isFile()) {
-            }
-        }
-    }
-
-    static async #searchDoubleLast(base, result) {
-        let dir = await fs.opendir(base)
-        for await (let item of dir) {
-            if (item.isDirectory()) {
-                if (!this.#ignoreDir.test(item.name)) {
-                    let temp = path.join(base, item.name)
-                    await this.#searchDoubleLast(temp, result)
-                }
-            } else if (item.isFile()) {
-                let temp = path.join(base, item.name)
-                result.push(temp)
-            }
-        }
-    }
-
-    static #makeRegex(input) {
-        let temp1 = input.replaceAll('.', '\\.')
-        let temp2 = temp1.replaceAll('*', '.*')
-        return new RegExp('^' + temp2 + '$')
     }
 }

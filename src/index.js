@@ -1,5 +1,9 @@
 import search from './common/search.js'
 
-let a1 = await search.search('C:\\Project\\PPM', '.gitignore')
+try {
+    let a1 = await search.search('C:\\Project', '**/zlib/**/*.c')
+    console.log(a1)
 
-console.log(a1)
+} catch (e) {
+    console.log(e)
+}
