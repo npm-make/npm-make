@@ -24,6 +24,7 @@ export default class {
                 await this.#searchNext(next, result, ...patternOther)
             }
         } catch {
+            //这可能是拼写错误导致的，应当提示警告，但也可能是正常扫描过程，难以区分，暂时忽略
         }
     }
 
