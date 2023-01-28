@@ -28,10 +28,10 @@ export default class {
         }
     }
 
-    static async #searchDir(base, result, includeChild, patternFirst, ...patternOther) {
+    static async #searchDir(base, result, doubleStar, patternFirst, ...patternOther) {
         let dir = await fs.opendir(base)
         for await (let item of dir) {
-            let isMatch = includeChild || patternFirst.test(item.name)
+            let isMatch = doubleStar || patternFirst.test(item.name)
             if (isMatch) {
                 let next = path.join(base, item.name)
                 if (patternOther.length > 0) {
@@ -40,7 +40,7 @@ export default class {
                         let isIgnore = /^node_modules|^npm_make|^\./.test(item.name)
                         if (!isIgnore) {
                             await this.#searchNext(next, result, ...patternOther)
-                            if (includeChild) {
+                            if (doubleStar) {
                                 await this.#searchDir(next, result, true, null, ...patternOther)
                             }
                         }
