@@ -1,6 +1,4 @@
-import search from './common/search.js'
+import search from './core/search.js'
 
-let a1 = await search.search('C:\\Project', '**/zlib/**/*.c')
-let a2 = await search.search('C:\\Project', '**/*.c')
+let a1 = await search.search('C:\\Project', '**/*')
 console.log(a1)
-console.log(a2)
