@@ -11,6 +11,10 @@ export default class {
 
     }
 
+    addDependencies(...params) {
+
+    }
+
     addIncludeDirectories(...params) {
 
     }
