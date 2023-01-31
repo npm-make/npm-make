@@ -2,71 +2,79 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 
 export default class {
-    static async search(base, pattern) {
-        let result = []
+    result = []
+
+    async search(base, pattern) {
         let patternSplit = pattern.split(/[/\\]+/)
-        let patternMap = patternSplit.map(this.#patternMap)
-        await this.#searchNext(base, result, ...patternMap)
-        return result
+        let patternMap = patternSplit.map(
+            input => {
+                let hasStar = input.includes('*')
+                if (hasStar) {
+                    if (input === '**') {
+                        return input
+                    } else {
+                        let temp1 = input.replaceAll('.', '\\.')
+                        let temp2 = temp1.replaceAll('?', '.?')
+                        let temp3 = temp2.replaceAll('*', '.*')
+                        return new RegExp('^' + temp3 + '$')
+                    }
+                } else {
+                    return input
+                }
+            }
+        )
+        await this.#searchNext(base, ...patternMap)
     }
 
-    static async #searchNext(base, result, patternFirst, ...patternOther) {
+    async #searchNext(base, patternFirst, ...patternOther) {
         try {
             if (patternFirst === undefined) {
-                result.push(base)
+                await this.#appendFile(base)
             } else if (patternFirst instanceof RegExp) {
-                await this.#searchDir(base, result, false, patternFirst, ...patternOther)
+                await this.#searchDir(base, false, patternFirst, ...patternOther)
             } else if (patternFirst === '**') {
-                await this.#searchNext(base, result, ...patternOther)
-                await this.#searchDir(base, result, true, null, ...patternOther)
+                if (patternOther.length > 0) {
+                    await this.#searchDir(base, true, null, ...patternOther)
+                }
             } else {
                 let next = path.join(base, patternFirst)
-                await this.#searchNext(next, result, ...patternOther)
+                await this.#searchNext(next, ...patternOther)
             }
         } catch {
             //这可能是拼写错误导致的，应当提示警告，但也可能是正常扫描过程，难以区分，暂时忽略
         }
     }
 
-    static async #searchDir(base, result, doubleStar, patternFirst, ...patternOther) {
+    async #searchDir(base, whole, patternFirst, ...patternOther) {
         let dir = await fs.opendir(base)
         for await (let item of dir) {
-            let isMatch = doubleStar || patternFirst.test(item.name)
+            let isMatch = whole || patternFirst.test(item.name)
             if (isMatch) {
                 let next = path.join(base, item.name)
-                if (patternOther.length > 0) {
-                    let isDir = item.isDirectory()
-                    if (isDir) {
-                        let isIgnore = /^node_modules|^npm_make|^\./.test(item.name)
-                        if (!isIgnore) {
-                            await this.#searchNext(next, result, ...patternOther)
-                            if (doubleStar) {
-                                await this.#searchDir(next, result, true, null, ...patternOther)
-                            }
+                let isDir = item.isDirectory()
+                if (isDir) {
+                    let isIgnore = /^node_modules|^npm_make|^\./.test(item.name)
+                    if (!isIgnore) {
+                        if (patternOther.length > 0) {
+                            await this.#searchNext(next, ...patternOther)
+                        }
+                        if (whole) {
+                            await this.#searchDir(next, true, null, ...patternOther)
                         }
                     }
-                } else {
-                    let isFile = item.isFile()
-                    if (isFile) {
-                        result.push(next)
+                }
+                let isFile = item.isFile()
+                if (isFile) {
+                    if (patternOther.length === 0) {
+                        await this.#appendFile(next, true)
                     }
                 }
             }
         }
     }
 
-    static #patternMap(input) {
-        let hasStar = input.includes('*')
-        if (hasStar) {
-            if (input === '**') {
-                return input
-            } else {
-                let temp1 = input.replaceAll('.', '\\.')
-                let temp2 = temp1.replaceAll('*', '.*')
-                return new RegExp('^' + temp2 + '$')
-            }
-        } else {
-            return input
-        }
+    async #appendFile(path) {
+        let file = await fs.stat(path)
+        this.result.push({ path, size: file.size, last: file.mtimeMs })
     }
 }
