@@ -75,6 +75,6 @@ export default class {
 
     async #appendFile(path) {
         let file = await fs.stat(path)
-        this.result.push({ path, size: file.size, last: file.mtimeMs })
+        this.result.push({ path, size: file.size, modify: file.mtimeMs })
     }
 }
