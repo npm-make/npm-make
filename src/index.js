@@ -57,5 +57,5 @@ import process from 'node:process'
 // )
 
 
-let fileList3 = await search.search('C:\\Project\\npm-make', '^.*/minizip/.*\\.c$')
+let fileList3 = await search.search('C:\\Project\\npm-make', ['.*\\.c'])
 console.log(fileList3)

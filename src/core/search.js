@@ -2,8 +2,10 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 
 export default class {
-    static async search(base, pattern) {
-        let regex = new RegExp(pattern)
+    static async search(base, list) {
+        let pattern1 = list.map(item => '^/(' + item + ')$')
+        let pattern2 = pattern1.join('|')
+        let regex = new RegExp(pattern2)
         let output = []
         await this.#searchNext(base, regex, output, '')
         return output
