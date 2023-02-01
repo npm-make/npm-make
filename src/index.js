@@ -1,49 +1,61 @@
 import search from './core/search.js'
 import child_process from 'node:child_process'
+import process from 'node:process'
 
-let decoder = new TextDecoder('gbk')
-let fileList = []
-await search.search(fileList, 'C:\\Project\\npm-make\\zlib', '**/*.c')
+// process.chdir('C:\\Project\\npm-make\\npm-make\\npm_make')
+// let decoder = new TextDecoder('gbk')
+//
+// let fileList = []
+// await search.search(fileList, 'C:\\Project\\npm-make\\zlib', '*.c')
+// for (let file of fileList) {
+//     child_process.execFile('C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.34.31933\\bin\\Hostx64\\x64\\cl.exe',
+//         [
+//             '/nologo',
+//             '-c',
+//             '/D_WIN32',
+//             '/MDd',
+//             '@C:\\Project\\npm-make\\npm-make\\env.cl',
+//             file.path,
+//         ],
+//         {
+//             cwd: 'C:\\Project\\npm-make\\npm-make\\npm_make',
+//             encoding: 'buffer',
+//             env: {
+//                 LIB: 'C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.34.31933\\lib\\x64;' +
+//                     'C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.22000.0\\ucrt\\x64;' +
+//                     'C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.22000.0\\um\\x64'
+//             }
+//         },
+//         (error, stdout, stderr) => {
+//             console.log(file.path + ':\n' + decoder.decode(stdout.buffer))
+//         }
+//     )
+// }
 
-for (let file of fileList) {
-    console.log(file)
+// let fileList2 = []
+// await search.search(fileList2, 'C:\\Project\\npm-make\\npm-make\\npm_make', '*.obj')
+// let fileList3 = fileList2.map(input => input.path)
+//
+// child_process.execFile('C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.34.31933\\bin\\Hostx64\\x64\\cl.exe',
+//     [
+//         '/nologo',
+//         ...fileList3,
+//         '/link',
+//         '/DLL',
+//         '/DEF:C:\\Project\\npm-make\\zlib\\win32\\zlib.def'
+//     ],
+//     {
+//         cwd: 'C:\\Project\\npm-make\\npm-make\\npm_make',
+//         encoding: 'buffer',
+//         env: {
+//             LIB: 'C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.34.31933\\lib\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.22000.0\\ucrt\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.22000.0\\um\\x64'
+//         }
+//     },
+//     (error, stdout, stderr) => {
+//         console.log(decoder.decode(stdout.buffer))
+//     }
+// )
 
-    // child_process.execFile('C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.34.31933\\bin\\Hostx86\\x86\\cl.exe',
-    //     [],
-    //     {
-    //         cwd: 'C:\\Project\\npm-make\\npm-make\\npm_make',
-    //         encoding: 'buffer'
-    //     },
-    //     (error, stdout, stderr) => {
-    //         console.log(decoder.decode(stdout.buffer))
-    //         console.log(decoder.decode(stderr.buffer))
-    //     }
-    // )
-}
 
-/*
-[1/17]
-C:\PROGRA~2\MICROS~3\2022\BUILDT~1\VC\Tools\MSVC\1434~1.319\bin\Hostx86\x86\cl.exe
-/nologo
--DNO_FSEEKO
--DZLIB_DLL
--D_CRT_NONSTDC_NO_DEPRECATE
--D_CRT_SECURE_NO_DEPRECATE
--IC:\Project\npm-make\zlib
--IC:\Project\npm-make\zlib\cmake-build-debug
-/DWIN32
-/D_WINDOWS
-/W3
-/MDd
-/Zi
-/Ob0
-/Od
-/RTC1
-/showIncludes
-/FoCMakeFiles\zlib.dir\compress.obj
-/FdCMakeFiles\zlib.dir\
-/FS
--c
-C:\Project\npm-make\zlib\compress.c
-
- */
+let fileList3 = await search.search('C:\\Project\\npm-make', '^.*/minizip/.*\\.c$')
+console.log(fileList3)
