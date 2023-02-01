@@ -2,9 +2,7 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 
 export default class {
-    result = []
-
-    async search(base, pattern) {
+    static async search(output, base, pattern) {
         let patternSplit = pattern.split(/[/\\]+/)
         let patternMap = patternSplit.map(
             input => {
@@ -23,29 +21,29 @@ export default class {
                 }
             }
         )
-        await this.#searchNext(base, ...patternMap)
+        await this.#searchNext(output, base, ...patternMap)
     }
 
-    async #searchNext(base, patternFirst, ...patternOther) {
+    static async #searchNext(output, base, patternFirst, ...patternOther) {
         try {
             if (patternFirst === undefined) {
-                await this.#appendFile(base)
+                await this.#appendFile(output, base)
             } else if (patternFirst instanceof RegExp) {
-                await this.#searchDir(base, false, patternFirst, ...patternOther)
+                await this.#searchDir(output, base, false, patternFirst, ...patternOther)
             } else if (patternFirst === '**') {
                 if (patternOther.length > 0) {
-                    await this.#searchDir(base, true, null, ...patternOther)
+                    await this.#searchDir(output, base, true, null, ...patternOther)
                 }
             } else {
                 let next = path.join(base, patternFirst)
-                await this.#searchNext(next, ...patternOther)
+                await this.#searchNext(output, next, ...patternOther)
             }
         } catch {
             //这可能是拼写错误导致的，应当提示警告，但也可能是正常扫描过程，难以区分，暂时忽略
         }
     }
 
-    async #searchDir(base, whole, patternFirst, ...patternOther) {
+    static async #searchDir(output, base, whole, patternFirst, ...patternOther) {
         let dir = await fs.opendir(base)
         for await (let item of dir) {
             let isMatch = whole || patternFirst.test(item.name)
@@ -56,25 +54,25 @@ export default class {
                     let isIgnore = /^node_modules|^npm_make|^\./.test(item.name)
                     if (!isIgnore) {
                         if (patternOther.length > 0) {
-                            await this.#searchNext(next, ...patternOther)
+                            await this.#searchNext(output, next, ...patternOther)
                         }
                         if (whole) {
-                            await this.#searchDir(next, true, null, ...patternOther)
+                            await this.#searchDir(output, next, true, null, ...patternOther)
                         }
                     }
                 }
                 let isFile = item.isFile()
                 if (isFile) {
                     if (patternOther.length === 0) {
-                        await this.#appendFile(next, true)
+                        await this.#appendFile(output, next)
                     }
                 }
             }
         }
     }
 
-    async #appendFile(path) {
+    static async #appendFile(output, path) {
         let file = await fs.stat(path)
-        this.result.push({ path, size: file.size, modify: file.mtimeMs })
+        output.push({ path, size: file.size, modify: file.mtimeMs })
     }
 }
