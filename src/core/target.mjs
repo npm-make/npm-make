@@ -65,14 +65,18 @@ export default class {
         if (scope === 'PRIVATE' || scope === 'PUBLIC' || scope === 'INTERFACE') {
             let pattern1 = patternList.map(item => '^/(' + item + ')$')
             let pattern2 = pattern1.join('|')
-            let regex = new RegExp(pattern2)
+            let patternRegex = new RegExp(pattern2)
+            let mismatchList = []
             for (let projectPath of this.projectFileList) {
-                let isMatch = regex.test(projectPath)
+                let isMatch = patternRegex.test(projectPath)
                 if (isMatch) {
-                    let source = path.join(this.basePath, projectPath)
+                    let source = path.resolve(this.basePath, projectPath)
                     this.sourceList.push({ scope, source })
+                } else {
+                    mismatchList.push(projectPath)
                 }
             }
+            this.projectFileList = mismatchList
         }
     }
 }
