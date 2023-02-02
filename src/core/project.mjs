@@ -1,23 +1,25 @@
 import Target from './target.mjs'
 
 export default class {
-    basePath
-    fileList
+    featureList
+    makeModule
     packageList = []
+    projectPath
     targetList = []
 
-    constructor(basePath, fileList) {
-        this.basePath = basePath
-        this.fileList = fileList
+    constructor(projectPath, featureList, makeModule) {
+        this.featureList = featureList
+        this.makeModule = makeModule
+        this.projectPath = projectPath
     }
 
     addTarget(name, ...featureList) {
-        let target = new Target(name, this.basePath, this.fileList, featureList)
+        let target = new Target(name, featureList)
         this.targetList.push(target)
         return target
     }
 
-    usePackage(name, ...flagList) {
-        this.packageList.push({ name, flagList })
+    usePackage(name, ...featureList) {
+        this.packageList.push({ name, featureList })
     }
 }

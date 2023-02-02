@@ -1,7 +1,4 @@
-import path from 'node:path'
-
 export default class {
-    basePath
     compileDefinitionList = []
     compileOptionList = []
     featureList = []
@@ -9,14 +6,11 @@ export default class {
     linkDirectoryList = []
     linkLibraryList = []
     linkOptionList = []
-    sourceList = []
-    sourceShortList
+    sourcePatternList = []
     targetName
 
-    constructor(targetName, basePath, fileList, featureList) {
-        this.basePath = basePath
+    constructor(targetName, featureList) {
         this.targetName = targetName
-        this.sourceShortList = fileList
         this.addFeatures('PRIVATE', ...featureList)
     }
 
@@ -46,8 +40,7 @@ export default class {
 
     addIncludeDirectories(scope, ...directoryList) {
         if (scope === 'PRIVATE' || scope === 'PUBLIC' || scope === 'INTERFACE') {
-            for (let projectPath of directoryList) {
-                let directory = path.resolve(this.basePath, projectPath)
+            for (let directory of directoryList) {
                 this.includeDirectoryList.push({ scope, directory })
             }
         }
@@ -55,8 +48,7 @@ export default class {
 
     addLinkDirectories(scope, ...directoryList) {
         if (scope === 'PRIVATE' || scope === 'PUBLIC' || scope === 'INTERFACE') {
-            for (let projectPath of directoryList) {
-                let directory = path.resolve(this.basePath, projectPath)
+            for (let directory of directoryList) {
                 this.linkDirectoryList.push({ scope, directory })
             }
         }
@@ -80,20 +72,9 @@ export default class {
 
     addSources(scope, ...patternList) {
         if (scope === 'PRIVATE' || scope === 'PUBLIC' || scope === 'INTERFACE') {
-            let pattern1 = patternList.map(item => '^/(' + item + ')$')
-            let pattern2 = pattern1.join('|')
-            let patternRegex = new RegExp(pattern2)
-            let shortList = []
-            for (let projectPath of this.sourceShortList) {
-                let isMatch = patternRegex.test(projectPath)
-                if (isMatch) {
-                    let source = path.resolve(this.basePath, projectPath)
-                    this.sourceList.push({ scope, source })
-                } else {
-                    shortList.push(projectPath)
-                }
+            for (let pattern of patternList) {
+                this.sourcePatternList.push({ scope, pattern })
             }
-            this.sourceShortList = shortList
         }
     }
 }

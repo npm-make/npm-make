@@ -1,13 +1,12 @@
-import search from './search.mjs'
+import url from 'node:url'
+import Project from './project.mjs'
 
 export default class {
-    static async load(base) {
-    }
-
-    static async #loadProject(parent, base, flagList) {
-        let project = Object.create(parent)
-        project.module = await import('file:' + base + '/make.mjs')
-        let result = project.module.default.generate(project, flagList)
+    static async loadProject(projectPath, featureList) {
+        let makeUrl = url.pathToFileURL(projectPath + '/make.mjs')
+        let makeModule = await import(makeUrl)
+        let project = new Project(projectPath, featureList, makeModule)
+        let result = makeModule.default.generate(project)
         if (result instanceof Promise) {
             await result
         }
