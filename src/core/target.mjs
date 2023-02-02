@@ -4,12 +4,14 @@ export default class {
     basePath
     compileDefinitionList = []
     compileOptionList = []
+    featureList = []
     includeDirectoryList = []
     linkDirectoryList = []
     linkLibraryList = []
     linkOptionList = []
-    projectFileList
     sourceList = []
+    targetName
+    waitingList
 
     addCompileDefinitions(scope, ...definitionList) {
         if (scope === 'PRIVATE' || scope === 'PUBLIC' || scope === 'INTERFACE') {
@@ -23,6 +25,14 @@ export default class {
         if (scope === 'PRIVATE' || scope === 'PUBLIC' || scope === 'INTERFACE') {
             for (let option of optionList) {
                 this.compileOptionList.push({ scope, option })
+            }
+        }
+    }
+
+    addFeatures(scope, ...featureList) {
+        if (scope === 'PRIVATE' || scope === 'PUBLIC' || scope === 'INTERFACE') {
+            for (let feature of featureList) {
+                this.featureList.push({ scope, feature })
             }
         }
     }
@@ -66,17 +76,17 @@ export default class {
             let pattern1 = patternList.map(item => '^/(' + item + ')$')
             let pattern2 = pattern1.join('|')
             let patternRegex = new RegExp(pattern2)
-            let mismatchList = []
-            for (let projectPath of this.projectFileList) {
+            let waitingList = []
+            for (let projectPath of this.waitingList) {
                 let isMatch = patternRegex.test(projectPath)
                 if (isMatch) {
                     let source = path.resolve(this.basePath, projectPath)
                     this.sourceList.push({ scope, source })
                 } else {
-                    mismatchList.push(projectPath)
+                    waitingList.push(projectPath)
                 }
             }
-            this.projectFileList = mismatchList
+            this.waitingList = waitingList
         }
     }
 }
