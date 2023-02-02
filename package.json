@@ -2,7 +2,6 @@
   "name": "@npm-make/npm-make",
   "version": "0.0.1",
   "license": "MIT",
-  "type": "module",
   "publishConfig": {
     "registry": "https://registry.npmjs.com/",
     "access": "public"
