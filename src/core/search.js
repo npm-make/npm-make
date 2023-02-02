@@ -1,9 +1,8 @@
 import fs from 'node:fs/promises'
-import path from 'node:path'
 
 export default class {
-    static async search(base, list) {
-        let pattern1 = list.map(item => '^/(' + item + ')$')
+    static async search(base, ...patternList) {
+        let pattern1 = patternList.map(item => '^/(' + item + ')$')
         let pattern2 = pattern1.join('|')
         let regex = new RegExp(pattern2)
         let output = []
@@ -25,8 +24,7 @@ export default class {
             if (isFile) {
                 let isMatch = regex.test(last + '/' + item.name)
                 if (isMatch) {
-                    let next = path.join(base, last, item.name)
-                    output.push(next)
+                    output.push(last + '/' + item.name)
                 }
             }
         }
