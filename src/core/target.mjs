@@ -10,8 +10,15 @@ export default class {
     linkLibraryList = []
     linkOptionList = []
     sourceList = []
+    sourceShortList
     targetName
-    waitingList
+
+    constructor(targetName, basePath, fileList, featureList) {
+        this.basePath = basePath
+        this.targetName = targetName
+        this.sourceShortList = fileList
+        this.addFeatures('PRIVATE', ...featureList)
+    }
 
     addCompileDefinitions(scope, ...definitionList) {
         if (scope === 'PRIVATE' || scope === 'PUBLIC' || scope === 'INTERFACE') {
@@ -76,17 +83,17 @@ export default class {
             let pattern1 = patternList.map(item => '^/(' + item + ')$')
             let pattern2 = pattern1.join('|')
             let patternRegex = new RegExp(pattern2)
-            let waitingList = []
-            for (let projectPath of this.waitingList) {
+            let shortList = []
+            for (let projectPath of this.sourceShortList) {
                 let isMatch = patternRegex.test(projectPath)
                 if (isMatch) {
                     let source = path.resolve(this.basePath, projectPath)
                     this.sourceList.push({ scope, source })
                 } else {
-                    waitingList.push(projectPath)
+                    shortList.push(projectPath)
                 }
             }
-            this.waitingList = waitingList
+            this.sourceShortList = shortList
         }
     }
 }
