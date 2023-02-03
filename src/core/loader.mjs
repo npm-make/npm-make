@@ -1,6 +1,6 @@
 import url from 'node:url'
 import Project from './project.mjs'
-import search from './search.mjs'
+import search from './searchTool.mjs'
 
 export default class {
     static async loadProject(projectPath, featureList) {
@@ -13,31 +13,5 @@ export default class {
         }
         await this.#loadSource(project)
         return project
-    }
-
-    static async #loadSource(project) {
-        await search.searchDir(project.searchResult, project.projectPath, '')
-        for (let target of project.targetList) {
-            await this.#matchSource(project, target, 'PRIVATE')
-            await this.#matchSource(project, target, 'PUBLIC')
-            await this.#matchSource(project, target, 'INTERFACE')
-        }
-    }
-
-    static async #matchSource(project, target, scope) {
-        let patternList = []
-        for (let sourcePattern of target.sourcePatternList) {
-            if (sourcePattern.scope === scope) {
-                patternList.push('^/(' + sourcePattern.pattern + ')$')
-            }
-        }
-        if (patternList.length > 0) {
-            let patternRegex = new RegExp(patternList.join('|'))
-            for (let searchPath of project.searchResult) {
-                if (patternRegex.test(searchPath)) {
-                    target.sourceList.push({ scope, searchPath })
-                }
-            }
-        }
     }
 }

@@ -6,7 +6,7 @@ export default class s {
             let value = feature.substring(index + 1)
             output.set(key, value)
         } else {
-            output.set(feature, true)
+            output.set(feature, '')
         }
     }
 }

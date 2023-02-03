@@ -46,4 +46,15 @@ export default class {
     addSources(...patternList) {
         this.sourcePatternList.push(...patternList)
     }
+
+    __afterSearch(projectFileList) {
+        let pattern1 = this.sourcePatternList.map(item => '^/(' + item + ')$')
+        let pattern2 = pattern1.join('|')
+        let regex = new RegExp(pattern2)
+        for (let projectFile of projectFileList) {
+            if (regex.test(projectFile)) {
+                this.sourceList.push(projectFile)
+            }
+        }
+    }
 }
