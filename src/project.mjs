@@ -5,6 +5,7 @@ export default class {
     makeModule
     packageList = []
     projectPath
+    searchResult = []
     targetList = []
 
     constructor(projectPath, featureList, makeModule) {

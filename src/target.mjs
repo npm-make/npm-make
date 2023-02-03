@@ -6,6 +6,7 @@ export default class {
     linkDirectoryList = []
     linkLibraryList = []
     linkOptionList = []
+    sourceList = []
     sourcePatternList = []
     targetName
 

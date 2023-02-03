@@ -1,13 +1,13 @@
 import fs from 'node:fs/promises'
 
 export default class {
+    static #ignoreDir = /^node_modules|^npm_make|^\./
+
     static async searchDir(output, base, last) {
         let dir = await fs.opendir(base + last)
         for await (let item of dir) {
-            let isDir = item.isDirectory()
-            if (isDir) {
-                let isIgnore = /^node_modules|^npm_make|^\./.test(item.name)
-                if (!isIgnore) {
+            if (item.isDirectory()) {
+                if (!this.#ignoreDir.test(item.name)) {
                     await this.searchDir(output, base, last + '/' + item.name)
                 }
             } else {
