@@ -12,11 +12,11 @@ export default class {
     }
 
     static compileFlag(output, featureTable) {
-        if (featureTable.DEBUG) {
-            if (!featureTable.DEBUG_WITHOUT_RTC) {
+        if ('DEBUG' in featureTable) {
+            if (!'DEBUG_WITHOUT_RTC' in featureTable) {
                 output.push('/RTC1')
             }
-            if (featureTable.STATIC_RUNTIME) {
+            if ('STATIC_RUNTIME' in featureTable) {
                 output.push('/MTd')
             } else {
                 output.push('/MDd')
@@ -24,36 +24,36 @@ export default class {
             output.push('/Od')
             output.push('/Zi')
         } else {
-            if (featureTable.RELEASE_MIN_SIZE) {
+            if ('RELEASE_MIN_SIZE' in featureTable) {
                 output.push('/O1')
             } else {
                 output.push('/O2')
             }
-            if (featureTable.RELEASE_WITH_DEBUG_INFO) {
+            if ('RELEASE_WITH_DEBUG_INFO' in featureTable) {
                 output.push('/Zi')
             }
-            if (featureTable.STATIC_RUNTIME) {
+            if ('STATIC_RUNTIME' in featureTable) {
                 output.push('/MT')
             } else {
                 output.push('/MD')
             }
         }
-        if (featureTable.STANDARD_C11) {
+        if ('STANDARD_C11' in featureTable) {
             output.push('/std:c11')
         }
-        if (featureTable.STANDARD_C17) {
+        if ('STANDARD_C17' in featureTable) {
             output.push('/std:c17')
         }
-        if (featureTable.STANDARD_CXX14) {
+        if ('STANDARD_CXX14' in featureTable) {
             output.push('/std:c++14')
         }
-        if (featureTable.STANDARD_CXX17) {
+        if ('STANDARD_CXX17' in featureTable) {
             output.push('/std:c++17')
         }
-        if (featureTable.STANDARD_CXX20) {
+        if ('STANDARD_CXX20' in featureTable) {
             output.push('/std:c++20')
         }
-        if (featureTable.STANDARD_CXX23) {
+        if ('STANDARD_CXX23' in featureTable) {
             output.push('/std:c++latest')
         }
         output.push('/c')
