@@ -1,4 +1,4 @@
-import featureTool from './featureTool.mjs'
+import argumentTool from './argumentTool.mjs'
 
 export default class {
     compileDefinitionMap = new Map()
@@ -13,7 +13,7 @@ export default class {
 
     addCompileDefinitions(scope, ...definitionList) {
         for (let definition of definitionList) {
-            featureTool.parseFeature(this.compileDefinitionMap, definition)
+            argumentTool.parseArgument(this.compileDefinitionMap, definition)
         }
     }
 
@@ -23,7 +23,7 @@ export default class {
 
     addFeatures(...featureList) {
         for (let feature of featureList) {
-            featureTool.parseFeature(this.featureMap, feature)
+            argumentTool.parseArgument(this.featureMap, feature)
         }
     }
 
