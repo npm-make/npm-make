@@ -4,14 +4,14 @@
 //
 // console.log(ret)
 
-import searchTool from './core/searchTool.mjs'
+import searchTool from './core/search.mjs'
 import Target from './core/target.mjs'
 import path from 'node:path'
-import cpp from './local/msvc/cpp.mjs'
-import detect from './local/msvc/detect.mjs'
-import outputTool from './core/outputTool.mjs'
+import cpp from './toolchain/msvc/cpp.mjs'
+import detect from './system/windows/msvc.mjs'
+import outputTool from './core/output.mjs'
 import child_process from 'node:child_process'
-import language from './local/language.mjs'
+import language from './core/language.mjs'
 
 let projectFileList = []
 await searchTool.searchDir(projectFileList, 'C:\\Project\\npm-make\\zlib', '')
