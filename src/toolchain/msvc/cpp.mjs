@@ -1,17 +1,5 @@
 export default class {
-    static compileC(output, sourcePath, outputPrefix, debugPrefix) {
-        output.push('/Fd' + debugPrefix + '.pdb')
-        output.push('/Fo' + outputPrefix + '.obj')
-        output.push('/Tc' + sourcePath)
-    }
-
-    static compileCXX(output, sourcePath, outputPrefix, debugPrefix) {
-        output.push('/Fd' + debugPrefix + '.pdb')
-        output.push('/Fo' + outputPrefix + '.obj')
-        output.push('/Tp' + sourcePath)
-    }
-
-    static compileFlag(output, featureMap) {
+    static inputFeature(output, featureMap) {
         if (!featureMap.has('ANSI')) {
             output.push('/utf-8')
         }
@@ -41,26 +29,47 @@ export default class {
                 output.push('/MD')
             }
         }
-        if (featureMap.has('STANDARD_C11')) {
-            output.push('/std:c11')
+        switch (featureMap.get('STANDARD_C')) {
+            case '11':
+                output.push('/std:c11')
+                break
+            case '17':
+                output.push('/std:c17')
+                break
         }
-        if (featureMap.has('STANDARD_C17')) {
-            output.push('/std:c17')
-        }
-        if (featureMap.has('STANDARD_CXX14')) {
-            output.push('/std:c++14')
-        }
-        if (featureMap.has('STANDARD_CXX17')) {
-            output.push('/std:c++17')
-        }
-        if (featureMap.has('STANDARD_CXX20')) {
-            output.push('/std:c++20')
-        }
-        if (featureMap.has('STANDARD_CXX23')) {
-            output.push('/std:c++latest')
+        switch (featureMap.get('STANDARD_CXX')) {
+            case '14':
+                output.push('/std:c++14')
+                break
+            case '17':
+                output.push('/std:c++17')
+                break
+            case '20':
+                output.push('/std:c++20')
+                break
+            case '23':
+            case 'latest':
+                output.push('/std:c++latest')
+                break
         }
         output.push('/c')
         output.push('/FS')
         output.push('/nologo')
+    }
+
+    static inputC(output, sourcePath) {
+        output.push('/Tc' + sourcePath)
+    }
+
+    static inputCXX(output, sourcePath) {
+        output.push('/Tp' + sourcePath)
+    }
+
+    static outputObject(output, objectPrefix) {
+        output.push('/Fo' + objectPrefix + '.obj')
+    }
+
+    static outputTarget(output, targetPrefix) {
+        output.push('/Fd' + targetPrefix + '.pdb')
     }
 }
