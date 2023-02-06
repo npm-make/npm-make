@@ -12,6 +12,11 @@ import detect from './system/windows/msvc.mjs'
 import outputTool from './core/output.mjs'
 import child_process from 'node:child_process'
 import language from './core/language.mjs'
+import Project from './core/project.mjs'
+
+let project = new Project('zlib')
+let zlib = project.addTarget('zlib')
+zlib.private.addSource('\\w+\\.c')
 
 let projectFileList = []
 await searchTool.#searchDirextory(projectFileList, 'C:\\Project\\npm-make\\zlib', '')

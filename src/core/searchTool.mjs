@@ -39,9 +39,7 @@ export default class {
     static #searchScope(result, scope) {
         if (scope instanceof Scope) {
             if (scope.sourcePatternList.length > 0) {
-                let pattern1 = scope.sourcePatternList.map(item => '^/(' + item + ')$')
-                let pattern2 = pattern1.join('|')
-                let regex = new RegExp(pattern2)
+                let regex = new RegExp(scope.sourcePatternList.join('|'))
                 for (let item of result) {
                     if (regex.test(item)) {
                         scope.sourceList.push(item)

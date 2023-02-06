@@ -49,6 +49,11 @@ export default class {
     }
 
     addSource(...patternList) {
-        this.sourcePatternList.push(...patternList)
+        for (let pattern of patternList) {
+            let temp1 = pattern.replaceAll(/[|.+^$(){}\[\]\\]/g, '\\$&')
+            let temp2 = temp1.replaceAll('**', '.*')
+            let temp3 = temp2.replaceAll('*?', '[^/\\]*')
+            this.sourcePatternList.push('^/(' + temp3 + ')$')
+        }
     }
 }
