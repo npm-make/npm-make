@@ -1,26 +1,25 @@
-import Target from './scope.mjs'
+import Target from './target.mjs'
 
 export default class {
     featureList
-    makeModule
     packageList = []
+    projectFileList = []
+    projectName
     projectPath
-    searchResult = []
     targetList = []
 
-    constructor(projectPath, featureList, makeModule) {
+    constructor(projectName, ...featureList) {
+        this.projectName = projectName
         this.featureList = featureList
-        this.makeModule = makeModule
-        this.projectPath = projectPath
     }
 
-    addTarget(name, ...featureList) {
-        let target = new Target(name, featureList)
+    addTarget(targetName, ...featureList) {
+        let target = new Target(targetName, featureList)
         this.targetList.push(target)
         return target
     }
 
-    usePackage(name, ...featureList) {
-        this.packageList.push({ name, featureList })
+    usePackage(packageName, ...featureList) {
+        this.packageList.push({ packageName, featureList })
     }
 }

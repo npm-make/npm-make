@@ -4,7 +4,7 @@
 //
 // console.log(ret)
 
-import searchTool from './core/search.mjs'
+import searchTool from './core/searchTool.mjs'
 import Target from './core/scope.mjs'
 import path from 'node:path'
 import cpp from './toolchain/msvc/cpp.mjs'
@@ -14,7 +14,7 @@ import child_process from 'node:child_process'
 import language from './core/language.mjs'
 
 let projectFileList = []
-await searchTool.searchDir(projectFileList, 'C:\\Project\\npm-make\\zlib', '')
+await searchTool.#searchDirextory(projectFileList, 'C:\\Project\\npm-make\\zlib', '')
 
 let target = new Target()
 target.addSources('\\w+\\.c')
