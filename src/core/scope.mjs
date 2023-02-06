@@ -1,0 +1,67 @@
+import argumentTool from './argumentTool.mjs'
+
+export default class {
+    compileOptionList = []
+    definitionTable = {}
+    dependencyList = []
+    featureTable = {}
+    includeDirectoryList = []
+    libraryList = []
+    linkDirectoryList = []
+    linkOptionList = []
+    sourceList = []
+    sourcePatternList = []
+
+    addCompileOption(...optionList) {
+        this.compileOptionList.push(...optionList)
+    }
+
+    addDefinition(...definitionList) {
+        for (let definition of definitionList) {
+            argumentTool.parseArgument(this.definitionTable, definition)
+        }
+    }
+
+    addDependency(...dependencyList) {
+        this.dependencyList.push(...dependencyList)
+    }
+
+    addFeature(...featureList) {
+        for (let feature of featureList) {
+            argumentTool.parseArgument(this.featureTable, feature)
+        }
+    }
+
+    addIncludeDirectory(...directoryList) {
+        this.includeDirectoryList.push(...directoryList)
+    }
+
+    addLibrary(...libraryList) {
+        this.libraryList.push(...libraryList)
+    }
+
+    addLinkDirectory(...directoryList) {
+        this.linkDirectoryList.push(...directoryList)
+    }
+
+    addLinkOption(...optionList) {
+        this.linkOptionList.push(...optionList)
+    }
+
+    addSource(...patternList) {
+        this.sourcePatternList.push(...patternList)
+    }
+
+    __afterSearch(projectFileList) {
+        if (this.sourcePatternList.length > 0) {
+            let pattern1 = this.sourcePatternList.map(item => '^/(' + item + ')$')
+            let pattern2 = pattern1.join('|')
+            let regex = new RegExp(pattern2)
+            for (let projectFile of projectFileList) {
+                if (regex.test(projectFile)) {
+                    this.sourceList.push(projectFile)
+                }
+            }
+        }
+    }
+}
