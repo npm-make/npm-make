@@ -6,6 +6,7 @@ export default class {
     dependencyList = []
     featureTable = {}
     includeDirectoryList = []
+    interfaceIncludeDirectoryList = []
     libraryList = []
     linkDirectoryList = []
     linkOptionList = []
@@ -35,6 +36,10 @@ export default class {
 
     addIncludeDirectory(...directoryList) {
         this.includeDirectoryList.push(...directoryList)
+    }
+
+    addInterfaceIncludeDirectory(...directoryList) {
+        this.interfaceIncludeDirectoryList.push(...directoryList)
     }
 
     addLibrary(...libraryList) {
