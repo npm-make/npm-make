@@ -1,4 +1,4 @@
-import Target from './target.mjs'
+import Target from './scope.mjs'
 
 export default class {
     featureList

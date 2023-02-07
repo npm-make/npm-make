@@ -5,7 +5,7 @@
 // console.log(ret)
 
 import searchTool from './core/searchTool.mjs'
-import Target from './core/target.mjs'
+import Target from './core/scope.mjs'
 import path from 'node:path'
 import cpp from './toolchain/msvc/cpp.mjs'
 import detect from './system/windows/msvc.mjs'
