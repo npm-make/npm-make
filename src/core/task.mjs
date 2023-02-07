@@ -20,7 +20,7 @@ export default class Task {
             await Promise.all(promiseList)
         }
         if (!this.successPromise) {
-            if (Task.concurrentSet.size >= Task.concurrentLimit) {
+            while (Task.concurrentSet.size >= Task.concurrentLimit) {
                 await Promise.race(Task.concurrentSet)
             }
             this.successPromise = this.runTaskForce(callback)
