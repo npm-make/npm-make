@@ -14,7 +14,9 @@ export default class {
     }
 
     addTarget(targetName, ...featureList) {
-        let target = new Target(targetName, featureList)
+        let target = new Target()
+        target.targetName = targetName
+        target.addFeature(...featureList)
         this.targetList.push(target)
         return target
     }
