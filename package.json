@@ -7,6 +7,6 @@
     "access": "public"
   },
   "devDependencies": {
-    "@types/node": "^18.11.18"
+    "@types/node": "^18.11.19"
   }
 }

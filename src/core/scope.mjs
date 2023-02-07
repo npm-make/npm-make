@@ -9,9 +9,8 @@ export default class {
     libraryList = []
     linkDirectoryList = []
     linkOptionList = []
-    projectFileList
     sourceList = []
-    targetName
+    sourcePatternList = []
 
     addCompileOption(...optionList) {
         this.compileOptionList.push(...optionList)
@@ -54,13 +53,6 @@ export default class {
     }
 
     addSourcePattern(...patternList) {
-        for (let pattern of patternList) {
-            let regex = new RegExp(pattern)
-            for (let projectFile of this.projectFileList) {
-                if (regex.test(projectFile)) {
-                    this.sourceList.push(projectFile)
-                }
-            }
-        }
+        this.sourcePatternList.push(...patternList)
     }
 }
