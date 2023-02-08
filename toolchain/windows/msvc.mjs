@@ -38,7 +38,6 @@ export default class Self {
             for await (let instance of instanceDir) {
                 let statePath = path.join(instanceDir.path, instance.name, 'state.json')
                 let stateJson = JSON.parse(await fs.readFile(statePath, 'utf-8'))
-                //noinspection JSUnresolvedVariable
                 await this.#detectMsvcRoot(msvcList, localMachine, targetMachine, stateJson.installationPath)
             }
         } catch {
