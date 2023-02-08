@@ -1,112 +1,77 @@
-import child_process from 'node:child_process'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import process from 'node:process'
 
-class Msvc {
-    executeCL
-    includeList = []
-    libraryList = []
-    version
-
-    constructor(localMachine, targetMachine, installPath, version) {
-        this.version = version
-        this.executeCL = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'cl.exe')
-        this.includeList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'include'))
-        this.includeList.push(path.join(installPath, 'VC', 'Auxiliary', 'VS', 'include'))
-        this.libraryList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'lib', targetMachine))
-    }
-}
-
-class Sdk {
-}
-
 export default class Self {
-    msvcList = []
-    sdkList = []
+    static selected
 
-    async detect(localMachine, targetMachine) {
-        await this.#detectSdk(localMachine, targetMachine)
-    }
-
-    async #detectMsvc(localMachine, targetMachine) {
-        let instanceDir = await fs.opendir('C:\\ProgramData\\Microsoft\\VisualStudio\\Packages\\_Instances')
-        for await (let instance of instanceDir) {
-            let statePath = path.join(instanceDir.path, instance.name, 'state.json')
-            let stateText = await fs.readFile(statePath, 'utf-8')
-            let stateJson = JSON.parse(stateText)
-            let versionPath = path.join(stateJson.installationPath, 'VC', 'Tools', 'MSVC')
-            let versionDir = await fs.opendir(versionPath)
-            for await (let version of versionDir) {
-                this.msvcList.push(new Msvc(localMachine, targetMachine, stateJson.installationPath, version))
-            }
-        }
-    }
-
-    async #detectSdk(localMachine, targetMachine) {
+    static async selectMsvc(targetMachine, expectVersion) {
+        let msvcList = []
         switch (process.arch) {
+            case 'ia32':
+                await this.#detectMsvc(msvcList, 'x86', targetMachine)
+                break
             case 'x64':
-                rootDir = await fs.opendir('C:\\Program Files\\Windows Kits')
+                await this.#detectMsvc(msvcList, 'x64', targetMachine)
+                break
         }
+        if (msvcList.length > 0) {
+            if (expectVersion) {
+                for (let msvcItem of msvcList) {
+                    if (msvcItem.version === expectVersion) {
+                        this.selected = msvcItem
+                        return
+                    }
+                }
+                throw new Error('MSVC specified version not found')
+            } else {
+                this.selected = msvcList.at(-1)
+            }
+        } else {
+            throw new Error('MSVC not found')
+        }
+    }
 
+    static async #detectMsvc(msvcList, localMachine, targetMachine) {
         try {
-            let rootDir
-            await this.#detectSdkRoot(localMachine, targetMachine, rootDir)
+            let instanceDir = await fs.opendir('C:\\ProgramData\\Microsoft\\VisualStudio\\Packages\\_Instances')
+            for await (let instance of instanceDir) {
+                let statePath = path.join(instanceDir.path, instance.name, 'state.json')
+                let stateJson = JSON.parse(await fs.readFile(statePath, 'utf-8'))
+                //noinspection JSUnresolvedVariable
+                await this.#detectMsvcRoot(msvcList, localMachine, targetMachine, stateJson.installationPath)
+            }
         } catch {
         }
+    }
+
+    static async #detectMsvcRoot(msvcList, localMachine, targetMachine, rootPath) {
         try {
-            let rootDir = await fs.opendir('C:\\Program Files (x86)\\Windows Kits')
-            await this.#detectSdkRoot(localMachine, targetMachine, rootDir)
+            let versionDir = await fs.opendir(path.join(rootPath, 'VC', 'Tools', 'MSVC'))
+            for await (let versionItem of versionDir) {
+                await this.#detectMsvcVersion(msvcList, localMachine, targetMachine, rootPath, versionItem.name)
+            }
         } catch {
         }
     }
 
-    async #detectSdkRoot(localMachine, targetMachine, rootPath) {
-        for await (let rootItem of rootDir) {
-            try {
-                let rootPath = path.join(rootDir.path, rootItem.name)
-                let includePath = path.join(rootDir.path, rootItem.name, 'Include')
-                let includeDir = await fs.opendir(includePath)
-                for await (let versionItem of includeDir) {
-                    await this.#detectSdkVersion(localMachine, targetMachine, rootPath, versionItem.name)
-                }
-            } catch {
-            }
-        }
+    static async #detectMsvcVersion(msvcList, localMachine, targetMachine, rootPath, version) {
+        let msvcItem = {}
+        msvcItem.version = version
+        msvcItem.executeCL = path.join(rootPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'cl.exe')
+        msvcItem.includeList = []
+        msvcItem.libraryList = []
+        await this.#detectMsvcInclude(msvcItem.includeList, rootPath, version)
+        await this.#detectMsvcLibrary(msvcItem.libraryList, targetMachine, rootPath, version)
+        msvcList.push(msvcItem)
     }
 
-    async #detectSdkVersion(localMachine, targetMachine, rootPath, version) {
-        let sdkItem = {}
-        sdkItem.version = version
-        sdkItem.executeRC = path.join(rootPath, 'bin', version, localMachine, 'rc.exe')
-        sdkItem.includeList = []
-        sdkItem.libraryList = []
-        await this.#detectSdkInclude(rootPath, version, sdkItem.includeList)
-        await this.#detectSdkLibrary(targetMachine, rootPath, version, sdkItem.libraryList)
-        this.sdkList.push(sdkItem)
+    static async #detectMsvcInclude(includeList, rootPath, version) {
+        includeList.push(path.join(rootPath, 'VC', 'Tools', 'MSVC', version, 'include'))
+        includeList.push(path.join(rootPath, 'VC', 'Auxiliary', 'VS', 'include'))
     }
 
-    async #detectSdkInclude(rootPath, version, output) {
-        let includeDir = await fs.opendir(path.join(rootPath, 'Include', version))
-        for await (let includeItem of includeDir) {
-            output.push(path.join(includeDir.path, includeItem.name))
-        }
-    }
-
-    async #detectSdkLibrary(targetMachine, rootPath, version, output) {
-        let libraryDir = await fs.opendir(path.join(rootPath, 'Lib', version))
-        for await (let libraryItem of libraryDir) {
-            let machineDir = await fs.opendir(path.join(libraryDir.path, libraryItem.name))
-            for await (let machineItem of machineDir) {
-                if (machineItem.name === targetMachine) {
-                    output.push(path.join(machineDir.path, machineItem.name))
-                }
-            }
-        }
+    static async #detectMsvcLibrary(libraryList, targetMachine, rootPath, version) {
+        libraryList.push(path.join(rootPath, 'VC', 'Tools', 'MSVC', version, 'lib', targetMachine))
     }
 }
-
-let ret = new Self()
-await ret.detect('x64', 'x64')
-
-console.log(ret)
