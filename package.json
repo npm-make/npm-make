@@ -1,6 +1,6 @@
 {
   "name": "@npm-make/npm-make",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "license": "MIT",
   "bin": {
     "npm-make": "index.mjs"
