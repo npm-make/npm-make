@@ -15,4 +15,8 @@ export default class {
             }
         }
     }
+
+    static async searchProject(project) {
+
+    }
 }

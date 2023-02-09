@@ -9,12 +9,12 @@ export default class Task {
     executeFlagList = []
     successPromise
 
-    async runTask(callback) {
+    async runTask() {
         if (this.dependencyList.length > 0) {
             let promiseList = []
             for (let dependency of this.dependencyList) {
                 if (dependency instanceof Task) {
-                    promiseList.push(dependency.runTask(callback))
+                    promiseList.push(dependency.runTask())
                 }
             }
             await Promise.all(promiseList)
@@ -23,26 +23,27 @@ export default class Task {
             while (Task.concurrentSet.size >= Task.concurrentLimit) {
                 await Promise.race(Task.concurrentSet)
             }
-            this.successPromise = this.runTaskForce(callback)
+            this.successPromise = this.runTaskForce()
         }
         return this.successPromise
     }
 
-    async runTaskForce(callback) {
+    async runTaskForce() {
         let result = new Promise((resolve, reject) => {
             child_process.execFile(
                 this.executeFile,
                 this.executeFlagList,
                 {
                     cwd: this.executeDictionary,
-                    encoding: 'buffer',
+                    encoding: 'utf-8',
                 },
                 (error, stdout, stderr) => {
                     Task.concurrentSet.delete(result)
-                    let success = callback(this, error, stdout, stderr)
-                    if (success) {
+                    if (error) {
+                        console.log(stdout)
                         resolve()
                     } else {
+                        console.log(stderr)
                         reject()
                     }
                 }

@@ -1,12 +1,13 @@
 import Target from './target.mjs'
 
-export default class {
+export default class Project {
     targetList = []
+    featureTable
 
     addTarget(targetName, ...featureList) {
         let target = new Target()
         target.targetName = targetName
-        target.private.addFeature(...featureList)
+        target.addFeature(...featureList)
         this.targetList.push(target)
         return target
     }
