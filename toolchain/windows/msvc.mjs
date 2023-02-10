@@ -82,26 +82,26 @@ export default class Self {
         msvcItem.libraryList = []
         msvcItem.includeList.push(path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'include'))
         if (targetMachine === 'x86') {
+            msvcItem.libraryList.push(path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'lib'))
             if (localMachine === 'x86') {
                 msvcItem.executeCL = path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'bin', 'cl.exe')
             } else {
                 msvcItem.executeCL = path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'bin', 'amd64_x86', 'cl.exe')
             }
-            msvcItem.libraryList.push(path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'lib'))
         } else if (targetMachine === 'x64') {
+            msvcItem.libraryList.push(path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'lib', 'amd64'))
             if (localMachine === 'x86') {
                 msvcItem.executeCL = path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'bin', 'x86_amd64', 'cl.exe')
             } else {
                 msvcItem.executeCL = path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'bin', 'amd64', 'cl.exe')
             }
-            msvcItem.libraryList.push(path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'lib', 'amd64'))
         } else if (targetMachine === 'arm') {
+            msvcItem.libraryList.push(path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'lib', 'arm'))
             if (localMachine === 'x86') {
                 msvcItem.executeCL = path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'bin', 'x86_arm', 'cl.exe')
             } else {
                 msvcItem.executeCL = path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'bin', 'amd64_arm', 'cl.exe')
             }
-            msvcItem.libraryList.push(path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'lib', 'arm'))
         } else {
             return undefined
         }
