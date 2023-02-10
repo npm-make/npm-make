@@ -18,14 +18,14 @@ export default class Self {
         if (installPath) {
             let version = await this.#detectSdkVersion(installPath, expectVersion)
             if (version) {
-                this.selected = this.#detectSdk(localMachine, targetMachine, installPath, version)
+                this.selected = await this.#detectSdk(localMachine, targetMachine, installPath, version)
             }
         } else {
             let installList = await this.#detectSdkInstall(installRoot)
             for (let thisPath of installList) {
                 let version = await this.#detectSdkVersion(thisPath, expectVersion)
                 if (version) {
-                    this.selected = this.#detectSdk(localMachine, targetMachine, thisPath, version)
+                    this.selected = await this.#detectSdk(localMachine, targetMachine, thisPath, version)
                     break
                 }
             }

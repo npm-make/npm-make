@@ -18,14 +18,14 @@ export default class Self {
         if (installPath) {
             let version = await this.#detectMsvcVersion(installPath, expectVersion)
             if (version) {
-                this.selected = this.#detectMsvc(localMachine, targetMachine, installPath, version)
+                this.selected = await this.#detectMsvc(localMachine, targetMachine, installPath, version)
             }
         } else {
             let installList = await this.#detectMsvcInstall()
             for (let thisPath of installList) {
                 let version = await this.#detectMsvcVersion(thisPath, expectVersion)
                 if (version) {
-                    this.selected = this.#detectMsvc(localMachine, targetMachine, thisPath, version)
+                    this.selected = await this.#detectMsvc(localMachine, targetMachine, thisPath, version)
                     break
                 }
             }
