@@ -4,6 +4,7 @@ import argumentTool from './argumentTool.mjs'
  * @namespace core
  */
 export default class Target {
+    static targetMap = new Map()
     compileOptionList = []
     definitionTable = {}
     dependencyList = []
@@ -15,5 +16,4 @@ export default class Target {
     sourceList = []
     sourcePatternList = []
     targetName
-
 }
