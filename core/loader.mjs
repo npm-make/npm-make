@@ -6,7 +6,7 @@ export default class {
     static async loadProject(projectPath, featureTable) {
         let makeUrl = url.pathToFileURL(projectPath + '/make.mjs')
         let makeModule = await import(makeUrl)
-        let project = new Project()
+        let project = new Project
         project.featureTable = featureTable
         let result = makeModule.default.generate(project)
         if (result instanceof Promise) {

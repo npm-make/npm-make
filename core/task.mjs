@@ -2,7 +2,7 @@ import child_process from 'node:child_process'
 
 export default class Task {
     static concurrentLimit = 10
-    static concurrentSet = new Set()
+    static concurrentSet = new Set
     dependencyList = []
     executeDictionary
     executeFile

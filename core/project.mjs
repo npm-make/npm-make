@@ -4,18 +4,14 @@ import Target from './target.mjs'
  * @namespace core
  */
 export default class Project {
-    static projectMap = new Map()
-    featureTable
+    featureMap = new Map
+    targetList = []
 
-    addExecute(executeName, ...featureList) {
-    }
-
-    addImported(importedName, ...featureList) {
-    }
-
-    addSharedLibrary(libraryName, ...featureList) {
-    }
-
-    addStaticLibrary(libraryName, ...featureList) {
+    addTarget(targetName, ...featureList) {
+        let target = new Target
+        target.targetName = targetName
+        target.addFeature(...featureList)
+        this.targetList.push(target)
+        return target
     }
 }

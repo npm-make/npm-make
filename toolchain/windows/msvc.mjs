@@ -5,72 +5,78 @@ import process from 'node:process'
 export default class Self {
     static selected
 
-    static async selectMsvc(targetMachine, expectVersion) {
-        let msvcList = []
+    static async selectMsvc(targetMachine, installPath, expectVersion) {
         switch (process.arch) {
             case 'ia32':
-                await this.#detectMsvc(msvcList, 'x86', targetMachine)
-                break
+                return this.#selectMsvc('x86', targetMachine, installPath, expectVersion)
             case 'x64':
-                await this.#detectMsvc(msvcList, 'x64', targetMachine)
-                break
-        }
-        if (msvcList.length > 0) {
-            if (expectVersion) {
-                for (let msvcItem of msvcList) {
-                    if (msvcItem.version === expectVersion) {
-                        this.selected = msvcItem
-                        return
-                    }
-                }
-                throw new Error('MSVC specified version not found')
-            } else {
-                this.selected = msvcList.at(-1)
-            }
-        } else {
-            throw new Error('MSVC not found')
+                return this.#selectMsvc('x64', targetMachine, installPath, expectVersion)
         }
     }
 
-    static async #detectMsvc(msvcList, localMachine, targetMachine) {
+    static async #selectMsvc(localMachine, targetMachine, installPath, expectVersion) {
+        if (installPath) {
+            let version = await this.#detectMsvcVersion(installPath, expectVersion)
+            if (version) {
+                this.selected = this.#detectMsvc(localMachine, targetMachine, installPath, version)
+            }
+        } else {
+            let installList = await this.#detectMsvcInstall()
+            for (let thisPath of installList) {
+                let version = await this.#detectMsvcVersion(thisPath, expectVersion)
+                if (version) {
+                    this.selected = this.#detectMsvc(localMachine, targetMachine, thisPath, version)
+                    break
+                }
+            }
+        }
+        return this.selected
+    }
+
+    static async #detectMsvcInstall() {
         try {
+            let installList = []
             let instanceDir = await fs.opendir('C:\\ProgramData\\Microsoft\\VisualStudio\\Packages\\_Instances')
             for await (let instance of instanceDir) {
                 let statePath = path.join(instanceDir.path, instance.name, 'state.json')
                 let stateJson = JSON.parse(await fs.readFile(statePath, 'utf-8'))
-                await this.#detectMsvcRoot(msvcList, localMachine, targetMachine, stateJson.installationPath)
+                //noinspection JSUnresolvedVariable
+                installList.push(stateJson.installationPath)
             }
+            return installList
         } catch {
         }
     }
 
-    static async #detectMsvcRoot(msvcList, localMachine, targetMachine, rootPath) {
+    static async #detectMsvcVersion(installPath, expectVersion) {
         try {
-            let versionDir = await fs.opendir(path.join(rootPath, 'VC', 'Tools', 'MSVC'))
+            let versionDir = await fs.opendir(path.join(installPath, 'VC', 'Tools', 'MSVC'))
             for await (let versionItem of versionDir) {
-                await this.#detectMsvcVersion(msvcList, localMachine, targetMachine, rootPath, versionItem.name)
+                if (!expectVersion || expectVersion === versionItem.name) {
+                    return versionItem.name
+                }
             }
         } catch {
         }
     }
 
-    static async #detectMsvcVersion(msvcList, localMachine, targetMachine, rootPath, version) {
+    static async #detectMsvc(localMachine, targetMachine, installPath, version) {
         let msvcItem = {}
         msvcItem.version = version
-        msvcItem.executeCL = path.join(rootPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'cl.exe')
+        msvcItem.executeCL = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'cl.exe')
         msvcItem.includeList = []
         msvcItem.libraryList = []
-        await this.#detectMsvcInclude(msvcItem.includeList, rootPath, version)
-        await this.#detectMsvcLibrary(msvcItem.libraryList, targetMachine, rootPath, version)
-        msvcList.push(msvcItem)
+        await this.#detectMsvcInclude(msvcItem.includeList, installPath, version)
+        await this.#detectMsvcLibrary(msvcItem.libraryList, targetMachine, installPath, version)
+        return msvcItem
     }
 
-    static async #detectMsvcInclude(includeList, rootPath, version) {
-        includeList.push(path.join(rootPath, 'VC', 'Tools', 'MSVC', version, 'include'))
-        includeList.push(path.join(rootPath, 'VC', 'Auxiliary', 'VS', 'include'))
+    static async #detectMsvcInclude(includeList, installPath, version) {
+        includeList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'include'))
+        includeList.push(path.join(installPath, 'VC', 'Auxiliary', 'VS', 'include'))
     }
 
-    static async #detectMsvcLibrary(libraryList, targetMachine, rootPath, version) {
-        libraryList.push(path.join(rootPath, 'VC', 'Tools', 'MSVC', version, 'lib', targetMachine))
+    static async #detectMsvcLibrary(libraryList, targetMachine, installPath, version) {
+        libraryList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'lib', targetMachine))
     }
 }
