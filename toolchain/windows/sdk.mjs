@@ -89,17 +89,19 @@ export default class Self {
         sdkItem.version = '7.1A'
         sdkItem.includeList = []
         sdkItem.libraryList = []
-        if (localMachine === 'x64') {
-            sdkItem.executeRC = path.join(programRoot, 'Microsoft SDKs', 'Windows', 'v7.1A', 'Bin', 'x64', 'RC.exe')
-        } else {
+        sdkItem.includeList.push(path.join(programRoot, 'Microsoft SDKs', 'Windows', 'v7.1A', 'Include'))
+        if (localMachine === 'x86') {
             sdkItem.executeRC = path.join(programRoot, 'Microsoft SDKs', 'Windows', 'v7.1A', 'Bin', 'RC.exe')
+        } else {
+            sdkItem.executeRC = path.join(programRoot, 'Microsoft SDKs', 'Windows', 'v7.1A', 'Bin', 'x64', 'RC.exe')
         }
-        if (targetMachine === 'x64') {
+        if (targetMachine === 'x86') {
+            sdkItem.libraryList.push(path.join(programRoot, 'Microsoft SDKs', 'Windows', 'v7.1A', 'Lib'))
+        } else if (targetMachine === 'x64') {
             sdkItem.libraryList.push(path.join(programRoot, 'Microsoft SDKs', 'Windows', 'v7.1A', 'Lib', 'x64'))
         } else {
-            sdkItem.libraryList.push(path.join(programRoot, 'Microsoft SDKs', 'Windows', 'v7.1A', 'Lib'))
+            return undefined
         }
-        sdkItem.includeList.push(path.join(programRoot, 'Microsoft SDKs', 'Windows', 'v7.1A', 'Include'))
         return sdkItem
     }
 }
