@@ -5,27 +5,24 @@ import process from 'node:process'
 export default class Self {
     static selected
 
-    static async selectSdk(targetMachine, installPath, expectVersion) {
+    static async selectSdk(targetMachine, expectVersion) {
         switch (process.arch) {
             case 'ia32':
-                return this.#selectSdk('C:\\Program Files\\Windows Kits', 'x86', targetMachine, installPath, expectVersion)
+                return this.#selectSdk('C:\\Program Files', 'x86', targetMachine, expectVersion)
             case 'x64':
-                return this.#selectSdk('C:\\Program Files (x86)\\Windows Kits', 'x64', targetMachine, installPath, expectVersion)
+                return this.#selectSdk('C:\\Program Files (x86)', 'x64', targetMachine, expectVersion)
         }
     }
 
-    static async #selectSdk(installRoot, localMachine, targetMachine, installPath, expectVersion) {
-        if (installPath) {
-            let version = await this.#detectSdkVersion(installPath, expectVersion)
-            if (version) {
-                this.selected = await this.#detectSdk(localMachine, targetMachine, installPath, version)
-            }
+    static async #selectSdk(programRoot, localMachine, targetMachine, expectVersion) {
+        if (expectVersion === '7.1A') {
+            this.selected = this.#detectSdk71A(programRoot, localMachine, targetMachine)
         } else {
-            let installList = await this.#detectSdkInstall(installRoot)
-            for (let thisPath of installList) {
-                let version = await this.#detectSdkVersion(thisPath, expectVersion)
+            let installList = await this.#detectSdkInstall(programRoot)
+            for (let installPath of installList) {
+                let version = await this.#detectSdkVersion(installPath, expectVersion)
                 if (version) {
-                    this.selected = await this.#detectSdk(localMachine, targetMachine, thisPath, version)
+                    this.selected = await this.#detectSdk(installPath, localMachine, targetMachine, version)
                     break
                 }
             }
@@ -33,10 +30,10 @@ export default class Self {
         return this.selected
     }
 
-    static async #detectSdkInstall(installRoot) {
+    static async #detectSdkInstall(programRoot) {
         try {
             let installList = []
-            let installDir = await fs.opendir(installRoot)
+            let installDir = await fs.opendir(path.join(programRoot, 'Windows Kits'))
             for await (let installItem of installDir) {
                 installList.push(path.join(installDir.path, installItem.name))
             }
@@ -57,12 +54,12 @@ export default class Self {
         }
     }
 
-    static async #detectSdk(localMachine, targetMachine, installPath, version) {
+    static async #detectSdk(installPath, localMachine, targetMachine, version) {
         let sdkItem = {}
         sdkItem.version = version
-        sdkItem.executeRC = path.join(installPath, 'bin', version, localMachine, 'rc.exe')
         sdkItem.includeList = []
         sdkItem.libraryList = []
+        sdkItem.executeRC = path.join(installPath, 'bin', version, localMachine, 'rc.exe')
         await this.#detectSdkInclude(sdkItem.includeList, installPath, version)
         await this.#detectSdkLibrary(sdkItem.libraryList, targetMachine, installPath, version)
         return sdkItem
@@ -85,5 +82,24 @@ export default class Self {
                 }
             }
         }
+    }
+
+    static #detectSdk71A(programRoot, localMachine, targetMachine) {
+        let sdkItem = {}
+        sdkItem.version = '7.1A'
+        sdkItem.includeList = []
+        sdkItem.libraryList = []
+        if (localMachine === 'x64') {
+            sdkItem.executeRC = path.join(programRoot, 'Microsoft SDKs', 'Windows', 'v7.1A', 'Bin', 'x64', 'RC.exe')
+        } else {
+            sdkItem.executeRC = path.join(programRoot, 'Microsoft SDKs', 'Windows', 'v7.1A', 'Bin', 'RC.exe')
+        }
+        if (targetMachine === 'x64') {
+            sdkItem.libraryList.push(path.join(programRoot, 'Microsoft SDKs', 'Windows', 'v7.1A', 'Lib', 'x64'))
+        } else {
+            sdkItem.libraryList.push(path.join(programRoot, 'Microsoft SDKs', 'Windows', 'v7.1A', 'Lib'))
+        }
+        sdkItem.includeList.push(path.join(programRoot, 'Microsoft SDKs', 'Windows', 'v7.1A', 'Include'))
+        return sdkItem
     }
 }
