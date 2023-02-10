@@ -1,11 +1,12 @@
-export default class {
+export default class Self {
     static parseArgument(output, argument) {
         let index = argument.indexOf('=')
         if (index >= 0) {
             let key = argument.substring(0, index)
-            output[key] = argument.substring(index + 1)
+            let value = argument.substring(index + 1)
+            output.set(key, value)
         } else {
-            output[argument] = ''
+            output.set(argument, '')
         }
     }
 }

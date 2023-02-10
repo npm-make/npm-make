@@ -1,17 +1,18 @@
 import process from 'node:process'
 import command from './core/command.mjs'
+import argumentTool from './core/argumentTool.mjs'
 
 let inputList = process.argv.slice(2)
-let beforeMethod = []
+let beforeMethod = new Map
 let method = null
-let afterMethod = []
+let afterMethod = new Map
 for (let input of inputList) {
     if (method) {
-        afterMethod.push(input)
+        argumentTool.parseArgument(afterMethod, input)
     } else if (input in command) {
         method = input
     } else {
-        beforeMethod.push(input)
+        argumentTool.parseArgument(beforeMethod, input)
     }
 }
 if (method) {
