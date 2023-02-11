@@ -15,7 +15,7 @@ export default class Self {
     }
 
     static async #selectSdk(programRoot, localMachine, targetMachine, expectVersion) {
-        if (expectVersion === '7.1A') {
+        if (expectVersion === 'v7.1A') {
             this.selected = this.#detectSdk71A(programRoot, localMachine, targetMachine)
         } else {
             let installList = await this.#detectSdkInstall(programRoot)
@@ -86,7 +86,7 @@ export default class Self {
 
     static #detectSdk71A(programRoot, localMachine, targetMachine) {
         let sdkItem = {}
-        sdkItem.version = '7.1A'
+        sdkItem.version = 'v7.1A'
         sdkItem.includeList = []
         sdkItem.libraryList = []
         sdkItem.includeList.push(path.join(programRoot, 'Microsoft SDKs', 'Windows', 'v7.1A', 'Include'))

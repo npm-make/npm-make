@@ -16,7 +16,7 @@ export default class Self {
     }
 
     static async #selectMsvc(programRoot, localMachine, targetMachine, expectVersion) {
-        if (expectVersion === '140xp') {
+        if (expectVersion === 'v140xp') {
             this.selected = await this.#detectMsvc140xp(programRoot, localMachine, targetMachine)
         } else {
             let installList = await this.#detectMsvcInstall()
@@ -77,7 +77,7 @@ export default class Self {
 
     static async #detectMsvc140xp(programRoot, localMachine, targetMachine) {
         let msvcItem = {}
-        msvcItem.version = '140xp'
+        msvcItem.version = 'v140xp'
         msvcItem.includeList = []
         msvcItem.libraryList = []
         msvcItem.includeList.push(path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'include'))
