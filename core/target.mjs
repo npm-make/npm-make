@@ -15,6 +15,7 @@ export default class Target {
     sourceList = []
     sourcePatternList = []
     targetName
+    objectPath
 
     addCompileOption(...optionList) {
         this.compileOptionList.push(...optionList)

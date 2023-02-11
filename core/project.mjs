@@ -5,7 +5,12 @@ import Target from './target.mjs'
  */
 export default class Project {
     featureMap = new Map
+    /**
+     * @type {core.Target[]}
+     */
     targetList = []
+    projectFileList = []
+    projectPath
 
     addTarget(targetName, ...featureList) {
         let target = new Target

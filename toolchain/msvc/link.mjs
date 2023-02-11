@@ -36,24 +36,27 @@ export default class {
         output.push('/DEF:' + sourcePath)
     }
 
-    static inputLibrary(output, libraryName) {
-        output.push(libraryName)
+    static inputLibrary(output, libraryList) {
+        output.push(...libraryList)
     }
 
     static inputObject(output, objectPrefix) {
         output.push(objectPrefix + '.obj')
     }
 
+    static inputSearch(output, searchList) {
+        for (let search of searchList) {
+            output.push('/LIBPATH:' + search)
+        }
+    }
+
     static outputTarget(output, featureMap, targetPrefix) {
-        let outputName = featureMap.get('OUTPUT_NAME')
-        if (outputName) {
-            output.push('/IMPLIB:' + outputName + '.lib')
-            output.push('/OUT:' + outputName)
-            output.push('/PDB:' + outputName + '.pdb')
-        } else if (featureMap.has('SHARED')) {
+        if (featureMap.has('SHARED')) {
             output.push('/OUT:' + targetPrefix + '.dll')
         } else {
             output.push('/OUT:' + targetPrefix + '.exe')
         }
+        output.push('/IMPLIB:' + targetPrefix + '.lib')
+        output.push('/PDB:' + targetPrefix + '.pdb')
     }
 }

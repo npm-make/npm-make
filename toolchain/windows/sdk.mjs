@@ -4,6 +4,7 @@ import process from 'node:process'
 
 export default class Self {
     static selected
+    static defaultLink = ['kernel32.lib', 'user32.lib', 'gdi32.lib', 'winspool.lib', 'shell32.lib', 'ole32.lib', 'oleaut32.lib', 'uuid.lib', 'comdlg32.lib', 'advapi32.lib']
 
     static async selectSdk(targetMachine, expectVersion) {
         switch (process.arch) {

@@ -49,18 +49,6 @@ export default class {
                 output.push('/std:c++latest')
                 break
         }
-        if (featureMap.has('__OBJECT_NAME')) {
-            output.push('/Fo' + featureMap.get('__OBJECT_NAME'))
-        }
-        if (featureMap.has('__SOURCE_C')) {
-            output.push('/Tc' + featureMap.get('__SOURCE_C'))
-        }
-        if (featureMap.has('__SOURCE_CXX')) {
-            output.push('/Tp' + featureMap.get('__SOURCE_CXX'))
-        }
-        if (featureMap.has('__TARGET_NAME')) {
-            output.push('/Fd' + featureMap.get('__TARGET_NAME'))
-        }
         output.push('/c')
         output.push('/FS')
         output.push('/nologo')
@@ -79,5 +67,27 @@ export default class {
 
     static inputOption(output, optionList) {
         output.push(...optionList)
+    }
+
+    static inputSourceC(output, sourcePath) {
+        output.push('/Tc' + sourcePath)
+    }
+
+    static inputSourceCXX(output, sourcePath) {
+        output.push('/Tp' + sourcePath)
+    }
+
+    static inputInclude(output, includeList) {
+        for (let include of includeList) {
+            output.push('/I' + include)
+        }
+    }
+
+    static outputObject(output, objectPrefix) {
+        output.push('/Fo' + objectPrefix + '.obj')
+    }
+
+    static outputDebug(output, targetPrefix) {
+        output.push('/Fd' + targetPrefix + '.pdb')
     }
 }

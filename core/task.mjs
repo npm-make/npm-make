@@ -4,10 +4,15 @@ export default class Task {
     static concurrentLimit = 10
     static concurrentSet = new Set
     dependencyList = []
-    executeDictionary
-    executeFile
-    executeFlagList = []
     successPromise
+    callback
+
+    constructor(callback, beforeList) {
+        this.callback = callback
+        if (beforeList) {
+            this.dependencyList = beforeList
+        }
+    }
 
     async runTask() {
         if (this.dependencyList.length > 0) {
@@ -20,36 +25,12 @@ export default class Task {
             await Promise.all(promiseList)
         }
         if (!this.successPromise) {
-            while (Task.concurrentSet.size >= Task.concurrentLimit) {
-                await Promise.race(Task.concurrentSet)
+            if (this.callback) {
+                this.successPromise = this.callback()
+            } else {
+                this.successPromise = Promise.resolve()
             }
-            this.successPromise = this.runTaskForce()
         }
         return this.successPromise
-    }
-
-    async runTaskForce() {
-        let result = new Promise((resolve, reject) => {
-            child_process.execFile(
-                this.executeFile,
-                this.executeFlagList,
-                {
-                    cwd: this.executeDictionary,
-                    encoding: 'utf-8',
-                },
-                (error, stdout, stderr) => {
-                    Task.concurrentSet.delete(result)
-                    if (error) {
-                        console.log(stdout)
-                        resolve()
-                    } else {
-                        console.log(stderr)
-                        reject()
-                    }
-                }
-            )
-        })
-        Task.concurrentSet.add(result)
-        return result
     }
 }

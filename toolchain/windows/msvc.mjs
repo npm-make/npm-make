@@ -63,6 +63,7 @@ export default class Self {
         msvcItem.includeList = []
         msvcItem.libraryList = []
         msvcItem.executeCL = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'cl.exe')
+        msvcItem.executeLINK = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'link.exe')
         msvcItem.includeList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'include'))
         msvcItem.includeList.push(path.join(installPath, 'VC', 'Auxiliary', 'VS', 'include'))
         msvcItem.libraryList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'lib', targetMachine))
