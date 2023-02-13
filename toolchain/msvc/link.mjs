@@ -7,6 +7,26 @@ export default class {
      * @param {toolchain.Artifact} artifact
      */
     static async link(artifact) {
+        if (artifact.targetType === 'STATIC') {
+            return this.#libReal(artifact)
+        } else if (artifact.targetType === 'EXECUTE' || artifact.targetType === 'SHARED') {
+            return this.#linkReal(artifact)
+        }
+    }
+
+    /**
+     * @param {toolchain.Artifact} artifact
+     */
+    static async #libReal(artifact) {
+        let flagList = Array.from(artifact.optionList)
+
+        return executeTool.execute(artifact.outputPath, msvc.executeLIB, ...flagList)
+    }
+
+    /**
+     * @param {toolchain.Artifact} artifact
+     */
+    static async #linkReal(artifact) {
         let flagList = Array.from(artifact.optionList)
         if (artifact.buildFeature.has('DEBUG')) {
             flagList.push('/DEBUG')
@@ -33,14 +53,14 @@ export default class {
                 flagList.push('/MACHINE:X86')
                 break
         }
-        if (artifact.targetFeature.has('SHARED')) {
+        if (artifact.targetFeature.has('WIN32_MAIN')) {
+            flagList.push('/SUBSYSTEM:WINDOWS')
+        }
+        if (artifact.targetType === 'SHARED') {
             flagList.push('/DLL')
             flagList.push('/OUT:' + artifact.targetPrefix + '.dll')
         } else {
             flagList.push('/OUT:' + artifact.targetPrefix + '.exe')
-        }
-        if (artifact.targetFeature.has('WIN32_MAIN')) {
-            flagList.push('/SUBSYSTEM:WINDOWS')
         }
         for (let libraryPath of artifact.libraryPathList) {
             flagList.push('/LIBPATH:' + libraryPath)

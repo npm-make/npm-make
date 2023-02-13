@@ -10,4 +10,5 @@ export default class Artifact {
     sourceList
     targetFeature
     targetPrefix
+    targetType
 }

@@ -34,17 +34,7 @@ export default class {
                 flagList.push('/MD')
             }
         }
-        if (source.sourceType === 'C') {
-            flagList.push('/Tc' + source.sourcePath)
-            switch (source.targetFeature.get('STANDARD_C')) {
-                case '11':
-                    flagList.push('/std:c11')
-                    break
-                case '17':
-                    flagList.push('/std:c17')
-                    break
-            }
-        } else if (source.sourceType === 'CXX') {
+        if (source.sourceType === 'CXX') {
             flagList.push('/Tp' + source.sourcePath)
             switch (source.targetFeature.get('STANDARD_CXX')) {
                 case '14':
@@ -59,6 +49,16 @@ export default class {
                 case '23':
                 case 'latest':
                     flagList.push('/std:c++latest')
+                    break
+            }
+        } else {
+            flagList.push('/Tc' + source.sourcePath)
+            switch (source.targetFeature.get('STANDARD_C')) {
+                case '11':
+                    flagList.push('/std:c11')
+                    break
+                case '17':
+                    flagList.push('/std:c17')
                     break
             }
         }
