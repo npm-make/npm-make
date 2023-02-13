@@ -3,6 +3,7 @@ import loader from './loader.mjs'
 import toolchain from '../toolchain/toolchain.mjs'
 import projectTask from './projectTask.mjs'
 import path from 'node:path'
+import executeTool from './executeTool.mjs'
 
 export default class Self {
     static async build(beforeMethod, afterMethod) {

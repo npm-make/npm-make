@@ -1,7 +1,7 @@
-import msvc from './windows/msvc.mjs'
-import sdk from './windows/sdk.mjs'
+import msvc from './msvc/msvc.mjs'
 
 export default class {
     static async initToolchain(targetMachine) {
+        await msvc.detect(targetMachine)
     }
 }

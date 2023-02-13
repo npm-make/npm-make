@@ -1,6 +1,4 @@
-import executeTool from '../../core/executeTool.mjs'
-import msvc from '../windows/msvc.mjs'
-import sdk from '../windows/sdk.mjs'
+import msvc from './msvc.mjs'
 
 export default class {
     /**
@@ -71,15 +69,11 @@ export default class {
         for (let includePath of msvc.includePathList) {
             flagList.push('/I' + includePath)
         }
-        for (let includePath of sdk.includePathList) {
-            flagList.push('/I' + includePath)
-        }
         flagList.push('/c')
         flagList.push('/Fd' + source.objectPrefix + '.pdb')
         flagList.push('/Fo' + source.objectPrefix + '.obj')
-        flagList.push('/FS')
         flagList.push('/nologo')
         flagList.push('/utf-8')
-        return executeTool.execute(source.outputPath, msvc.executeCL, ...flagList)
+        return msvc.execute(source.outputPath, msvc.executeCL, ...flagList)
     }
 }

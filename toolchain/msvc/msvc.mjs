@@ -1,3 +1,4 @@
+import child_process from 'node:child_process'
 import process from 'node:process'
 import msvcWindows from './system/windows.mjs'
 
@@ -27,5 +28,13 @@ export default class Self {
                 await msvcWindows.detect(targetMachine, expectMsvc, expectSdk)
                 break
         }
+    }
+
+    static async execute(cwd, file, ...args) {
+        return new Promise(resolve => {
+            child_process.execFile(file, args, { cwd }, (error, stdout, stderr) => {
+                resolve({ error, stdout, stderr })
+            })
+        })
     }
 }

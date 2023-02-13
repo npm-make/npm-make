@@ -5,7 +5,7 @@ import argumentTool from './argumentTool.mjs'
  */
 export default class Target {
     compileOptionList = []
-    definitionMap = new Map
+    definitionList = []
     dependencyList = []
     featureMap = new Map
     includeDirectoryList = []
@@ -22,9 +22,7 @@ export default class Target {
     }
 
     addDefinition(...definitionList) {
-        for (let definition of definitionList) {
-            argumentTool.parseArgument(this.definitionMap, definition)
-        }
+        this.definitionList.push(...definitionList)
     }
 
     addDependency(...dependencyList) {

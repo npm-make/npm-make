@@ -1,41 +1,11 @@
-import executeTool from '../../core/executeTool.mjs'
-import msvc from '../windows/msvc.mjs'
-import sdk from '../windows/sdk.mjs'
+import msvc from './msvc.mjs'
 
 export default class {
     /**
      * @param {toolchain.Artifact} artifact
      */
     static async link(artifact) {
-        if (artifact.targetType === 'STATIC') {
-            return this.#libReal(artifact)
-        } else if (artifact.targetType === 'EXECUTE' || artifact.targetType === 'SHARED') {
-            return this.#linkReal(artifact)
-        }
-    }
-
-    /**
-     * @param {toolchain.Artifact} artifact
-     */
-    static async #libReal(artifact) {
         let flagList = Array.from(artifact.optionList)
-
-        return executeTool.execute(artifact.outputPath, msvc.executeLIB, ...flagList)
-    }
-
-    /**
-     * @param {toolchain.Artifact} artifact
-     */
-    static async #linkReal(artifact) {
-        let flagList = Array.from(artifact.optionList)
-        if (artifact.buildFeature.has('DEBUG')) {
-            flagList.push('/DEBUG')
-        } else {
-            if (artifact.buildFeature.has('RELEASE_WITH_DEBUG_INFO')) {
-                flagList.push('/DEBUG')
-            }
-            flagList.push('/INCREMENTAL:NO')
-        }
         switch (artifact.buildFeature.get('MACHINE')) {
             case 'arm':
                 flagList.push('/MACHINE:ARM')
@@ -56,20 +26,14 @@ export default class {
         if (artifact.targetFeature.has('WIN32_MAIN')) {
             flagList.push('/SUBSYSTEM:WINDOWS')
         }
-        if (artifact.targetType === 'SHARED') {
-            flagList.push('/DLL')
-            flagList.push('/OUT:' + artifact.targetPrefix + '.dll')
-        } else {
-            flagList.push('/OUT:' + artifact.targetPrefix + '.exe')
-        }
         for (let libraryPath of artifact.libraryPathList) {
             flagList.push('/LIBPATH:' + libraryPath)
         }
         for (let libraryPath of msvc.libraryPathList) {
             flagList.push('/LIBPATH:' + libraryPath)
         }
-        for (let libraryPath of sdk.libraryPathList) {
-            flagList.push('/LIBPATH:' + libraryPath)
+        for (let library of artifact.libraryList) {
+            flagList.push(library)
         }
         for (let source of artifact.sourceList) {
             switch (source.sourceType) {
@@ -82,13 +46,27 @@ export default class {
                     break
             }
         }
-        for (let library of artifact.libraryList) {
-            flagList.push(library)
-        }
-        for (let library of sdk.libraryList) {
-            flagList.push(library)
-        }
         flagList.push('/NOLOGO')
-        return executeTool.execute(artifact.outputPath, msvc.executeLINK, ...flagList)
+        if (artifact.targetType === 'STATIC') {
+            flagList.push('/DEF')
+            flagList.push('/OUT:' + artifact.targetPrefix + '.lib')
+            return msvc.execute(artifact.outputPath, msvc.executeLIB, ...flagList)
+        } else {
+            if (artifact.buildFeature.has('DEBUG')) {
+                flagList.push('/DEBUG')
+            } else {
+                if (artifact.buildFeature.has('RELEASE_WITH_DEBUG_INFO')) {
+                    flagList.push('/DEBUG')
+                }
+                flagList.push('/INCREMENTAL:NO')
+            }
+            if (artifact.targetType === 'SHARED') {
+                flagList.push('/DLL')
+                flagList.push('/OUT:' + artifact.targetPrefix + '.dll')
+            } else {
+                flagList.push('/OUT:' + artifact.targetPrefix + '.exe')
+            }
+            return msvc.execute(artifact.outputPath, msvc.executeLINK, ...flagList)
+        }
     }
 }
