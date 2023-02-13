@@ -2,14 +2,13 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import process from 'node:process'
 
-//noinspection JSUnresolvedVariable,SpellCheckingInspection
+//noinspection JSUnresolvedVariable
 export default class Self {
-    static selected
-    static version
-    static includeList
-    static libraryList
     static executeCL
     static executeLINK
+    static includePathList
+    static libraryPathList
+    static version
 
     static async selectMsvc(targetMachine, expectVersion) {
         switch (process.arch) {

@@ -4,7 +4,7 @@
 export default class Source {
     buildFeature
     definitionList
-    includeList
+    includePathList
     objectPrefix
     optionList
     outputPath

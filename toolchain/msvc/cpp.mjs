@@ -1,5 +1,6 @@
 import executeTool from '../../core/executeTool.mjs'
 import msvc from '../windows/msvc.mjs'
+import sdk from '../windows/sdk.mjs'
 
 export default class {
     /**
@@ -64,11 +65,14 @@ export default class {
         for (let definition of source.definitionList) {
             flagList.push('/D' + definition)
         }
-        for (let include of source.includeList) {
-            flagList.push('/I' + include)
+        for (let includePath of source.includePathList) {
+            flagList.push('/I' + includePath)
         }
-        for (let include of msvc.includeList) {
-            flagList.push('/I' + include)
+        for (let includePath of msvc.includePathList) {
+            flagList.push('/I' + includePath)
+        }
+        for (let includePath of sdk.includePathList) {
+            flagList.push('/I' + includePath)
         }
         flagList.push('/c')
         flagList.push('/Fd' + source.objectPrefix + '.pdb')

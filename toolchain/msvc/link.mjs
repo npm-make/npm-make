@@ -1,62 +1,74 @@
+import executeTool from '../../core/executeTool.mjs'
+import msvc from '../windows/msvc.mjs'
+import sdk from '../windows/sdk.mjs'
+
 export default class {
-    static inputFeature(output, featureMap) {
-        if (featureMap.has('DEBUG')) {
-            output.push('/DEBUG')
+    /**
+     * @param {toolchain.Artifact} artifact
+     */
+    static async link(artifact) {
+        let flagList = Array.from(artifact.optionList)
+        if (artifact.buildFeature.has('DEBUG')) {
+            flagList.push('/DEBUG')
         } else {
-            if (featureMap.has('RELEASE_WITH_DEBUG_INFO')) {
-                output.push('/DEBUG')
+            if (artifact.buildFeature.has('RELEASE_WITH_DEBUG_INFO')) {
+                flagList.push('/DEBUG')
             }
-            output.push('/INCREMENTAL:NO')
+            flagList.push('/INCREMENTAL:NO')
         }
-        switch (featureMap.get('MACHINE')) {
-            case 'AMD64':
-            case 'X64':
-                output.push('/MACHINE:X64')
+        switch (artifact.buildFeature.get('MACHINE')) {
+            case 'arm':
+                flagList.push('/MACHINE:ARM')
                 break
-            case 'ARM32':
-                output.push('/MACHINE:ARM')
+            case 'arm64':
+                flagList.push('/MACHINE:ARM64')
                 break
-            case 'ARM64':
-                output.push('/MACHINE:ARM64')
+            case 'arm64ec':
+                flagList.push('/MACHINE:ARM64EC')
                 break
-            case 'X86':
-                output.push('/MACHINE:X86')
+            case 'x64':
+                flagList.push('/MACHINE:X64')
+                break
+            case 'x86':
+                flagList.push('/MACHINE:X86')
                 break
         }
-        if (featureMap.has('SHARED')) {
-            output.push('/DLL')
-        }
-        if (featureMap.has('WIN32_MAIN')) {
-            output.push('/SUBSYSTEM:WINDOWS')
-        }
-        output.push('/NOLOGO')
-    }
-
-    static inputDef(output, sourcePath) {
-        output.push('/DEF:' + sourcePath)
-    }
-
-    static inputLibrary(output, libraryList) {
-        output.push(...libraryList)
-    }
-
-    static inputObject(output, objectPrefix) {
-        output.push(objectPrefix + '.obj')
-    }
-
-    static inputSearch(output, searchList) {
-        for (let search of searchList) {
-            output.push('/LIBPATH:' + search)
-        }
-    }
-
-    static outputTarget(output, featureMap, targetPrefix) {
-        if (featureMap.has('SHARED')) {
-            output.push('/OUT:' + targetPrefix + '.dll')
+        if (artifact.targetFeature.has('SHARED')) {
+            flagList.push('/DLL')
+            flagList.push('/OUT:' + artifact.targetPrefix + '.dll')
         } else {
-            output.push('/OUT:' + targetPrefix + '.exe')
+            flagList.push('/OUT:' + artifact.targetPrefix + '.exe')
         }
-        output.push('/IMPLIB:' + targetPrefix + '.lib')
-        output.push('/PDB:' + targetPrefix + '.pdb')
+        if (artifact.targetFeature.has('WIN32_MAIN')) {
+            flagList.push('/SUBSYSTEM:WINDOWS')
+        }
+        for (let libraryPath of artifact.libraryPathList) {
+            flagList.push('/LIBPATH:' + libraryPath)
+        }
+        for (let libraryPath of msvc.libraryPathList) {
+            flagList.push('/LIBPATH:' + libraryPath)
+        }
+        for (let libraryPath of sdk.libraryPathList) {
+            flagList.push('/LIBPATH:' + libraryPath)
+        }
+        for (let source of artifact.sourceList) {
+            switch (source.sourceType) {
+                case 'C':
+                case 'CXX':
+                    flagList.push(source.objectPrefix + '.obj')
+                    break
+                case 'DEF':
+                    flagList.push('/DEF:' + source.sourcePath)
+                    break
+            }
+        }
+        for (let library of artifact.libraryList) {
+            flagList.push(library)
+        }
+        for (let library of sdk.libraryList) {
+            flagList.push(library)
+        }
+        flagList.push('/NOLOGO')
+        return executeTool.execute(artifact.outputPath, msvc.executeLINK, ...flagList)
     }
 }
