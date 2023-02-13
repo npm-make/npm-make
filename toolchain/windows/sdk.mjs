@@ -5,36 +5,36 @@ import process from 'node:process'
 export default class Self {
     static executeRC
     static includePathList
-    static libraryList = ['kernel32.lib', 'user32.lib', 'gdi32.lib', 'winspool.lib', 'shell32.lib', 'ole32.lib', 'oleaut32.lib', 'uuid.lib', 'comdlg32.lib', 'advapi32.lib']
+    static libraryList
     static libraryPathList
     static version
 
-    static async selectSdk(targetMachine, expectVersion) {
+    static async detectSdk(targetMachine, expectVersion) {
+        this.executeRC = ''
+        this.includePathList = []
+        this.libraryList = []
+        this.libraryPathList = []
+        this.version = ''
         switch (process.arch) {
             case 'ia32':
-                return this.#selectSdk('C:\\Program Files', 'x86', targetMachine, expectVersion)
+                return this.#detectSdk('C:\\Program Files', 'x86', targetMachine, expectVersion)
             case 'x64':
-                return this.#selectSdk('C:\\Program Files (x86)', 'x64', targetMachine, expectVersion)
+                return this.#detectSdk('C:\\Program Files (x86)', 'x64', targetMachine, expectVersion)
         }
     }
 
-    static async #selectSdk(programRoot, localMachine, targetMachine, expectVersion) {
-        if (expectVersion === 'v7.1A') {
-            this.selected = this.#detectSdk71A(programRoot, localMachine, targetMachine)
-        } else {
-            let installList = await this.#detectSdkInstall(programRoot)
-            for (let installPath of installList) {
-                let version = await this.#detectSdkVersion(installPath, expectVersion)
-                if (version) {
-                    this.selected = await this.#detectSdk(installPath, localMachine, targetMachine, version)
-                    break
-                }
+    static async #detectSdk(programRoot, localMachine, targetMachine, expectVersion) {
+        let installList = await this.#detectSdk8Install(programRoot)
+        for (let installPath of installList) {
+            let version = await this.#detectSdk8Version(installPath, expectVersion)
+            if (version) {
+                await this.#detectSdk8Real(installPath, localMachine, targetMachine, version)
+                break
             }
         }
-        return this.selected
     }
 
-    static async #detectSdkInstall(programRoot) {
+    static async #detectSdk8Install(programRoot) {
         try {
             let installList = []
             let installDir = await fs.opendir(path.join(programRoot, 'Windows Kits'))
@@ -46,7 +46,7 @@ export default class Self {
         }
     }
 
-    static async #detectSdkVersion(installPath, expectVersion) {
+    static async #detectSdk8Version(installPath, expectVersion) {
         try {
             let includeDir = await fs.opendir(path.join(installPath, 'Include'))
             for await (let versionItem of includeDir) {
@@ -58,54 +58,29 @@ export default class Self {
         }
     }
 
-    static async #detectSdk(installPath, localMachine, targetMachine, version) {
-        let sdkItem = {}
-        sdkItem.version = version
-        sdkItem.includeList = []
-        sdkItem.libraryList = []
-        sdkItem.executeRC = path.join(installPath, 'bin', version, localMachine, 'rc.exe')
-        await this.#detectSdkInclude(sdkItem.includeList, installPath, version)
-        await this.#detectSdkLibrary(sdkItem.libraryList, targetMachine, installPath, version)
-        return sdkItem
+    static async #detectSdk8Real(installPath, localMachine, targetMachine, version) {
+        this.version = version
+        this.executeRC = path.join(installPath, 'bin', version, localMachine, 'rc.exe')
+        await this.#detectSdk8Include(installPath, version)
+        await this.#detectSdk8Library(targetMachine, installPath, version)
     }
 
-    static async #detectSdkInclude(includeList, installPath, version) {
+    static async #detectSdk8Include(installPath, version) {
         let includeDir = await fs.opendir(path.join(installPath, 'Include', version))
         for await (let includeItem of includeDir) {
-            includeList.push(path.join(includeDir.path, includeItem.name))
+            this.includePathList.push(path.join(includeDir.path, includeItem.name))
         }
     }
 
-    static async #detectSdkLibrary(libraryList, targetMachine, installPath, version) {
+    static async #detectSdk8Library(targetMachine, installPath, version) {
         let libraryDir = await fs.opendir(path.join(installPath, 'Lib', version))
         for await (let libraryItem of libraryDir) {
             let machineDir = await fs.opendir(path.join(libraryDir.path, libraryItem.name))
             for await (let machineItem of machineDir) {
                 if (machineItem.name === targetMachine) {
-                    libraryList.push(path.join(machineDir.path, machineItem.name))
+                    this.libraryPathList.push(path.join(machineDir.path, machineItem.name))
                 }
             }
         }
-    }
-
-    static #detectSdk71A(programRoot, localMachine, targetMachine) {
-        let sdkItem = {}
-        sdkItem.version = 'v7.1A'
-        sdkItem.includeList = []
-        sdkItem.libraryList = []
-        sdkItem.includeList.push(path.join(programRoot, 'Microsoft SDKs', 'Windows', 'v7.1A', 'Include'))
-        if (localMachine === 'x86') {
-            sdkItem.executeRC = path.join(programRoot, 'Microsoft SDKs', 'Windows', 'v7.1A', 'Bin', 'RC.exe')
-        } else {
-            sdkItem.executeRC = path.join(programRoot, 'Microsoft SDKs', 'Windows', 'v7.1A', 'Bin', 'x64', 'RC.exe')
-        }
-        if (targetMachine === 'x86') {
-            sdkItem.libraryList.push(path.join(programRoot, 'Microsoft SDKs', 'Windows', 'v7.1A', 'Lib'))
-        } else if (targetMachine === 'x64') {
-            sdkItem.libraryList.push(path.join(programRoot, 'Microsoft SDKs', 'Windows', 'v7.1A', 'Lib', 'x64'))
-        } else {
-            return undefined
-        }
-        return sdkItem
     }
 }

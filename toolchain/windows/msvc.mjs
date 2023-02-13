@@ -5,37 +5,38 @@ import process from 'node:process'
 //noinspection JSUnresolvedVariable
 export default class Self {
     static executeCL
+    static executeLIB
     static executeLINK
     static includePathList
     static libraryPathList
     static version
 
-    static async selectMsvc(targetMachine, expectVersion) {
+    static async detectMsvc(targetMachine, expectVersion) {
+        this.executeCL = ''
+        this.executeLINK = ''
+        this.includePathList = []
+        this.libraryPathList = []
+        this.version = ''
         switch (process.arch) {
             case 'ia32':
-                return this.#selectMsvc('C:\\Program Files', 'x86', targetMachine, expectVersion)
+                return this.#detectMsvc('C:\\Program Files', 'x86', targetMachine, expectVersion)
             case 'x64':
-                return this.#selectMsvc('C:\\Program Files (x86)', 'x64', targetMachine, expectVersion)
+                return this.#detectMsvc('C:\\Program Files (x86)', 'x64', targetMachine, expectVersion)
         }
     }
 
-    static async #selectMsvc(programRoot, localMachine, targetMachine, expectVersion) {
-        if (expectVersion === 'v140xp') {
-            this.selected = await this.#detectMsvc140xp(programRoot, localMachine, targetMachine)
-        } else {
-            let installList = await this.#detectMsvcInstall()
-            for (let installPath of installList) {
-                let version = await this.#detectMsvcVersion(installPath, expectVersion)
-                if (version) {
-                    this.selected = await this.#detectMsvc(localMachine, targetMachine, installPath, version)
-                    break
-                }
+    static async #detectMsvc(programRoot, localMachine, targetMachine, expectVersion) {
+        let installList = await this.#detectMsvc14Install()
+        for (let installPath of installList) {
+            let version = await this.#detectMsvc14Version(installPath, expectVersion)
+            if (version) {
+                await this.#detectMsvc14Real(localMachine, targetMachine, installPath, version)
+                break
             }
         }
-        return this.selected
     }
 
-    static async #detectMsvcInstall() {
+    static async #detectMsvc14Install() {
         try {
             let installList = []
             let instanceDir = await fs.opendir('C:\\ProgramData\\Microsoft\\VisualStudio\\Packages\\_Instances')
@@ -49,7 +50,7 @@ export default class Self {
         }
     }
 
-    static async #detectMsvcVersion(installPath, expectVersion) {
+    static async #detectMsvc14Version(installPath, expectVersion) {
         try {
             let versionDir = await fs.opendir(path.join(installPath, 'VC', 'Tools', 'MSVC'))
             for await (let versionItem of versionDir) {
@@ -61,73 +62,19 @@ export default class Self {
         }
     }
 
-    static async #detectMsvc(localMachine, targetMachine, installPath, version) {
-        let msvcItem = {}
-        msvcItem.version = version
-        msvcItem.includeList = []
-        msvcItem.libraryList = []
-        msvcItem.executeCL = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'cl.exe')
-        msvcItem.executeLINK = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'link.exe')
-        msvcItem.includeList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'include'))
-        msvcItem.includeList.push(path.join(installPath, 'VC', 'Auxiliary', 'VS', 'include'))
-        msvcItem.libraryList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'lib', targetMachine))
+    static async #detectMsvc14Real(localMachine, targetMachine, installPath, version) {
+        this.version = version
+        this.executeCL = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'cl.exe')
+        this.executeLIB = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'lib.exe')
+        this.executeLINK = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'link.exe')
+        this.includePathList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'include'))
+        this.includePathList.push(path.join(installPath, 'VC', 'Auxiliary', 'VS', 'include'))
+        this.libraryPathList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'lib', targetMachine))
         try {
             await fs.access(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'atlmfc'))
-            msvcItem.includeList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'atlmfc', 'include'))
-            msvcItem.libraryList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'atlmfc', 'lib', targetMachine))
+            this.includePathList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'atlmfc', 'include'))
+            this.libraryPathList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'atlmfc', 'lib', targetMachine))
         } catch {
         }
-        return msvcItem
-    }
-
-    static async #detectMsvc140xp(programRoot, localMachine, targetMachine) {
-        let msvcItem = {}
-        msvcItem.version = 'v140xp'
-        msvcItem.includeList = []
-        msvcItem.libraryList = []
-        msvcItem.includeList.push(path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'include'))
-        if (targetMachine === 'x86') {
-            msvcItem.libraryList.push(path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'lib'))
-            if (localMachine === 'x86') {
-                msvcItem.executeCL = path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'bin', 'cl.exe')
-                msvcItem.executeLINK = path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'bin', 'link.exe')
-            } else {
-                msvcItem.executeCL = path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'bin', 'amd64_x86', 'cl.exe')
-                msvcItem.executeLINK = path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'bin', 'amd64_x86', 'link.exe')
-            }
-        } else if (targetMachine === 'x64') {
-            msvcItem.libraryList.push(path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'lib', 'amd64'))
-            if (localMachine === 'x86') {
-                msvcItem.executeCL = path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'bin', 'x86_amd64', 'cl.exe')
-                msvcItem.executeLINK = path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'bin', 'x86_amd64', 'link.exe')
-            } else {
-                msvcItem.executeCL = path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'bin', 'amd64', 'cl.exe')
-                msvcItem.executeLINK = path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'bin', 'amd64', 'link.exe')
-            }
-        } else if (targetMachine === 'arm') {
-            msvcItem.libraryList.push(path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'lib', 'arm'))
-            if (localMachine === 'x86') {
-                msvcItem.executeCL = path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'bin', 'x86_arm', 'cl.exe')
-                msvcItem.executeLINK = path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'bin', 'x86_arm', 'link.exe')
-            } else {
-                msvcItem.executeCL = path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'bin', 'amd64_arm', 'cl.exe')
-                msvcItem.executeLINK = path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'bin', 'amd64_arm', 'link.exe')
-            }
-        } else {
-            return undefined
-        }
-        try {
-            await fs.access(path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'atlmfc'))
-            msvcItem.includeList.push(path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'atlmfc', 'include'))
-            if (targetMachine === 'x86') {
-                msvcItem.libraryList.push(path.join(programRoot, 'Microsoft Visual Studio 14.0', 'atlmfc', 'VC', 'lib'))
-            } else if (targetMachine === 'x64') {
-                msvcItem.libraryList.push(path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'atlmfc', 'lib', 'amd64'))
-            } else if (targetMachine === 'arm') {
-                msvcItem.libraryList.push(path.join(programRoot, 'Microsoft Visual Studio 14.0', 'VC', 'atlmfc', 'lib', 'arm'))
-            }
-        } catch {
-        }
-        return msvcItem
     }
 }
