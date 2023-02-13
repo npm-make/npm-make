@@ -5,6 +5,11 @@ import process from 'node:process'
 //noinspection JSUnresolvedVariable,SpellCheckingInspection
 export default class Self {
     static selected
+    static version
+    static includeList
+    static libraryList
+    static executeCL
+    static executeLINK
 
     static async selectMsvc(targetMachine, expectVersion) {
         switch (process.arch) {

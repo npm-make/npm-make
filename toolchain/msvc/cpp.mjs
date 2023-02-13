@@ -1,93 +1,81 @@
+import executeTool from '../../core/executeTool.mjs'
+import msvc from '../windows/msvc.mjs'
+
 export default class {
-    static inputFeature(output, featureMap) {
-        if (featureMap.has('DEBUG')) {
-            if (!featureMap.has('DEBUG_WITHOUT_RTC')) {
-                output.push('/RTC1')
+    /**
+     * @param {toolchain.Source} source
+     */
+    static async compile(source) {
+        let flagList = Array.from(source.optionList)
+        if (source.buildFeature.has('DEBUG')) {
+            if (!source.buildFeature.has('DEBUG_WITHOUT_RTC')) {
+                flagList.push('/RTC1')
             }
-            if (featureMap.has('STATIC_RUNTIME')) {
-                output.push('/MTd')
+            if (source.buildFeature.has('STATIC_RUNTIME')) {
+                flagList.push('/MTd')
             } else {
-                output.push('/MDd')
+                flagList.push('/MDd')
             }
-            output.push('/Od')
-            output.push('/Zi')
+            flagList.push('/Od')
+            flagList.push('/Zi')
         } else {
-            if (featureMap.has('RELEASE_MIN_SIZE')) {
-                output.push('/O1')
+            if (source.buildFeature.has('RELEASE_MIN_SIZE')) {
+                flagList.push('/O1')
             } else {
-                output.push('/O2')
+                flagList.push('/O2')
             }
-            if (featureMap.has('RELEASE_WITH_DEBUG_INFO')) {
-                output.push('/Zi')
+            if (source.buildFeature.has('RELEASE_WITH_DEBUG_INFO')) {
+                flagList.push('/Zi')
             }
-            if (featureMap.has('STATIC_RUNTIME')) {
-                output.push('/MT')
+            if (source.buildFeature.has('STATIC_RUNTIME')) {
+                flagList.push('/MT')
             } else {
-                output.push('/MD')
+                flagList.push('/MD')
             }
         }
-        switch (featureMap.get('STANDARD_C')) {
-            case '11':
-                output.push('/std:c11')
-                break
-            case '17':
-                output.push('/std:c17')
-                break
-        }
-        switch (featureMap.get('STANDARD_CXX')) {
-            case '14':
-                output.push('/std:c++14')
-                break
-            case '17':
-                output.push('/std:c++17')
-                break
-            case '20':
-                output.push('/std:c++20')
-                break
-            case '23':
-            case 'latest':
-                output.push('/std:c++latest')
-                break
-        }
-        output.push('/c')
-        output.push('/FS')
-        output.push('/nologo')
-        output.push('/utf-8')
-    }
-
-    static inputDefinition(output, definitionMap) {
-        for (let [name, value] of definitionMap) {
-            if (value !== '') {
-                output.push('/D' + name + '#' + value)
-            } else {
-                output.push('/D' + name)
+        if (source.sourceType === 'C') {
+            flagList.push('/Tc' + source.sourcePath)
+            switch (source.targetFeature.get('STANDARD_C')) {
+                case '11':
+                    flagList.push('/std:c11')
+                    break
+                case '17':
+                    flagList.push('/std:c17')
+                    break
+            }
+        } else if (source.sourceType === 'CXX') {
+            flagList.push('/Tp' + source.sourcePath)
+            switch (source.targetFeature.get('STANDARD_CXX')) {
+                case '14':
+                    flagList.push('/std:c++14')
+                    break
+                case '17':
+                    flagList.push('/std:c++17')
+                    break
+                case '20':
+                    flagList.push('/std:c++20')
+                    break
+                case '23':
+                case 'latest':
+                    flagList.push('/std:c++latest')
+                    break
             }
         }
-    }
-
-    static inputOption(output, optionList) {
-        output.push(...optionList)
-    }
-
-    static inputSourceC(output, sourcePath) {
-        output.push('/Tc' + sourcePath)
-    }
-
-    static inputSourceCXX(output, sourcePath) {
-        output.push('/Tp' + sourcePath)
-    }
-
-    static inputInclude(output, includeList) {
-        for (let include of includeList) {
-            output.push('/I' + include)
+        for (let definition of source.definitionList) {
+            flagList.push('/D' + definition)
         }
-    }
-
-    static outputObject(output, objectPrefix) {
-        output.push('/Fo' + objectPrefix + '.obj')
-    }
-
-    static outputDebug(output, targetPrefix) {
-        output.push('/Fd' + targetPrefix + '.pdb')
+        for (let include of source.includeList) {
+            flagList.push('/I' + include)
+        }
+        for (let include of msvc.includeList) {
+            flagList.push('/I' + include)
+        }
+        flagList.push('/c')
+        flagList.push('/Fd' + source.objectPrefix + '.pdb')
+        flagList.push('/Fo' + source.objectPrefix + '.obj')
+        flagList.push('/FS')
+        flagList.push('/nologo')
+        flagList.push('/utf-8')
+        return executeTool.execute(source.outputPath, msvc.executeCL, ...flagList)
     }
 }
