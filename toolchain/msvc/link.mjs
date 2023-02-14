@@ -2,11 +2,11 @@ import msvc from './msvc.mjs'
 
 export default class {
     /**
-     * @param {toolchain.Artifact} artifact
+     * @param {ToolchainTarget} target
      */
-    static async link(artifact) {
-        let flagList = Array.from(artifact.optionList)
-        switch (artifact.buildFeature.get('MACHINE')) {
+    static async link(target) {
+        let flagList = Array.from(target.optionList)
+        switch (target.buildFeature.get('MACHINE')) {
             case 'arm':
                 flagList.push('/MACHINE:ARM')
                 break
@@ -23,19 +23,19 @@ export default class {
                 flagList.push('/MACHINE:X86')
                 break
         }
-        if (artifact.targetFeature.has('WIN32_MAIN')) {
+        if (target.targetFeature.has('WIN32_MAIN')) {
             flagList.push('/SUBSYSTEM:WINDOWS')
         }
-        for (let libraryPath of artifact.libraryPathList) {
+        for (let libraryPath of target.libraryPathList) {
             flagList.push('/LIBPATH:' + libraryPath)
         }
         for (let libraryPath of msvc.libraryPathList) {
             flagList.push('/LIBPATH:' + libraryPath)
         }
-        for (let library of artifact.libraryList) {
+        for (let library of target.libraryList) {
             flagList.push(library)
         }
-        for (let source of artifact.sourceList) {
+        for (let source of target.sourceList) {
             switch (source.sourceType) {
                 case 'C':
                 case 'CXX':
@@ -47,26 +47,26 @@ export default class {
             }
         }
         flagList.push('/NOLOGO')
-        if (artifact.targetType === 'STATIC') {
+        if (target.targetType === 'STATIC') {
             flagList.push('/DEF')
-            flagList.push('/OUT:' + artifact.targetPrefix + '.lib')
-            return msvc.execute(artifact.outputPath, msvc.executeLIB, ...flagList)
+            flagList.push('/OUT:' + target.targetPrefix + '.lib')
+            return msvc.execute(target.outputPath, msvc.executeLIB, ...flagList)
         } else {
-            if (artifact.buildFeature.has('DEBUG')) {
+            if (target.buildFeature.has('DEBUG')) {
                 flagList.push('/DEBUG')
             } else {
-                if (artifact.buildFeature.has('RELEASE_WITH_DEBUG_INFO')) {
+                if (target.buildFeature.has('RELEASE_WITH_DEBUG_INFO')) {
                     flagList.push('/DEBUG')
                 }
                 flagList.push('/INCREMENTAL:NO')
             }
-            if (artifact.targetType === 'SHARED') {
+            if (target.targetType === 'SHARED') {
                 flagList.push('/DLL')
-                flagList.push('/OUT:' + artifact.targetPrefix + '.dll')
+                flagList.push('/OUT:' + target.targetPrefix + '.dll')
             } else {
-                flagList.push('/OUT:' + artifact.targetPrefix + '.exe')
+                flagList.push('/OUT:' + target.targetPrefix + '.exe')
             }
-            return msvc.execute(artifact.outputPath, msvc.executeLINK, ...flagList)
+            return msvc.execute(target.outputPath, msvc.executeLINK, ...flagList)
         }
     }
 }

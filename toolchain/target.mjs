@@ -1,8 +1,6 @@
-/**
- * @namespace toolchain
- */
-export default class Artifact {
+export default class ToolchainTarget {
     buildFeature
+    buildSkip
     libraryList
     libraryPathList
     optionList

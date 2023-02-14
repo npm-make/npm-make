@@ -2,7 +2,7 @@ import msvc from './msvc.mjs'
 
 export default class {
     /**
-     * @param {toolchain.Source} source
+     * @param {ToolchainSource} source
      */
     static async compile(source) {
         let flagList = Array.from(source.optionList)

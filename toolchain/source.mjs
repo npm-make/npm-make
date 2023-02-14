@@ -1,8 +1,6 @@
-/**
- * @namespace toolchain
- */
-export default class Source {
+export default class ToolchainSource {
     buildFeature
+    buildSkip
     definitionList
     includePathList
     objectPrefix

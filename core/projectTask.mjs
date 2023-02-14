@@ -3,7 +3,7 @@ import fs from 'node:fs/promises'
 import output from './output.mjs'
 import Task from './task.mjs'
 import Source from '../toolchain/source.mjs'
-import Artifact from '../toolchain/artifact.mjs'
+import Target from '../toolchain/target.mjs'
 import cpp from '../toolchain/msvc/cpp.mjs'
 import link from '../toolchain/msvc/link.mjs'
 
@@ -18,19 +18,19 @@ export default class {
         for (let target of project.targetList) {
             target.objectPath = path.join(outputPath, target.targetName)
             await fs.mkdir(target.objectPath, { recursive: true })
-            //build artifact
-            let artifact = new Artifact
-            artifact.buildFeature = buildFeature
-            artifact.libraryList = target.libraryList
-            artifact.libraryPathList = []
-            artifact.optionList = target.linkOptionList
-            artifact.outputPath = outputPath
-            artifact.sourceList = []
-            artifact.targetFeature = target.featureMap
-            artifact.targetPrefix = target.objectPath
-            artifact.targetType = 'SHARED'
+            //build toolchainTarget
+            let toolchainTarget = new Target
+            toolchainTarget.buildFeature = buildFeature
+            toolchainTarget.libraryList = target.libraryList
+            toolchainTarget.libraryPathList = []
+            toolchainTarget.optionList = target.linkOptionList
+            toolchainTarget.outputPath = outputPath
+            toolchainTarget.sourceList = []
+            toolchainTarget.targetFeature = target.featureMap
+            toolchainTarget.targetPrefix = target.objectPath
+            toolchainTarget.targetType = 'SHARED'
             for (let linkDirectory of target.linkDirectoryList) {
-                artifact.libraryPathList.push(path.join(project.projectPath, linkDirectory))
+                toolchainTarget.libraryPathList.push(path.join(project.projectPath, linkDirectory))
             }
             //for each source
             let sourceTaskList = []
@@ -40,7 +40,7 @@ export default class {
                 let outputName = output.outputName(realPath)
                 //build source
                 let sourceObj = new Source
-                artifact.sourceList.push(sourceObj)
+                toolchainTarget.sourceList.push(sourceObj)
                 sourceObj.buildFeature = buildFeature
                 sourceObj.definitionList = target.definitionList
                 sourceObj.includePathList = []
@@ -69,7 +69,7 @@ export default class {
                 }))
             }
             targetTaskList.push(new Task(async () => {
-                let result = await link.link(artifact)
+                let result = await link.link(toolchainTarget)
                 console.log(result.stdout, result.stderr)
             }, sourceTaskList))
         }
