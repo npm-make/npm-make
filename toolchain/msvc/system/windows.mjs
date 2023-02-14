@@ -19,7 +19,7 @@ export default class Self {
     }
 
     static async #detectMsvc(programRoot, localMachine, targetMachine, expectMsvc) {
-        let detectMsvc14 = this.#detectMsvc14(programRoot, localMachine, targetMachine, expectMsvc)
+        let detectMsvc14 = await this.#detectMsvc14(programRoot, localMachine, targetMachine, expectMsvc)
         if (!detectMsvc14) {
             throw new Error('cannot found MSVC')
         }
@@ -28,7 +28,7 @@ export default class Self {
     static async #detectMsvc14(programRoot, localMachine, targetMachine, expectMsvc) {
         let installPathList = await this.#detectMsvc14Install()
         for (let installPath of installPathList) {
-            let versionList = await this.#detectMsvc14Version(installPath, expectMsvc)
+            let versionList = await this.#detectMsvc14Version(installPath)
             for (let version of versionList) {
                 if (!expectMsvc || expectMsvc === version) {
                     await this.#detectMsvc14Real(localMachine, targetMachine, installPath, version)
@@ -90,7 +90,7 @@ export default class Self {
     static async #detectSdk8(programRoot, localMachine, targetMachine, expectSdk) {
         let installPathList = await this.#detectSdk8Install(programRoot)
         for (let installPath of installPathList) {
-            let versionList = await this.#detectSdk8Version(installPath, expectSdk)
+            let versionList = await this.#detectSdk8Version(installPath)
             for (let version of versionList) {
                 if (!expectSdk || expectSdk === version) {
                     await this.#detectSdk8Real(installPath, localMachine, targetMachine, version)
