@@ -1,6 +1,8 @@
-import child_process from 'node:child_process'
 import process from 'node:process'
-import msvcWindows from './system/windows.mjs'
+import executeTool from '../../core/executeTool.mjs'
+import detectWindows from './detect/windows.mjs'
+import msvcCpp from './cpp.mjs'
+import msvcLink from './link.mjs'
 
 export default class Self {
     static executeCL
@@ -12,6 +14,29 @@ export default class Self {
     static libraryPathList
     static versionMsvc
     static versionSdk
+
+    /**
+     * @param {ToolchainTarget} target
+     */
+    static async build(target) {
+        if (!target.buildSuccess) {
+            let promiseList = []
+            for (let source of target.sourceList) {
+                if (!source.buildSuccess) {
+                    switch (source.sourceType) {
+                        case 'C':
+                        case 'CXX':
+                            promiseList.push(msvcCpp.build(source))
+                            break
+                    }
+                }
+            }
+            if (promiseList.length > 0) {
+                await Promise.all(promiseList)
+            }
+            await msvcLink.build(target)
+        }
+    }
 
     static async detect(targetMachine, expectMsvc, expectSdk) {
         this.executeCL = ''
@@ -25,16 +50,14 @@ export default class Self {
         this.versionSdk = ''
         switch (process.platform) {
             case 'win32':
-                await msvcWindows.detect(targetMachine, expectMsvc, expectSdk)
+                await detectWindows.detect(targetMachine, expectMsvc, expectSdk)
                 break
         }
     }
 
     static async execute(cwd, file, ...args) {
-        return new Promise(resolve => {
-            child_process.execFile(file, args, { cwd }, (error, stdout, stderr) => {
-                resolve({ error, stdout, stderr })
-            })
-        })
+        let result = await executeTool.execute(cwd, file, ...args)
+        console.log(result.stdout)
+        return result
     }
 }

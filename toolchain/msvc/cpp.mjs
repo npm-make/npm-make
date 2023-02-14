@@ -4,7 +4,7 @@ export default class {
     /**
      * @param {ToolchainSource} source
      */
-    static async compile(source) {
+    static async build(source) {
         let flagList = Array.from(source.optionList)
         if (source.buildFeature.has('DEBUG')) {
             if (!source.buildFeature.has('DEBUG_WITHOUT_RTC')) {

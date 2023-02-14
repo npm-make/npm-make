@@ -1,11 +1,9 @@
 import path from 'node:path'
 import fs from 'node:fs/promises'
 import output from './output.mjs'
-import Task from './task.mjs'
 import Source from '../toolchain/source.mjs'
 import Target from '../toolchain/target.mjs'
-import cpp from '../toolchain/msvc/cpp.mjs'
-import link from '../toolchain/msvc/link.mjs'
+import msvc from '../toolchain/msvc/msvc.mjs'
 
 export default class {
     /**
@@ -21,6 +19,7 @@ export default class {
             //build toolchainTarget
             let toolchainTarget = new Target
             toolchainTarget.buildFeature = buildFeature
+            toolchainTarget.buildSuccess = false
             toolchainTarget.libraryList = target.libraryList
             toolchainTarget.libraryPathList = []
             toolchainTarget.optionList = target.linkOptionList
@@ -33,46 +32,38 @@ export default class {
                 toolchainTarget.libraryPathList.push(path.join(project.projectPath, linkDirectory))
             }
             //for each source
-            let sourceTaskList = []
             for (let sourcePath of target.sourceList) {
                 let extName = path.extname(sourcePath)
                 let realPath = path.join(project.projectPath, sourcePath)
                 let outputName = output.outputName(realPath)
                 //build source
-                let sourceObj = new Source
-                toolchainTarget.sourceList.push(sourceObj)
-                sourceObj.buildFeature = buildFeature
-                sourceObj.definitionList = target.definitionList
-                sourceObj.includePathList = []
-                sourceObj.objectPrefix = path.join(target.objectPath, outputName)
-                sourceObj.optionList = target.compileOptionList
-                sourceObj.outputPath = target.objectPath
-                sourceObj.sourcePath = realPath
-                sourceObj.targetFeature = target.featureMap
+                let toolchainSource = new Source
+                toolchainSource.buildFeature = buildFeature
+                toolchainSource.definitionList = target.definitionList
+                toolchainSource.includePathList = []
+                toolchainSource.objectPrefix = path.join(target.objectPath, outputName)
+                toolchainSource.optionList = target.compileOptionList
+                toolchainSource.outputPath = target.objectPath
+                toolchainSource.sourcePath = realPath
+                toolchainSource.targetFeature = target.featureMap
                 for (let includeDirectory of target.includeDirectoryList) {
-                    sourceObj.includePathList.push(path.join(project.projectPath, includeDirectory))
+                    toolchainSource.includePathList.push(path.join(project.projectPath, includeDirectory))
                 }
                 switch (extName) {
                     case '.c':
-                        sourceObj.sourceType = 'C'
+                        toolchainSource.sourceType = 'C'
                         break
                     case '.cpp':
-                        sourceObj.sourceType = 'CXX'
+                        toolchainSource.sourceType = 'CXX'
                         break
                     case '.def':
-                        sourceObj.sourceType = 'DEF'
+                        toolchainSource.sourceType = 'DEF'
                         continue
                 }
-                sourceTaskList.push(new Task(async () => {
-                    let result = await cpp.compile(sourceObj)
-                    console.log(result.stdout, result.stderr)
-                }))
+                toolchainTarget.sourceList.push(toolchainSource)
             }
-            targetTaskList.push(new Task(async () => {
-                let result = await link.link(toolchainTarget)
-                console.log(result.stdout, result.stderr)
-            }, sourceTaskList))
+            targetTaskList.push(msvc.build(toolchainTarget))
         }
-        return new Task(null, targetTaskList)
+        return Promise.all(targetTaskList)
     }
 }

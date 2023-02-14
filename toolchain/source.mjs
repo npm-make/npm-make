@@ -1,6 +1,6 @@
 export default class ToolchainSource {
     buildFeature
-    buildSkip
+    buildSuccess
     definitionList
     includePathList
     objectPrefix

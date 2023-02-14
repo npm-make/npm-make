@@ -4,7 +4,7 @@ export default class {
     /**
      * @param {ToolchainTarget} target
      */
-    static async link(target) {
+    static async build(target) {
         let flagList = Array.from(target.optionList)
         switch (target.buildFeature.get('MACHINE')) {
             case 'arm':
