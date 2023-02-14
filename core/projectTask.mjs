@@ -28,7 +28,7 @@ export default class {
             artifact.sourceList = []
             artifact.targetFeature = target.featureMap
             artifact.targetPrefix = target.objectPath
-            artifact.targetType = 'STATIC'
+            artifact.targetType = 'SHARED'
             for (let linkDirectory of target.linkDirectoryList) {
                 artifact.libraryPathList.push(path.join(project.projectPath, linkDirectory))
             }
