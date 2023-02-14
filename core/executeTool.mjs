@@ -19,15 +19,16 @@ export default class Self {
                     let nextTask = Self.#taskQueue.shift()
                     if (nextTask) {
                         nextTask()
+                    } else {
+                        Self.#taskExecuting--
                     }
-                    Self.#taskExecuting--
                 }
 
-                Self.#taskExecuting++
                 child_process.execFile(file, args, { cwd }, taskDone)
             }
 
             if (Self.#taskExecuting < Self.#taskLimit) {
+                Self.#taskExecuting++
                 thisTask()
             } else {
                 Self.#taskQueue.push(thisTask)
