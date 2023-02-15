@@ -7,6 +7,7 @@ import msvcLink from './link.mjs'
 import msvcRc from './rc.mjs'
 
 export default class Self {
+    static environment
     static executeCL
     static executeLIB
     static executeLINK
@@ -48,6 +49,7 @@ export default class Self {
     }
 
     static async detect(targetMachine, expectMsvc, expectSdk) {
+        this.environment = {}
         this.executeCL = ''
         this.executeLIB = ''
         this.executeLINK = ''
@@ -63,17 +65,13 @@ export default class Self {
                 await detectWindows.detect(targetMachine, expectMsvc, expectSdk)
                 break
         }
+        this.environment.INCLUDE = this.includePathList.join(';')
+        this.environment.LIB = this.libraryPathList.join(';')
+        this.environment.PATH = this.executePathList.join(';')
     }
 
     static async execute(cwd, file, ...args) {
-        let result = await executeTool.execute({
-            cwd,
-            env: {
-                PATH: this.executePathList.join(';'),
-                INCLUDE: this.includePathList.join(';'),
-                LIB: this.libraryPathList.join(';')
-            }
-        }, file, ...args)
+        let result = await executeTool.execute({ cwd, env: this.environment }, file, ...args)
         console.log(result.stdout)
         return result
     }
