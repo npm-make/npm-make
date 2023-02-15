@@ -40,6 +40,7 @@ export default class {
         }
         for (let source of target.sourceList) {
             switch (source.sourceType) {
+                case 'ASM':
                 case 'C':
                 case 'CXX':
                     flagList.push(source.objectPrefix + '.obj')
