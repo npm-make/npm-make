@@ -7,6 +7,9 @@ export default class ToolchainSource {
     optionList
     outputPath
     sourcePath
+    /**
+     * @type {'ASM'|'C'|'CXX'|'DEF'|'MANIFEST'|'RC'} sourceType
+     */
     sourceType
     targetFeature
 }

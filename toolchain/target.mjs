@@ -11,5 +11,8 @@ export default class ToolchainTarget {
     sourceList
     targetFeature
     targetPrefix
+    /**
+     * @type {'EXECUTE'|'SHARED'|'STATIC'} targetType
+     */
     targetType
 }
