@@ -12,9 +12,6 @@ export default class {
         for (let includePath of source.includePathList) {
             flagList.push('/I' + includePath)
         }
-        for (let includePath of msvc.includePathList) {
-            flagList.push('/I' + includePath)
-        }
         flagList.push('/Fo' + source.objectPrefix + '.res')
         flagList.push('/nologo')
         flagList.push(source.sourcePath)

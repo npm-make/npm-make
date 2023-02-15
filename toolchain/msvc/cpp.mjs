@@ -33,7 +33,6 @@ export default class {
             }
         }
         if (source.sourceType === 'CXX') {
-            flagList.push('/Tp' + source.sourcePath)
             switch (source.targetFeature.get('STANDARD_CXX')) {
                 case '14':
                     flagList.push('/std:c++14')
@@ -49,8 +48,8 @@ export default class {
                     flagList.push('/std:c++latest')
                     break
             }
+            flagList.push('/Tp' + source.sourcePath)
         } else {
-            flagList.push('/Tc' + source.sourcePath)
             switch (source.targetFeature.get('STANDARD_C')) {
                 case '11':
                     flagList.push('/std:c11')
@@ -59,14 +58,12 @@ export default class {
                     flagList.push('/std:c17')
                     break
             }
+            flagList.push('/Tc' + source.sourcePath)
         }
         for (let definition of source.definitionList) {
             flagList.push('/D' + definition)
         }
         for (let includePath of source.includePathList) {
-            flagList.push('/I' + includePath)
-        }
-        for (let includePath of msvc.includePathList) {
             flagList.push('/I' + includePath)
         }
         flagList.push('/c')

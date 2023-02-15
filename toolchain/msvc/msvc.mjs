@@ -1,5 +1,6 @@
 import path from 'node:path'
 import process from 'node:process'
+import detectWindows from './detect/windows.mjs'
 import executeTool from '../../core/executeTool.mjs'
 import detectWindows from './detect/windows.mjs'
 import msvcCpp from './cpp.mjs'
@@ -64,7 +65,9 @@ export default class Self {
         let result = await executeTool.execute({
             cwd,
             env: {
-                PATH: path.dirname(this.executeCL) + ';' + path.dirname(this.executeRC)
+                PATH: path.dirname(this.executeCL) + ';' + path.dirname(this.executeRC),
+                INCLUDE: this.includePathList.join(';'),
+                LIB: this.libraryPathList.join(';')
             }
         }, file, ...args)
         console.log(result.stdout)

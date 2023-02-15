@@ -29,9 +29,6 @@ export default class {
         for (let libraryPath of target.libraryPathList) {
             flagList.push('/LIBPATH:' + libraryPath)
         }
-        for (let libraryPath of msvc.libraryPathList) {
-            flagList.push('/LIBPATH:' + libraryPath)
-        }
         for (let library of target.libraryList) {
             flagList.push(library)
         }
