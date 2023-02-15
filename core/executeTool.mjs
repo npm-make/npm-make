@@ -11,7 +11,7 @@ export default class Self {
         }
     }
 
-    static async execute(cwd, file, ...args) {
+    static async execute(options, file, ...args) {
         function invoke(resolve) {
             function thisTask() {
                 function taskDone(error, stdout, stderr) {
@@ -24,7 +24,7 @@ export default class Self {
                     }
                 }
 
-                child_process.execFile(file, args, { cwd }, taskDone)
+                child_process.execFile(file, args, options, taskDone)
             }
 
             if (Self.#executing < Self.#limit) {

@@ -1,3 +1,4 @@
+import path from 'node:path'
 import process from 'node:process'
 import executeTool from '../../core/executeTool.mjs'
 import detectWindows from './detect/windows.mjs'
@@ -60,7 +61,12 @@ export default class Self {
     }
 
     static async execute(cwd, file, ...args) {
-        let result = await executeTool.execute(cwd, file, ...args)
+        let result = await executeTool.execute({
+            cwd,
+            env: {
+                PATH: path.dirname(this.executeCL) + ';' + path.dirname(this.executeRC)
+            }
+        }, file, ...args)
         console.log(result.stdout)
         return result
     }
