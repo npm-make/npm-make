@@ -1,4 +1,3 @@
-import path from 'node:path'
 import process from 'node:process'
 import detectWindows from './detect/windows.mjs'
 import executeTool from '../../core/executeTool.mjs'
@@ -11,6 +10,7 @@ export default class Self {
     static executeCL
     static executeLIB
     static executeLINK
+    static executePathList
     static executeRC
     static includePathList
     static libraryList
@@ -51,6 +51,7 @@ export default class Self {
         this.executeCL = ''
         this.executeLIB = ''
         this.executeLINK = ''
+        this.executePathList = []
         this.executeRC = ''
         this.includePathList = []
         this.libraryList = []
@@ -68,7 +69,7 @@ export default class Self {
         let result = await executeTool.execute({
             cwd,
             env: {
-                PATH: path.dirname(this.executeCL) + ';' + path.dirname(this.executeRC),
+                PATH: this.executePathList.join(';'),
                 INCLUDE: this.includePathList.join(';'),
                 LIB: this.libraryPathList.join(';')
             }

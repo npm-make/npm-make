@@ -80,6 +80,7 @@ export default class Self {
         msvc.executeCL = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'cl.exe')
         msvc.executeLIB = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'lib.exe')
         msvc.executeLINK = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'link.exe')
+        msvc.executePathList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine))
         msvc.includePathList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'include'))
         msvc.libraryPathList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'lib', targetMachine))
         try {
@@ -138,6 +139,7 @@ export default class Self {
     static async #detectSdk8Real(installPath, localMachine, targetMachine, version) {
         msvc.versionSdk = version
         msvc.executeRC = path.join(installPath, 'bin', version, localMachine, 'rc.exe')
+        msvc.executePathList.push(path.join(installPath, 'bin', version, localMachine))
         msvc.includePathList.push(path.join(installPath, 'Include', version, 'cppwinrt'))
         msvc.includePathList.push(path.join(installPath, 'Include', version, 'shared'))
         msvc.includePathList.push(path.join(installPath, 'Include', version, 'ucrt'))
