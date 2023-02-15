@@ -47,6 +47,9 @@ export default class {
                 case 'DEF':
                     flagList.push('/DEF:' + source.sourcePath)
                     break
+                case 'RC':
+                    flagList.push(source.objectPrefix + '.res')
+                    break
             }
         }
         flagList.push('/NOLOGO')

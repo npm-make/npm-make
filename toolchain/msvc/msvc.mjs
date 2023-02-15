@@ -3,6 +3,7 @@ import executeTool from '../../core/executeTool.mjs'
 import detectWindows from './detect/windows.mjs'
 import msvcCpp from './cpp.mjs'
 import msvcLink from './link.mjs'
+import msvcRc from './rc.mjs'
 
 export default class Self {
     static executeCL
@@ -27,6 +28,9 @@ export default class Self {
                         case 'C':
                         case 'CXX':
                             promiseList.push(msvcCpp.build(source))
+                            break
+                        case 'RC':
+                            promiseList.push(msvcRc.build(source))
                             break
                     }
                 }

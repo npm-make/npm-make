@@ -58,7 +58,10 @@ export default class {
                         break
                     case '.def':
                         toolchainSource.sourceType = 'DEF'
-                        continue
+                        break
+                    case '.rc':
+                        toolchainSource.sourceType = 'RC'
+                        break
                 }
                 toolchainTarget.sourceList.push(toolchainSource)
             }
