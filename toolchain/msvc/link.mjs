@@ -47,6 +47,9 @@ export default class {
                 case 'DEF':
                     flagList.push('/DEF:' + source.sourcePath)
                     break
+                case 'MANIFEST':
+                    flagList.push('/MANIFESTINPUT:' + source.sourcePath)
+                    break
                 case 'RC':
                     flagList.push(source.objectPrefix + '.res')
                     break
@@ -72,6 +75,7 @@ export default class {
             } else {
                 flagList.push('/OUT:' + target.targetPrefix + '.exe')
             }
+            flagList.push('/MANIFEST:EMBED')
             return msvc.execute(target.outputPath, msvc.executeLINK, ...flagList)
         }
     }

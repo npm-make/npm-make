@@ -59,6 +59,9 @@ export default class {
                     case '.def':
                         toolchainSource.sourceType = 'DEF'
                         break
+                    case '.manifest':
+                        toolchainSource.sourceType = 'MANIFEST'
+                        break
                     case '.rc':
                         toolchainSource.sourceType = 'RC'
                         break
