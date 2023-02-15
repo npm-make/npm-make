@@ -35,6 +35,9 @@ export default class {
         for (let library of target.libraryList) {
             flagList.push(library)
         }
+        for (let library of msvc.libraryList) {
+            flagList.push(library)
+        }
         for (let source of target.sourceList) {
             switch (source.sourceType) {
                 case 'C':
