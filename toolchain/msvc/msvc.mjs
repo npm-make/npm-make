@@ -2,7 +2,7 @@ import path from 'node:path'
 import process from 'node:process'
 import detectWindows from './detect/windows.mjs'
 import executeTool from '../../core/executeTool.mjs'
-import detectWindows from './detect/windows.mjs'
+import msvcAsm from './asm.mjs'
 import msvcCpp from './cpp.mjs'
 import msvcLink from './link.mjs'
 import msvcRc from './rc.mjs'
@@ -27,6 +27,9 @@ export default class Self {
             for (let source of target.sourceList) {
                 if (!source.buildSuccess) {
                     switch (source.sourceType) {
+                        case 'ASM':
+                            promiseList.push(msvcAsm.build(source))
+                            break
                         case 'C':
                         case 'CXX':
                             promiseList.push(msvcCpp.build(source))
