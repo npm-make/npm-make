@@ -83,6 +83,21 @@ export default class Self {
         msvc.executePathList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine))
         msvc.includePathList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'include'))
         msvc.libraryPathList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'lib', targetMachine))
+        switch (targetMachine) {
+            case 'arm':
+                msvc.executeASM = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'armasm.exe')
+                break
+            case 'arm64':
+            case 'arm64ec':
+                msvc.executeASM = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'armasm64.exe')
+                break
+            case 'x64':
+                msvc.executeASM = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'ml64.exe')
+                break
+            case 'x86':
+                msvc.executeASM = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'ml.exe')
+                break
+        }
         try {
             await fs.access(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'atlmfc'))
             msvc.includePathList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'atlmfc', 'include'))
