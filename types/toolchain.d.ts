@@ -7,7 +7,7 @@ declare class BuildFeature {
     STATIC_RUNTIME: boolean
 }
 
-declare class TargetFeature {
+export declare class TargetFeature {
     STANDARD_C: string
     STANDARD_CXX: string
     WIN32_MAIN: boolean
