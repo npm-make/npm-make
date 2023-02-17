@@ -1,4 +1,8 @@
-import { TargetFeature } from './toolchain'
+export declare class TargetFeature {
+    STANDARD_C: string
+    STANDARD_CXX: string
+    WIN32_MAIN: boolean
+}
 
 declare class InterfaceTarget {
     compileOptionList: string[]

@@ -1,3 +1,5 @@
+import { TargetFeature } from './project'
+
 declare class BuildFeature {
     DEBUG: boolean
     DEBUG_WITHOUT_RTC: boolean
@@ -5,12 +7,6 @@ declare class BuildFeature {
     RELEASE_WITH_DEBUG_INFO: boolean
     RELEASE_MIN_SIZE: boolean
     STATIC_RUNTIME: boolean
-}
-
-export declare class TargetFeature {
-    STANDARD_C: string
-    STANDARD_CXX: string
-    WIN32_MAIN: boolean
 }
 
 declare class ToolchainSource {
