@@ -6,7 +6,7 @@ export default class {
      */
     static async build(target) {
         let flagList = Array.from(target.optionList)
-        switch (target.buildFeature.get('MACHINE')) {
+        switch (target.buildFeature.MACHINE) {
             case 'arm':
                 flagList.push('/MACHINE:ARM')
                 break
@@ -23,7 +23,7 @@ export default class {
                 flagList.push('/MACHINE:X86')
                 break
         }
-        if (target.targetFeature.has('WIN32_MAIN')) {
+        if (target.targetFeature.WIN32_MAIN) {
             flagList.push('/SUBSYSTEM:WINDOWS')
         }
         for (let libraryPath of target.libraryPathList) {
@@ -59,10 +59,10 @@ export default class {
             flagList.push('/OUT:' + target.targetPrefix + '.lib')
             return msvc.execute(target.outputPath, msvc.executeLIB, ...flagList)
         } else {
-            if (target.buildFeature.has('DEBUG')) {
+            if (target.buildFeature.DEBUG) {
                 flagList.push('/DEBUG')
             } else {
-                if (target.buildFeature.has('RELEASE_WITH_DEBUG_INFO')) {
+                if (target.buildFeature.RELEASE_WITH_DEBUG_INFO) {
                     flagList.push('/DEBUG')
                 }
                 flagList.push('/INCREMENTAL:NO')

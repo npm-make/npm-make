@@ -5,14 +5,8 @@ export default class ToolchainTarget {
     libraryPathList
     optionList
     outputPath
-    /**
-     * @type {ToolchainSource[]} sourceList
-     */
     sourceList
     targetFeature
     targetPrefix
-    /**
-     * @type {'EXECUTE'|'SHARED'|'STATIC'} targetType
-     */
     targetType
 }

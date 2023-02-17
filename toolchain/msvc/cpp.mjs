@@ -6,11 +6,11 @@ export default class {
      */
     static async build(source) {
         let flagList = Array.from(source.optionList)
-        if (source.buildFeature.has('DEBUG')) {
-            if (!source.buildFeature.has('DEBUG_WITHOUT_RTC')) {
+        if (source.buildFeature.DEBUG) {
+            if (!source.buildFeature.DEBUG_WITHOUT_RTC) {
                 flagList.push('/RTC1')
             }
-            if (source.buildFeature.has('STATIC_RUNTIME')) {
+            if (source.buildFeature.STATIC_RUNTIME) {
                 flagList.push('/MTd')
             } else {
                 flagList.push('/MDd')
@@ -18,22 +18,22 @@ export default class {
             flagList.push('/Od')
             flagList.push('/Zi')
         } else {
-            if (source.buildFeature.has('RELEASE_MIN_SIZE')) {
+            if (source.buildFeature.RELEASE_MIN_SIZE) {
                 flagList.push('/O1')
             } else {
                 flagList.push('/O2')
             }
-            if (source.buildFeature.has('RELEASE_WITH_DEBUG_INFO')) {
+            if (source.buildFeature.RELEASE_WITH_DEBUG_INFO) {
                 flagList.push('/Zi')
             }
-            if (source.buildFeature.has('STATIC_RUNTIME')) {
+            if (source.buildFeature.STATIC_RUNTIME) {
                 flagList.push('/MT')
             } else {
                 flagList.push('/MD')
             }
         }
         if (source.sourceType === 'CXX') {
-            switch (source.targetFeature.get('STANDARD_CXX')) {
+            switch (source.targetFeature.STANDARD_CXX) {
                 case '14':
                     flagList.push('/std:c++14')
                     break
@@ -50,7 +50,7 @@ export default class {
             }
             flagList.push('/Tp' + source.sourcePath)
         } else {
-            switch (source.targetFeature.get('STANDARD_C')) {
+            switch (source.targetFeature.STANDARD_C) {
                 case '11':
                     flagList.push('/std:c11')
                     break
