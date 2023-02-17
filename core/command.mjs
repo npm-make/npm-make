@@ -1,6 +1,6 @@
 import process from 'node:process'
 import loader from './loader.mjs'
-import toolchain from '../toolchain/toolchain.mjs'
+import toolchain from './toolchain.mjs'
 import projectTask from './projectTask.mjs'
 import path from 'node:path'
 

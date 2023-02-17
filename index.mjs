@@ -8,11 +8,11 @@ let method = null
 let afterMethod = new Map
 for (let input of inputList) {
     if (method) {
-        argumentTool.parseArgument(afterMethod, input)
+        argumentTool.parse(afterMethod, input)
     } else if (input in command) {
         method = input
     } else {
-        argumentTool.parseArgument(beforeMethod, input)
+        argumentTool.parse(beforeMethod, input)
     }
 }
 if (method) {

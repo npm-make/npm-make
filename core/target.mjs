@@ -31,7 +31,7 @@ export default class Target {
 
     addFeature(...featureList) {
         for (let feature of featureList) {
-            argumentTool.parseArgument(this.featureMap, feature)
+            argumentTool.parse(this.featureMap, feature)
         }
     }
 
