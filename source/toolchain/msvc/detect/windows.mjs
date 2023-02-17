@@ -5,29 +5,6 @@ import msvc from '../msvc.mjs'
 
 //noinspection JSUnresolvedVariable
 export default class Self {
-    static async detect(targetMachine, expectMsvc, expectSdk) {
-        msvc.libraryList.push('advapi32.lib')
-        msvc.libraryList.push('comdlg32.lib')
-        msvc.libraryList.push('gdi32.lib')
-        msvc.libraryList.push('kernel32.lib')
-        msvc.libraryList.push('ole32.lib')
-        msvc.libraryList.push('oleaut32.lib')
-        msvc.libraryList.push('shell32.lib')
-        msvc.libraryList.push('user32.lib')
-        msvc.libraryList.push('uuid.lib')
-        msvc.libraryList.push('winspool.lib')
-        switch (process.arch) {
-            case 'ia32':
-                await this.#detectMsvc('C:\\Program Files', 'x86', targetMachine, expectMsvc)
-                await this.#detectSdk('C:\\Program Files', 'x86', targetMachine, expectSdk)
-                break
-            case 'x64':
-                await this.#detectMsvc('C:\\Program Files (x86)', 'x64', targetMachine, expectMsvc)
-                await this.#detectSdk('C:\\Program Files (x86)', 'x64', targetMachine, expectSdk)
-                break
-        }
-    }
-
     static async #detectMsvc(programRoot, localMachine, targetMachine, expectMsvc) {
         let detectMsvc14 = await this.#detectMsvc14(programRoot, localMachine, targetMachine, expectMsvc)
         if (!detectMsvc14) {

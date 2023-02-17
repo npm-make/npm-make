@@ -1,4 +1,4 @@
-import argumentTool from './argumentTool.mjs'
+import argumentTool from '../argumentTool.mjs'
 
 /**
  * @namespace core

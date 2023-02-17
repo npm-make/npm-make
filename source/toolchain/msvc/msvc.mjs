@@ -1,12 +1,10 @@
-import process from 'node:process'
-import detectWindows from './detect/windows.mjs'
 import executeTool from '../../executeTool.mjs'
 import msvcAsm from './asm.mjs'
 import msvcCpp from './cpp.mjs'
 import msvcLink from './link.mjs'
 import msvcRc from './rc.mjs'
 
-export default class Self {
+export default class {
     static environment
     static executeASM
     static executeCL
@@ -25,9 +23,11 @@ export default class Self {
      */
     static async build(target) {
         if (!target.buildSuccess) {
+            target.buildSuccess = true
             let promiseList = []
             for (let source of target.sourceList) {
                 if (!source.buildSuccess) {
+                    source.buildSuccess = true
                     switch (source.sourceType) {
                         case 'ASM':
                             promiseList.push(msvcAsm.build(source))
@@ -42,34 +42,9 @@ export default class Self {
                     }
                 }
             }
-            if (promiseList.length > 0) {
-                await Promise.all(promiseList)
-            }
+            await Promise.all(promiseList)
             await msvcLink.build(target)
         }
-    }
-
-    static async detect(targetMachine, expectMsvc, expectSdk) {
-        this.executeASM = ''
-        this.executeCL = ''
-        this.executeLIB = ''
-        this.executeLINK = ''
-        this.executePathList = []
-        this.executeRC = ''
-        this.includePathList = []
-        this.libraryList = []
-        this.libraryPathList = []
-        this.versionMsvc = ''
-        this.versionSdk = ''
-        switch (process.platform) {
-            case 'win32':
-                await detectWindows.detect(targetMachine, expectMsvc, expectSdk)
-                break
-        }
-        this.environment = {}
-        this.environment.INCLUDE = this.includePathList.join(';')
-        this.environment.LIB = this.libraryPathList.join(';')
-        this.environment.PATH = this.executePathList.join(';')
     }
 
     static async execute(cwd, file, ...args) {

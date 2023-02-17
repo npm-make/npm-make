@@ -7,19 +7,19 @@ export default class {
     static async build(target) {
         let flagList = Array.from(target.optionList)
         switch (target.buildFeature.MACHINE) {
-            case 'arm':
+            case 'ARM':
                 flagList.push('/MACHINE:ARM')
                 break
-            case 'arm64':
+            case 'ARM64':
                 flagList.push('/MACHINE:ARM64')
                 break
-            case 'arm64ec':
+            case 'ARM64EC':
                 flagList.push('/MACHINE:ARM64EC')
                 break
-            case 'x64':
+            case 'X64':
                 flagList.push('/MACHINE:X64')
                 break
-            case 'x86':
+            case 'X86':
                 flagList.push('/MACHINE:X86')
                 break
         }
