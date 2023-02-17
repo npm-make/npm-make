@@ -7,6 +7,7 @@ export declare class TargetFeature {
 declare class InterfaceTarget {
     compileOptionList: string[]
     definitionList: string[]
+    dependencyList: string[]
     includeDirectoryList: string[]
     libraryList: string[]
     linkDirectoryList: string[]
