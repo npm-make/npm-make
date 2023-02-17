@@ -73,6 +73,10 @@ export default class Self {
     }
 
     static async execute(cwd, file, ...args) {
-        return executeTool.execute({ cwd, env: this.environment }, file, ...args)
+        let result = await executeTool.execute({ cwd, env: this.environment }, file, ...args)
+        console.log(result.stdout)
+        if (result.error) {
+            throw new Error(result.stdout)
+        }
     }
 }
