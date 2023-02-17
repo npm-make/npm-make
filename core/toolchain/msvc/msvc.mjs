@@ -1,6 +1,6 @@
 import process from 'node:process'
 import detectWindows from './detect/windows.mjs'
-import executeTool from '../executeTool.mjs'
+import executeTool from '../../executeTool.mjs'
 import msvcAsm from './asm.mjs'
 import msvcCpp from './cpp.mjs'
 import msvcLink from './link.mjs'
