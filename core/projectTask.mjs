@@ -1,9 +1,7 @@
 import path from 'node:path'
 import fs from 'node:fs/promises'
 import output from './output.mjs'
-import Source from '../toolchain/source.mjs'
-import Target from '../toolchain/target.mjs'
-import msvc from '../toolchain/msvc/msvc.mjs'
+import msvc from './msvc/msvc.mjs'
 
 export default class {
     /**
@@ -17,7 +15,7 @@ export default class {
             target.objectPath = path.join(outputPath, target.targetName)
             await fs.mkdir(target.objectPath, { recursive: true })
             //build toolchainTarget
-            let toolchainTarget = new Target
+            let toolchainTarget = {}
             toolchainTarget.buildFeature = buildFeature
             toolchainTarget.buildSuccess = false
             toolchainTarget.libraryList = target.libraryList
@@ -37,7 +35,7 @@ export default class {
                 let realPath = path.join(project.projectPath, sourcePath)
                 let outputName = output.outputName(realPath)
                 //build source
-                let toolchainSource = new Source
+                let toolchainSource = {}
                 toolchainSource.buildFeature = buildFeature
                 toolchainSource.definitionList = target.definitionList
                 toolchainSource.includePathList = []
