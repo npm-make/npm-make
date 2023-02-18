@@ -4,7 +4,7 @@ export default class {
     static #ignoreDir = /^node_modules|^npm_make|^\./
 
     /**
-     * @param {InterfaceProject} project
+     * @param {InternalProject} project
      */
     static async searchProject(project) {
         await this.searchPath(project.projectFileList, project.projectPath, '')
