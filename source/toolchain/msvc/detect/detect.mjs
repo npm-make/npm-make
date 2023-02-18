@@ -3,7 +3,6 @@ import detectWindows from './windows.mjs'
 import msvc from '../msvc.mjs'
 
 export default class {
-
     static async detect(targetMachine, expectMsvc, expectSdk) {
         this.executeASM = ''
         this.executeCL = ''

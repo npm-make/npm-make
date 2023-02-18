@@ -5,130 +5,158 @@ import msvc from '../msvc.mjs'
 
 //noinspection JSUnresolvedVariable
 export default class Self {
-    static async #detectMsvc(programRoot, localMachine, targetMachine, expectMsvc) {
-        let detectMsvc14 = await this.#detectMsvc14(programRoot, localMachine, targetMachine, expectMsvc)
-        if (!detectMsvc14) {
-            throw new Error('cannot found MSVC')
+    // static async #detectMsvc(programRoot, localMachine, targetMachine, expectMsvc) {
+    //     let detectMsvc14 = await this.#detectMsvc14(programRoot, localMachine, targetMachine, expectMsvc)
+    //     if (!detectMsvc14) {
+    //         throw new Error('cannot found MSVC')
+    //     }
+    // }
+    //
+    // static async #detectMsvc14(programRoot, localMachine, targetMachine, expectMsvc) {
+    //     let installPathList = await this.#detectMsvc14Install()
+    //     for (let installPath of installPathList) {
+    //         let versionList = await this.#detectMsvc14Version(installPath)
+    //         for (let version of versionList) {
+    //             if (!expectMsvc || expectMsvc === version) {
+    //                 await this.#detectMsvc14Real(localMachine, targetMachine, installPath, version)
+    //                 return true
+    //             }
+    //         }
+    //     }
+    //     return false
+    // }
+    //
+    // static async #detectMsvc14Install() {
+    //     try {
+    //         let installPathList = []
+    //         let instanceDir = await fs.opendir('C:\\ProgramData\\Microsoft\\VisualStudio\\Packages\\_Instances')
+    //         for await (let instance of instanceDir) {
+    //             let statePath = path.join(instanceDir.path, instance.name, 'state.json')
+    //             let stateJson = JSON.parse(await fs.readFile(statePath, 'utf-8'))
+    //             installPathList.push(stateJson.installationPath)
+    //         }
+    //         return installPathList
+    //     } catch {
+    //     }
+    // }
+    //
+    // static async #detectMsvc14Version(installPath) {
+    //     try {
+    //         let versionList = []
+    //         let versionDir = await fs.opendir(path.join(installPath, 'VC', 'Tools', 'MSVC'))
+    //         for await (let versionItem of versionDir) {
+    //             versionList.push(versionItem.name)
+    //         }
+    //         return versionList
+    //     } catch {
+    //     }
+    // }
+    //
+    // static async #detectMsvc14Real(localMachine, targetMachine, installPath, version) {
+    //     msvc.versionMsvc = version
+    //     msvc.executeCL = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'cl.exe')
+    //     msvc.executeLIB = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'lib.exe')
+    //     msvc.executeLINK = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'link.exe')
+    //     msvc.executePathList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine))
+    //     msvc.includePathList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'include'))
+    //     msvc.libraryPathList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'lib', targetMachine))
+    //     switch (targetMachine) {
+    //         case 'arm':
+    //             msvc.executeASM = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'armasm.exe')
+    //             break
+    //         case 'arm64':
+    //         case 'arm64ec':
+    //             msvc.executeASM = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'armasm64.exe')
+    //             break
+    //         case 'x64':
+    //             msvc.executeASM = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'ml64.exe')
+    //             break
+    //         case 'x86':
+    //             msvc.executeASM = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'ml.exe')
+    //             break
+    //     }
+    //     try {
+    //         await fs.access(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'atlmfc'))
+    //         msvc.includePathList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'atlmfc', 'include'))
+    //         msvc.libraryPathList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'atlmfc', 'lib', targetMachine))
+    //     } catch {
+    //     }
+    // }
+    //
+    // static async #detectSdk(programRoot, localMachine, targetMachine, expectSdk) {
+    //     let detectSdk8 = await this.#detectSdk8(programRoot, localMachine, targetMachine, expectSdk)
+    //     if (!detectSdk8) {
+    //         throw new Error('cannot found Windows SDK')
+    //     }
+    // }
+    //
+    // static async #detectSdk8(programRoot, localMachine, targetMachine, expectSdk) {
+    //     let installPathList = await this.#detectSdk8Install(programRoot)
+    //     for (let installPath of installPathList) {
+    //         let versionList = await this.#detectSdk8Version(installPath)
+    //         for (let version of versionList) {
+    //             if (!expectSdk || expectSdk === version) {
+    //                 await this.#detectSdk8Real(installPath, localMachine, targetMachine, version)
+    //                 return true
+    //             }
+    //         }
+    //     }
+    //     return false
+    // }
+    //
+    // static async #detectSdk8Install(programRoot) {
+    //     try {
+    //         let installPathList = []
+    //         let installDir = await fs.opendir(path.join(programRoot, 'Windows Kits'))
+    //         for await (let installItem of installDir) {
+    //             installPathList.push(path.join(installDir.path, installItem.name))
+    //         }
+    //         return installPathList
+    //     } catch {
+    //     }
+    // }
+    //
+    // static async #detectSdk8Version(installPath) {
+    //     try {
+    //         let versionList = []
+    //         let includeDir = await fs.opendir(path.join(installPath, 'Include'))
+    //         for await (let versionItem of includeDir) {
+    //             versionList.push(versionItem.name)
+    //         }
+    //         return versionList
+    //     } catch {
+    //     }
+    // }
+
+    static #detectSdkReal7(installPath, localMachine, targetMachine, version, versionText) {
+        msvc.versionSdk = version
+        msvc.includePathList.push(path.join(installPath, versionText, 'Include'))
+        if (targetMachine === 'x86') {
+            msvc.executeRC = path.join(installPath, versionText, 'Bin', 'rc.exe')
+            msvc.executePathList.push(path.join(installPath, versionText, 'Bin'))
+            msvc.libraryPathList.push(path.join(installPath, versionText, 'Lib'))
+        } else if (targetMachine === 'x64') {
+            msvc.executeRC = path.join(installPath, versionText, 'Bin', 'x64', 'rc.exe')
+            msvc.executePathList.push(path.join(installPath, versionText, 'Bin', 'x64'))
+            msvc.libraryPathList.push(path.join(installPath, versionText, 'Lib', 'x64'))
         }
     }
 
-    static async #detectMsvc14(programRoot, localMachine, targetMachine, expectMsvc) {
-        let installPathList = await this.#detectMsvc14Install()
-        for (let installPath of installPathList) {
-            let versionList = await this.#detectMsvc14Version(installPath)
-            for (let version of versionList) {
-                if (!expectMsvc || expectMsvc === version) {
-                    await this.#detectMsvc14Real(localMachine, targetMachine, installPath, version)
-                    return true
-                }
-            }
-        }
-        return false
-    }
-
-    static async #detectMsvc14Install() {
-        try {
-            let installPathList = []
-            let instanceDir = await fs.opendir('C:\\ProgramData\\Microsoft\\VisualStudio\\Packages\\_Instances')
-            for await (let instance of instanceDir) {
-                let statePath = path.join(instanceDir.path, instance.name, 'state.json')
-                let stateJson = JSON.parse(await fs.readFile(statePath, 'utf-8'))
-                installPathList.push(stateJson.installationPath)
-            }
-            return installPathList
-        } catch {
+    static #detectSdkReal8(installPath, localMachine, targetMachine, version) {
+        msvc.versionSdk = version
+        msvc.executeRC = path.join(installPath, 'bin', localMachine, 'rc.exe')
+        msvc.executePathList.push(path.join(installPath, 'bin', localMachine))
+        msvc.includePathList.push(path.join(installPath, 'Include', 'shared'))
+        msvc.includePathList.push(path.join(installPath, 'Include', 'um'))
+        msvc.includePathList.push(path.join(installPath, 'Include', 'winrt'))
+        if (version === '8.0') {
+            msvc.libraryPathList.push(path.join(installPath, 'Lib', 'winv6.2', 'um', targetMachine))
+        } else if (version === '8.1') {
+            msvc.libraryPathList.push(path.join(installPath, 'Lib', 'winv6.3', 'um', targetMachine))
         }
     }
 
-    static async #detectMsvc14Version(installPath) {
-        try {
-            let versionList = []
-            let versionDir = await fs.opendir(path.join(installPath, 'VC', 'Tools', 'MSVC'))
-            for await (let versionItem of versionDir) {
-                versionList.push(versionItem.name)
-            }
-            return versionList
-        } catch {
-        }
-    }
-
-    static async #detectMsvc14Real(localMachine, targetMachine, installPath, version) {
-        msvc.versionMsvc = version
-        msvc.executeCL = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'cl.exe')
-        msvc.executeLIB = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'lib.exe')
-        msvc.executeLINK = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'link.exe')
-        msvc.executePathList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine))
-        msvc.includePathList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'include'))
-        msvc.libraryPathList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'lib', targetMachine))
-        switch (targetMachine) {
-            case 'arm':
-                msvc.executeASM = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'armasm.exe')
-                break
-            case 'arm64':
-            case 'arm64ec':
-                msvc.executeASM = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'armasm64.exe')
-                break
-            case 'x64':
-                msvc.executeASM = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'ml64.exe')
-                break
-            case 'x86':
-                msvc.executeASM = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'ml.exe')
-                break
-        }
-        try {
-            await fs.access(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'atlmfc'))
-            msvc.includePathList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'atlmfc', 'include'))
-            msvc.libraryPathList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'atlmfc', 'lib', targetMachine))
-        } catch {
-        }
-    }
-
-    static async #detectSdk(programRoot, localMachine, targetMachine, expectSdk) {
-        let detectSdk8 = await this.#detectSdk8(programRoot, localMachine, targetMachine, expectSdk)
-        if (!detectSdk8) {
-            throw new Error('cannot found Windows SDK')
-        }
-    }
-
-    static async #detectSdk8(programRoot, localMachine, targetMachine, expectSdk) {
-        let installPathList = await this.#detectSdk8Install(programRoot)
-        for (let installPath of installPathList) {
-            let versionList = await this.#detectSdk8Version(installPath)
-            for (let version of versionList) {
-                if (!expectSdk || expectSdk === version) {
-                    await this.#detectSdk8Real(installPath, localMachine, targetMachine, version)
-                    return true
-                }
-            }
-        }
-        return false
-    }
-
-    static async #detectSdk8Install(programRoot) {
-        try {
-            let installPathList = []
-            let installDir = await fs.opendir(path.join(programRoot, 'Windows Kits'))
-            for await (let installItem of installDir) {
-                installPathList.push(path.join(installDir.path, installItem.name))
-            }
-            return installPathList
-        } catch {
-        }
-    }
-
-    static async #detectSdk8Version(installPath) {
-        try {
-            let versionList = []
-            let includeDir = await fs.opendir(path.join(installPath, 'Include'))
-            for await (let versionItem of includeDir) {
-                versionList.push(versionItem.name)
-            }
-            return versionList
-        } catch {
-        }
-    }
-
-    static async #detectSdk8Real(installPath, localMachine, targetMachine, version) {
+    static #detectSdkReal10(installPath, localMachine, targetMachine, version) {
         msvc.versionSdk = version
         msvc.executeRC = path.join(installPath, 'bin', version, localMachine, 'rc.exe')
         msvc.executePathList.push(path.join(installPath, 'bin', version, localMachine))
