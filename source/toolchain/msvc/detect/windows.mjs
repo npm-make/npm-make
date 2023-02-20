@@ -3,7 +3,6 @@ import path from 'node:path'
 import process from 'node:process'
 import msvc from '../msvc.mjs'
 
-//noinspection JSUnresolvedVariable
 export default class Self {
     // static async #detectMsvc(programRoot, localMachine, targetMachine, expectMsvc) {
     //     let detectMsvc14 = await this.#detectMsvc14(programRoot, localMachine, targetMachine, expectMsvc)
@@ -51,37 +50,104 @@ export default class Self {
     //     } catch {
     //     }
     // }
-    //
-    // static async #detectMsvc14Real(localMachine, targetMachine, installPath, version) {
-    //     msvc.versionMsvc = version
-    //     msvc.executeCL = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'cl.exe')
-    //     msvc.executeLIB = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'lib.exe')
-    //     msvc.executeLINK = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'link.exe')
-    //     msvc.executePathList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine))
-    //     msvc.includePathList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'include'))
-    //     msvc.libraryPathList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'lib', targetMachine))
-    //     switch (targetMachine) {
-    //         case 'arm':
-    //             msvc.executeASM = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'armasm.exe')
-    //             break
-    //         case 'arm64':
-    //         case 'arm64ec':
-    //             msvc.executeASM = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'armasm64.exe')
-    //             break
-    //         case 'x64':
-    //             msvc.executeASM = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'ml64.exe')
-    //             break
-    //         case 'x86':
-    //             msvc.executeASM = path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'bin', 'Host' + localMachine, targetMachine, 'ml.exe')
-    //             break
-    //     }
-    //     try {
-    //         await fs.access(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'atlmfc'))
-    //         msvc.includePathList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'atlmfc', 'include'))
-    //         msvc.libraryPathList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'atlmfc', 'lib', targetMachine))
-    //     } catch {
-    //     }
-    // }
+
+    static #detectMsvc11Base(installPath, localMachine, targetMachine, version) {
+        msvc.versionMsvc = version
+        msvc.includePathList.push(path.join(installPath, 'VC', 'include'))
+        switch (targetMachine) {
+            case 'arm':
+                msvc.libraryPathList.push(path.join(installPath, 'VC', 'lib', 'arm'))
+                switch (localMachine) {
+                    case 'x86':
+                        this.#detectMsvc11Execute(installPath, 'x86_arm', 'armasm.exe')
+                        break
+                    case 'x64':
+                        this.#detectMsvc11Execute(installPath, 'amd64_arm', 'armasm.exe')
+                        break
+                }
+                break
+            case 'x64':
+                msvc.libraryPathList.push(path.join(installPath, 'VC', 'lib', 'amd64'))
+                switch (localMachine) {
+                    case 'x86':
+                        this.#detectMsvc11Execute(installPath, 'x86_amd64', 'ml64.exe')
+                        break
+                    case 'x64':
+                        this.#detectMsvc11Execute(installPath, 'amd64', 'ml64.exe')
+                        break
+                }
+                break
+            case 'x86':
+                msvc.libraryPathList.push(path.join(installPath, 'VC', 'lib'))
+                switch (localMachine) {
+                    case 'x86':
+                        this.#detectMsvc11Execute(installPath, '', 'ml.exe')
+                        break
+                    case 'x64':
+                        this.#detectMsvc11Execute(installPath, 'amd64_x86', 'ml.exe')
+                        break
+                }
+                break
+        }
+    }
+
+    static #detectMsvc11Execute(installPath, executePath, executeASM) {
+        msvc.executeASM = path.join(installPath, 'VC', 'bin', executePath, executeASM)
+        msvc.executeCL = path.join(installPath, 'VC', 'bin', executePath, 'cl.exe')
+        msvc.executeLIB = path.join(installPath, 'VC', 'bin', executePath, 'lib.exe')
+        msvc.executeLINK = path.join(installPath, 'VC', 'bin', executePath, 'link.exe')
+        msvc.executePathList.push(path.join(installPath, 'VC', 'bin', executePath))
+    }
+
+    static #detectMsvc14Base(installPath, localMachine, targetMachine, version) {
+        msvc.versionMsvc = version
+        msvc.includePathList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'include'))
+        msvc.libraryPathList.push(path.join(installPath, 'VC', 'Tools', 'MSVC', version, 'lib', targetMachine))
+        switch (localMachine) {
+            case 'x64':
+                this.#detectMsvc14Execute(installPath, targetMachine, version, 'Hostx64')
+                break
+            case 'x86':
+                this.#detectMsvc14Execute(installPath, targetMachine, version, 'Hostx86')
+                break
+        }
+    }
+
+    static async #detectMsvc14Execute(targetMachine, executePath) {
+        try {
+            await fs.access(executePath)
+            msvc.executeCL = path.join(executePath, 'cl.exe')
+            msvc.executeLIB = path.join(executePath, 'lib.exe')
+            msvc.executeLINK = path.join(executePath, 'link.exe')
+            msvc.executePathList.push(executePath)
+            switch (targetMachine) {
+                case 'arm':
+                    msvc.executeASM = path.join(executePath, 'armasm.exe')
+                    break
+                case 'arm64':
+                case 'arm64ec':
+                    msvc.executeASM = path.join(executePath, 'armasm64.exe')
+                    break
+                case 'x64':
+                    msvc.executeASM = path.join(executePath, 'ml64.exe')
+                    break
+                case 'x86':
+                    msvc.executeASM = path.join(executePath, 'ml.exe')
+                    break
+            }
+        } catch {
+        }
+    }
+
+    static async #detectMsvc14Mfc(targetMachine, mfcPath) {
+        try {
+            await fs.access(mfcPath)
+            msvc.includePathList.push(path.join(mfcPath, 'include'))
+            msvc.libraryPathList.push(path.join(mfcPath, 'lib', targetMachine))
+        } catch {
+        }
+    }
+
     //
     // static async #detectSdk(programRoot, localMachine, targetMachine, expectSdk) {
     //     let detectSdk8 = await this.#detectSdk8(programRoot, localMachine, targetMachine, expectSdk)
@@ -128,35 +194,41 @@ export default class Self {
     //     }
     // }
 
-    static #detectSdkReal7(installPath, localMachine, targetMachine, version, versionText) {
+    static #detectSdk7Base(installPath, targetMachine, version) {
         msvc.versionSdk = version
-        msvc.includePathList.push(path.join(installPath, versionText, 'Include'))
-        if (targetMachine === 'x86') {
-            msvc.executeRC = path.join(installPath, versionText, 'Bin', 'rc.exe')
-            msvc.executePathList.push(path.join(installPath, versionText, 'Bin'))
-            msvc.libraryPathList.push(path.join(installPath, versionText, 'Lib'))
-        } else if (targetMachine === 'x64') {
-            msvc.executeRC = path.join(installPath, versionText, 'Bin', 'x64', 'rc.exe')
-            msvc.executePathList.push(path.join(installPath, versionText, 'Bin', 'x64'))
-            msvc.libraryPathList.push(path.join(installPath, versionText, 'Lib', 'x64'))
+        msvc.includePathList.push(path.join(installPath, version, 'Include'))
+        switch (targetMachine) {
+            case 'x64':
+                msvc.executeRC = path.join(installPath, version, 'Bin', 'x64', 'rc.exe')
+                msvc.executePathList.push(path.join(installPath, version, 'Bin', 'x64'))
+                msvc.libraryPathList.push(path.join(installPath, version, 'Lib', 'x64'))
+                break
+            case 'x86':
+                msvc.executeRC = path.join(installPath, version, 'Bin', 'rc.exe')
+                msvc.executePathList.push(path.join(installPath, version, 'Bin'))
+                msvc.libraryPathList.push(path.join(installPath, version, 'Lib'))
+                break
         }
     }
 
-    static #detectSdkReal8(installPath, localMachine, targetMachine, version) {
+    static #detectSdk8Base(installPath, localMachine, targetMachine, version) {
         msvc.versionSdk = version
         msvc.executeRC = path.join(installPath, 'bin', localMachine, 'rc.exe')
         msvc.executePathList.push(path.join(installPath, 'bin', localMachine))
         msvc.includePathList.push(path.join(installPath, 'Include', 'shared'))
         msvc.includePathList.push(path.join(installPath, 'Include', 'um'))
         msvc.includePathList.push(path.join(installPath, 'Include', 'winrt'))
-        if (version === '8.0') {
-            msvc.libraryPathList.push(path.join(installPath, 'Lib', 'winv6.2', 'um', targetMachine))
-        } else if (version === '8.1') {
-            msvc.libraryPathList.push(path.join(installPath, 'Lib', 'winv6.3', 'um', targetMachine))
+        switch (version) {
+            case '8.0':
+                msvc.libraryPathList.push(path.join(installPath, 'Lib', 'winv6.2', 'um', targetMachine))
+                break
+            case '8.1':
+                msvc.libraryPathList.push(path.join(installPath, 'Lib', 'winv6.3', 'um', targetMachine))
+                break
         }
     }
 
-    static #detectSdkReal10(installPath, localMachine, targetMachine, version) {
+    static #detectSdk10Base(installPath, localMachine, targetMachine, version) {
         msvc.versionSdk = version
         msvc.executeRC = path.join(installPath, 'bin', version, localMachine, 'rc.exe')
         msvc.executePathList.push(path.join(installPath, 'bin', version, localMachine))
