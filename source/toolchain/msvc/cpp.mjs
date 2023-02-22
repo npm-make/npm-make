@@ -71,6 +71,8 @@ export default class {
         flagList.push('/Fo' + source.objectPrefix + '.obj')
         flagList.push('/nologo')
         flagList.push('/utf-8')
-        return msvc.execute(source.outputPath, msvc.executeCL, ...flagList)
+        let result = await msvc.execute(source.outputPath, msvc.executeCL, ...flagList)
+        source.buildSuccess = true
+        return result
     }
 }

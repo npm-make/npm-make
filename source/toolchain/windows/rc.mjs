@@ -1,4 +1,4 @@
-import msvc from './msvc.mjs'
+import windows from './windows.mjs'
 
 export default class {
     /**
@@ -15,6 +15,8 @@ export default class {
         flagList.push('/Fo' + source.objectPrefix + '.res')
         flagList.push('/nologo')
         flagList.push(source.sourcePath)
-        return msvc.execute(source.outputPath, msvc.executeRC, ...flagList)
+        let result = await windows.execute(source.outputPath, windows.executeRC, ...flagList)
+        source.buildSuccess = true
+        return result
     }
 }
