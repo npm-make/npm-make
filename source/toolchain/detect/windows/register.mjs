@@ -1,6 +1,6 @@
 import executeTool from '../../../executeTool.mjs'
 
-export default class {
+export default class Self {
     static async query(path, key) {
         let result = await executeTool.execute(null, 'reg', 'QUERY', path, '/v', key)
         if (!result.error) {
