@@ -1,8 +1,10 @@
 import executeTool from '../../../executeTool.mjs'
 
 export default class {
-    async query(path, key) {
-        let result = executeTool.execute(null, 'reg', path, key)
-
+    static async query(path, key) {
+        let result = await executeTool.execute(null, 'reg', 'QUERY', path, '/v', key)
+        if (!result.error) {
+            return /(?<type>REG_\w+)\s+(?<value>.*)/.exec(result.stdout)
+        }
     }
 }
