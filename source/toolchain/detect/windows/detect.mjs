@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import process from 'node:process'
-import msvc from '../msvc.mjs'
+import msvc from '../../msvc/msvc.mjs'
 
 export default class Self {
     // static async #detectMsvc(programRoot, localMachine, targetMachine, expectMsvc) {

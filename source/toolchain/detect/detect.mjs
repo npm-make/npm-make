@@ -1,6 +1,6 @@
 import process from 'node:process'
-import detectWindows from './windows.mjs'
-import msvc from '../msvc.mjs'
+import detectWindows from './windows/detect.mjs'
+import msvc from '../msvc/msvc.mjs'
 
 export default class {
     static async detect(targetMachine, expectMsvc, expectSdk) {

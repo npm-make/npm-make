@@ -2,7 +2,7 @@ import child_process from 'node:child_process'
 import process from 'node:process'
 
 export default class Self {
-    static #executing = 0
+    static #running = 0
     static #limit = 10
     static #queue = []
     static {
@@ -20,15 +20,15 @@ export default class Self {
                     if (nextTask) {
                         nextTask()
                     } else {
-                        Self.#executing--
+                        Self.#running--
                     }
                 }
 
                 child_process.execFile(file, args, options, taskDone)
             }
 
-            if (Self.#executing < Self.#limit) {
-                Self.#executing++
+            if (Self.#running < Self.#limit) {
+                Self.#running++
                 thisTask()
             } else {
                 Self.#queue.push(thisTask)
