@@ -3,10 +3,11 @@
   "version": "0.0.6",
   "license": "MIT",
   "bin": {
-    "npm-make": "index.mjs"
+    "npm-make": "index0.mjs"
   },
   "devDependencies": {
-    "@types/node": "^18.11.19"
+    "@types/node": "^18.11.19",
+    "esbuild": "^0.17.10"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.com/",
@@ -15,5 +16,8 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/npm-make/npm-make.git"
+  },
+  "scripts": {
+    "build": "esbuild --bundle --outdir=dist index.ts"
   }
 }
