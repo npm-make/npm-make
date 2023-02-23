@@ -1,6 +1,6 @@
-import executeTool from '../../executeTool.mjs'
+import executeTool from '../../executeTool.ts'
 import msvcAsm from './asm.mjs'
-import msvcCpp from './cpp.mjs'
+import msvcCpp from './cpp.ts'
 import msvcLink from './link.mjs'
 import msvcRc from './rc.mjs'
 

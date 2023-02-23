@@ -2,8 +2,14 @@
   "name": "@npm-make/npm-make",
   "version": "0.0.6",
   "license": "MIT",
+  "files": [
+    "bundle.mjs"
+  ],
+  "scripts": {
+    "build": "esbuild --bundle --format=esm --outfile=bundle.mjs --platform=node index.ts"
+  },
   "bin": {
-    "npm-make": "index0.mjs"
+    "npm-make": "bundle.mjs"
   },
   "devDependencies": {
     "@types/node": "^18.11.19",
@@ -16,8 +22,5 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/npm-make/npm-make.git"
-  },
-  "scripts": {
-    "build": "esbuild --bundle --outdir=dist index.ts"
   }
 }

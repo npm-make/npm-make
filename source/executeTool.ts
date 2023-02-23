@@ -1,10 +1,10 @@
 import child_process from 'node:child_process'
 import process from 'node:process'
 
+let taskLimit = 10
+let taskRunning = 0
+const waitingQueue = []
 export default class Self {
-    static #running = 0
-    static #limit = 10
-    static #queue = []
     static {
         if (process.platform === 'win32') {
             child_process.execSync('chcp 65001')
@@ -15,23 +15,23 @@ export default class Self {
         function invoke(resolve) {
             function thisTask() {
                 function taskDone(error, stdout, stderr) {
-                    resolve({ error, stdout, stderr })
-                    let nextTask = Self.#queue.shift()
+                    resolve({error, stdout, stderr})
+                    let nextTask = waitingQueue.shift()
                     if (nextTask) {
                         nextTask()
                     } else {
-                        Self.#running--
+                        taskRunning--
                     }
                 }
 
                 child_process.execFile(file, args, options, taskDone)
             }
 
-            if (Self.#running < Self.#limit) {
-                Self.#running++
+            if (taskRunning < taskLimit) {
+                taskRunning++
                 thisTask()
             } else {
-                Self.#queue.push(thisTask)
+                waitingQueue.push(thisTask)
             }
         }
 

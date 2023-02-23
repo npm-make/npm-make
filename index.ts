@@ -1,5 +1,3 @@
-import InternalProject from './source/internal/project'
-import ToolchainTarget from './source/toolchain/target'
+import a from './source/executeTool'
 
-(new InternalProject).dependencyProjectList.push(null)
-new ToolchainTarget
+await a.execute(undefined, '', '')
