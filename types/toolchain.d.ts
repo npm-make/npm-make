@@ -1,7 +1,6 @@
 declare class BuildFeature {
     DEBUG: boolean
     DEBUG_WITHOUT_RTC: boolean
-    FORCE_STATIC_LIBRARY: boolean
     MACHINE: 'ARM' | 'ARM64' | 'ARM64EC' | 'X64' | 'X86'
     RELEASE_WITH_DEBUG_INFO: boolean
     RELEASE_MIN_SIZE: boolean
@@ -18,20 +17,19 @@ declare class TargetFeature {
 
 declare class ToolchainSource {
     buildFeature: BuildFeature
-    buildSuccess: boolean
     definitionList: string[]
     includePathList: string[]
     objectPrefix: string
     optionList: string[]
     outputPath: string
     sourcePath: string
+    sourceStatus: 'WAIT' | 'SUCCESS'
     sourceType: 'ASM' | 'C' | 'CXX' | 'DEF' | 'MANIFEST' | 'RC'
     targetFeature: TargetFeature
 }
 
 declare class ToolchainTarget {
     buildFeature: BuildFeature
-    buildSuccess: boolean
     libraryList: string[]
     libraryPathList: string[]
     optionList: string[]
@@ -39,6 +37,7 @@ declare class ToolchainTarget {
     sourceList: ToolchainSource[]
     targetFeature: TargetFeature
     targetPrefix: string
+    targetStatus: 'WAIT' | 'SUCCESS'
     targetType: 'EXECUTE' | 'SHARED' | 'STATIC'
 }
 
@@ -59,6 +58,7 @@ declare class InternalTarget {
     sourcePatternList: string[]
     targetFeature: TargetFeature
     targetName: string
+    targetStatus: 'WAIT' | 'SUCCESS'
 }
 
 declare class InternalProject {
@@ -68,4 +68,5 @@ declare class InternalProject {
     projectFileList: string[]
     projectName: string
     projectPath: string
+    projectStatus: 'WAIT' | 'SUCCESS'
 }

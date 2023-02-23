@@ -58,7 +58,7 @@ export default class {
             flagList.push('/DEF')
             flagList.push('/OUT:' + target.targetPrefix + '.lib')
             let result = await msvc.execute(target.outputPath, msvc.executeLIB, ...flagList)
-            target.buildSuccess = true
+            target.targetStatus = 'SUCCESS'
             return result
         } else {
             if (target.buildFeature.DEBUG) {
@@ -77,7 +77,7 @@ export default class {
             }
             flagList.push('/MANIFEST:EMBED')
             let result = await msvc.execute(target.outputPath, msvc.executeLINK, ...flagList)
-            target.buildSuccess = true
+            target.targetStatus = 'SUCCESS'
             return result
         }
     }

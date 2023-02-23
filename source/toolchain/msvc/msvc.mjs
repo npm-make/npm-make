@@ -2,7 +2,7 @@ import executeTool from '../../executeTool.mjs'
 import msvcAsm from './asm.mjs'
 import msvcCpp from './cpp.mjs'
 import msvcLink from './link.mjs'
-import windowsRc from '../windows/rc.mjs'
+import msvcRc from './rc.mjs'
 
 export default class {
     static environment
@@ -10,16 +10,17 @@ export default class {
     static executeCL
     static executeLIB
     static executeLINK
+    static executeRC
     static libraryList
 
     /**
      * @param {ToolchainTarget} target
      */
     static async build(target) {
-        if (!target.buildSuccess) {
+        if (target.targetStatus !== 'SUCCESS') {
             let promiseList = []
             for (let source of target.sourceList) {
-                if (!source.buildSuccess) {
+                if (source.sourceStatus !== 'SUCCESS') {
                     switch (source.sourceType) {
                         case 'ASM':
                             promiseList.push(msvcAsm.build(source))
@@ -29,7 +30,7 @@ export default class {
                             promiseList.push(msvcCpp.build(source))
                             break
                         case 'RC':
-                            promiseList.push(windowsRc.build(source))
+                            promiseList.push(msvcRc.build(source))
                             break
                     }
                 }

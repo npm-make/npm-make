@@ -72,7 +72,7 @@ export default class {
         flagList.push('/nologo')
         flagList.push('/utf-8')
         let result = await msvc.execute(source.outputPath, msvc.executeCL, ...flagList)
-        source.buildSuccess = true
+        source.sourceStatus = 'SUCCESS'
         return result
     }
 }
