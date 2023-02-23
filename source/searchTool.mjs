@@ -9,10 +9,9 @@ export default class {
     static async searchProject(project) {
         await this.searchPath(project.projectFileList, project.projectPath, '')
         for (let target of project.targetList) {
-            for (let sourcePattern of target.sourcePatternList) {
-                let regex = new RegExp(sourcePattern)
+            for (let sourceRegex of target.sourceRegexList) {
                 for (let projectFile of project.projectFileList) {
-                    if (regex.test(projectFile)) {
+                    if (sourceRegex.test(projectFile)) {
                         target.sourceList.push(projectFile)
                     }
                 }

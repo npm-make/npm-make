@@ -47,7 +47,7 @@ declare class InternalOption {
     library: string
     linkDirectory: string
     option: string
-    pattern: string
+    regex: RegExp
     scope: 'INTERFACE' | 'PRIVATE' | 'PUBLIC'
 }
 
@@ -55,7 +55,7 @@ declare class InternalTarget {
     dependencyTargetList: InternalTarget[]
     optionList: InternalOption[]
     sourceList: string[]
-    sourcePatternList: string[]
+    sourceRegexList: RegExp[]
     targetFeature: TargetFeature
     targetName: string
     targetStatus: 'WAIT' | 'SUCCESS'
