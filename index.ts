@@ -1,3 +1,5 @@
-import a from './source/interface/buildFeature'
+import InternalProject from './source/internal/project'
+import ToolchainTarget from './source/toolchain/target'
 
-new a
+(new InternalProject).dependencyProjectList.push(null)
+new ToolchainTarget

@@ -1,16 +1,29 @@
-/**
- * @mixes InternalTarget
- */
-export default function Self() {
+import InternalOption from './option'
+import TargetFeature from '../targetFeature'
+
+export default class InternalTarget {
+    dependencyTargetList: InternalTarget[]
+    optionList: InternalOption[]
+    sourceList: string[]
+    sourceRegexList: RegExp[]
+    targetFeature: TargetFeature
+    targetName: string
+    targetStatus: 'WAIT' | 'SUCCESS'
 }
 
-Self.prototype.addSource = function (...sourceList) {
-    this.sourceList.push(...sourceList)
-}
-
-Self.prototype.addSourceRegex = function (...regexList) {
-    this.sourceRegexList.push(...regexList)
-}
+// /**
+//  * @mixes InternalTarget
+//  */
+// export default function Self() {
+// }
+//
+// Self.prototype.addSource = function (...sourceList) {
+//     this.sourceList.push(...sourceList)
+// }
+//
+// Self.prototype.addSourceRegex = function (...regexList) {
+//     this.sourceRegexList.push(...regexList)
+// }
 //
 //     addCompileOption(...optionList) {
 //         this.compileOptionList.push(...optionList)

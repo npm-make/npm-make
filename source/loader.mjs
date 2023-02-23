@@ -1,5 +1,5 @@
 import url from 'node:url'
-import Project from './interface/project.mjs'
+import Project from './internal/project.ts'
 import searchTool from './searchTool.mjs'
 
 export default class {
