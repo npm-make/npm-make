@@ -1,8 +1,8 @@
-import InternalTarget from './target'
+import Target from './target'
 
-export default class InternalProject {
-    dependencyProjectList: InternalProject[]
-    targetList: InternalTarget[]
+export default class Project {
+    dependencyProjectList: Project[]
+    targetList: Target[]
     projectFeature: any
     projectFileList: string[]
     projectName: string

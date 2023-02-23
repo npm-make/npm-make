@@ -1,9 +1,9 @@
-import InternalOption from './option'
-import TargetFeature from '../targetFeature'
+import Option from './option'
+import TargetFeature from './targetFeature'
 
-export default class InternalTarget {
-    dependencyTargetList: InternalTarget[]
-    optionList: InternalOption[]
+export default class Target {
+    dependencyTargetList: Target[]
+    optionList: Option[]
     sourceList: string[]
     sourceRegexList: RegExp[]
     targetFeature: TargetFeature

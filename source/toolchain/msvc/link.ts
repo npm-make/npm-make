@@ -1,10 +1,8 @@
-import msvc from './msvc.mjs'
+import msvc from './msvc'
+import ToolchainTarget from '../target'
 
 export default class {
-    /**
-     * @param {ToolchainTarget} target
-     */
-    static async build(target) {
+    static async build(target: ToolchainTarget) {
         let flagList = Array.from(target.optionList)
         switch (target.buildFeature.MACHINE) {
             case 'ARM':

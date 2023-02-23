@@ -1,7 +1,7 @@
 import path from 'node:path'
 import fs from 'node:fs/promises'
 import output from './output.mjs'
-import msvc from './toolchain/msvc/msvc.mjs'
+import msvc from './toolchain/msvc/msvc.ts'
 
 export default class {
     /**

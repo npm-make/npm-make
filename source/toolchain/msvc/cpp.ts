@@ -1,4 +1,4 @@
-import msvc from './msvc.mjs'
+import msvc from './msvc'
 import ToolchainSource from '../source'
 
 export default class {

@@ -1,8 +1,9 @@
-import executeTool from '../../executeTool.ts'
-import msvcAsm from './asm.mjs'
-import msvcCpp from './cpp.ts'
-import msvcLink from './link.mjs'
-import msvcRc from './rc.mjs'
+import executeTool from '../../executeTool'
+import msvcAsm from './asm'
+import msvcCpp from './cpp'
+import msvcLink from './link'
+import msvcRc from './rc'
+import ToolchainTarget from '../target'
 
 export default class {
     static environment
@@ -13,10 +14,7 @@ export default class {
     static executeRC
     static libraryList
 
-    /**
-     * @param {ToolchainTarget} target
-     */
-    static async build(target) {
+    static async build(target: ToolchainTarget) {
         if (target.targetStatus !== 'SUCCESS') {
             let promiseList = []
             for (let source of target.sourceList) {
@@ -41,7 +39,7 @@ export default class {
     }
 
     static async execute(cwd, file, ...args) {
-        let result = await executeTool.execute({ cwd, env: this.environment }, file, ...args)
+        let result = await executeTool.execute({cwd, env: this.environment}, file, ...args)
         console.log(result.stdout)
         if (result.error) {
             throw new Error(result.stdout)

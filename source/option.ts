@@ -1,4 +1,4 @@
-export default class InternalOption {
+export default class Option {
     definition: string = ''
     includeDirectory: string
     library: string

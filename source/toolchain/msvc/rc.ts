@@ -1,10 +1,8 @@
-import msvc from './msvc.mjs'
+import msvc from './msvc'
+import ToolchainSource from '../source'
 
 export default class {
-    /**
-     * @param {ToolchainSource} source
-     */
-    static async build(source) {
+    static async build(source: ToolchainSource) {
         let flagList = Array.from(source.optionList)
         for (let definition of source.definitionList) {
             flagList.push('/D' + definition)
