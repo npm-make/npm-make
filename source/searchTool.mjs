@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises'
 
 export default class {
-    static #ignoreDir = /^node_modules|^npm_make|^\./
+    static #ignoreDir = /^node_modules$|^npm_make$|^\./
 
     /**
      * @param {InternalProject} project
@@ -10,7 +10,7 @@ export default class {
         await this.searchPath(project.projectFileList, project.projectPath, '')
         for (let target of project.targetList) {
             for (let sourcePattern of target.sourcePatternList) {
-                let regex = this.searchRegex(sourcePattern)
+                let regex = new RegExp(sourcePattern)
                 for (let projectFile of project.projectFileList) {
                     if (regex.test(projectFile)) {
                         target.sourceList.push(projectFile)
@@ -31,11 +31,5 @@ export default class {
                 output.push(last + '/' + item.name)
             }
         }
-    }
-
-    static searchRegex(pattern) {
-        let temp1 = pattern.replaceAll(/[.?+^$|(){}\[\]\\]/g, '\\$&')
-        let temp2 = temp1.replaceAll(/\*+/g, ret => ret === '*' ? '[^/]*' : '.*')
-        return new RegExp('^/(' + temp2 + ')$')
     }
 }
