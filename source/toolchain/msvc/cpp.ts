@@ -1,10 +1,8 @@
 import msvc from './msvc.mjs'
+import ToolchainSource from '../source'
 
 export default class {
-    /**
-     * @param {ToolchainSource} source
-     */
-    static async build(source) {
+    static async build(source: ToolchainSource) {
         let flagList = Array.from(source.optionList)
         if (source.buildFeature.DEBUG) {
             if (!source.buildFeature.DEBUG_WITHOUT_RTC) {

@@ -1,3 +1,3 @@
-import a from './source/executeTool'
+import cpp from './source/toolchain/msvc/cpp'
 
-await a.execute(undefined, '', '')
+cpp.build(null)
