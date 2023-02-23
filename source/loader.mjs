@@ -1,6 +1,6 @@
 import url from 'node:url'
 import Project from './project.ts'
-import searchTool from './searchTool.mjs'
+import searchTool from './searchTool.ts'
 
 export default class {
     static async loadProject(projectPath, featureMap) {

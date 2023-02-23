@@ -1,12 +1,10 @@
 import fs from 'node:fs/promises'
+import Project from './project'
 
 export default class {
-    static #ignoreDir = /^node_modules$|^npm_make$|^\./
+    private static ignoreDir = /^node_modules$|^npm_make$|^\./
 
-    /**
-     * @param {InternalProject} project
-     */
-    static async searchProject(project) {
+    static async searchProject(project: Project) {
         await this.searchPath(project.projectFileList, project.projectPath, '')
         for (let target of project.targetList) {
             for (let sourceRegex of target.sourceRegexList) {
@@ -23,7 +21,7 @@ export default class {
         let dir = await fs.opendir(base + last)
         for await (let item of dir) {
             if (item.isDirectory()) {
-                if (!this.#ignoreDir.test(item.name)) {
+                if (!this.ignoreDir.test(item.name)) {
                     await this.searchPath(output, base, last + '/' + item.name)
                 }
             } else {

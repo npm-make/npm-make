@@ -9,52 +9,42 @@ export default class Target {
     targetFeature: TargetFeature
     targetName: string
     targetStatus: 'WAIT' | 'SUCCESS'
-}
 
-// /**
-//  * @mixes InternalTarget
-//  */
-// export default function Self() {
-// }
-//
-// Self.prototype.addSource = function (...sourceList) {
-//     this.sourceList.push(...sourceList)
-// }
-//
-// Self.prototype.addSourceRegex = function (...regexList) {
-//     this.sourceRegexList.push(...regexList)
-// }
-//
-//     addCompileOption(...optionList) {
-//         this.compileOptionList.push(...optionList)
-//     }
-//
-//     addDefinition(...definitionList) {
-//         this.definitionList.push(...definitionList)
-//     }
-//
-//     addDependency(...dependencyList) {
-//         this.dependencyList.push(...dependencyList)
-//     }
-//
-//     addFeature(...featureList) {
-//         for (let feature of featureList) {
-//             argumentTool.parse(this.featureMap, feature)
-//         }
-//     }
-//
-//     addIncludeDirectory(...directoryList) {
-//         this.includeDirectoryList.push(...directoryList)
-//     }
-//
-//     addLibrary(...libraryList) {
-//         this.libraryList.push(...libraryList)
-//     }
-//
-//     addLinkDirectory(...directoryList) {
-//         this.linkDirectoryList.push(...directoryList)
-//     }
-//
-//     addLinkOption(...optionList) {
-//         this.linkOptionList.push(...optionList)
-//     }
+    addCompileOption(compileOption) {
+        Option.append(inputList, this.optionList, 'compileOption')
+    }
+
+    addDefinition(...inputList) {
+        Option.append(inputList, this.optionList, 'definition')
+    }
+
+    addDependency(...inputList) {
+    }
+
+    addFeature(...inputList) {
+    }
+
+    addIncludeDirectory(...inputList) {
+        Option.append(inputList, this.optionList, 'includeDirectory')
+    }
+
+    addLibrary(...inputList) {
+        Option.append(inputList, this.optionList, 'library')
+    }
+
+    addLinkDirectory(...inputList) {
+        Option.append(inputList, this.optionList, 'linkDirectory')
+    }
+
+    addLinkOption(...inputList) {
+        Option.append(inputList, this.optionList, 'linkOption')
+    }
+
+    addSource(...sourceList) {
+        this.sourceList.push(...sourceList)
+    }
+
+    addSourceRegex(...regexList) {
+        this.sourceRegexList.push(...regexList)
+    }
+}

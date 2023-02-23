@@ -1,4 +1,4 @@
-export default class Self {
+export default class {
     static parse(output, argument) {
         let index = argument.indexOf('=')
         if (index >= 0) {

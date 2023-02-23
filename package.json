@@ -2,12 +2,10 @@
   "name": "@npm-make/npm-make",
   "version": "0.0.6",
   "license": "MIT",
+  "repository": "https://github.com/npm-make/npm-make",
   "files": [
     "bundle.mjs"
   ],
-  "scripts": {
-    "build": "esbuild --bundle --format=esm --outfile=bundle.mjs --platform=node index.ts"
-  },
   "bin": {
     "npm-make": "bundle.mjs"
   },
@@ -19,8 +17,7 @@
     "registry": "https://registry.npmjs.com/",
     "access": "public"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/npm-make/npm-make.git"
+  "scripts": {
+    "build": "esbuild --bundle --format=esm --outfile=bundle.mjs --platform=node index.ts"
   }
 }
