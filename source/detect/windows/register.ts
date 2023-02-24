@@ -1,4 +1,4 @@
-import executeTool from '../../executeTool.ts'
+import executeTool from '../../executeTool'
 
 export default class Self {
     static async query(path, key) {

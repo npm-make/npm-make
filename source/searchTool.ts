@@ -1,5 +1,5 @@
 import fs from 'node:fs/promises'
-import Project from '../project'
+import Project from './project'
 
 export default class Self {
     private static ignoreDir = /^node_modules$|^npm_make$|^\./
