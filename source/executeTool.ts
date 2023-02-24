@@ -1,37 +1,34 @@
 import child_process from 'node:child_process'
 import process from 'node:process'
 
-export default class Self {
-    private static limit = 10
-    private static running = 0
-    private static queue = []
-    static {
-        if (process.platform === 'win32') {
-            child_process.execSync('chcp 65001')
-        }
-    }
-
+let taskLimit = 10
+let taskRunning = 0
+const taskQueue = []
+if (process.platform === 'win32') {
+    child_process.execSync('chcp 65001')
+}
+export default class {
     static async execute(options, file, ...args) {
         function invoke(resolve) {
             function thisTask() {
                 function taskDone(error, stdout, stderr) {
                     resolve({error, stdout, stderr})
-                    let nextTask = Self.queue.shift()
+                    let nextTask = taskQueue.shift()
                     if (nextTask) {
                         nextTask()
                     } else {
-                        Self.running--
+                        taskRunning--
                     }
                 }
 
                 child_process.execFile(file, args, options, taskDone)
             }
 
-            if (Self.running < Self.limit) {
-                Self.running++
+            if (taskRunning < taskLimit) {
+                taskRunning++
                 thisTask()
             } else {
-                Self.queue.push(thisTask)
+                taskQueue.push(thisTask)
             }
         }
 
