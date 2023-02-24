@@ -3,6 +3,7 @@ import TargetFeature from '../targetFeature'
 import ToolchainSource from './source'
 
 export default class ToolchainTarget {
+    dependencyTargetList: ToolchainTarget[]
     buildFeature: BuildFeature
     libraryList: string[]
     libraryPathList: string[]

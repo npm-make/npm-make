@@ -15,25 +15,34 @@ export default class {
     static libraryList
 
     static async build(target: ToolchainTarget) {
-        if (target.targetStatus !== 'SUCCESS') {
-            let promiseList = []
-            for (let source of target.sourceList) {
-                if (source.sourceStatus !== 'SUCCESS') {
-                    switch (source.sourceType) {
-                        case 'ASM':
-                            promiseList.push(msvcAsm.build(source))
-                            break
-                        case 'C':
-                        case 'CXX':
-                            promiseList.push(msvcCpp.build(source))
-                            break
-                        case 'RC':
-                            promiseList.push(msvcRc.build(source))
-                            break
+        if (target.targetStatus == 'WAIT') {
+            if (target.dependencyTargetList.length > 0) {
+                let waitingList = []
+                for (let dependency of target.dependencyTargetList) {
+                    waitingList.push(this.build(dependency))
+                }
+                await Promise.all(waitingList)
+            }
+            if (target.sourceList.length > 0) {
+                let waitingList = []
+                for (let source of target.sourceList) {
+                    if (source.sourceStatus == 'WAIT') {
+                        switch (source.sourceType) {
+                            case 'ASM':
+                                waitingList.push(msvcAsm.build(source))
+                                break
+                            case 'C':
+                            case 'CXX':
+                                waitingList.push(msvcCpp.build(source))
+                                break
+                            case 'RC':
+                                waitingList.push(msvcRc.build(source))
+                                break
+                        }
                     }
                 }
+                await Promise.all(waitingList)
             }
-            await Promise.all(promiseList)
             await msvcLink.build(target)
         }
     }
