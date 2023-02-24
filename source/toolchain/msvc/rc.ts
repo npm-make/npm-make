@@ -12,6 +12,7 @@ export default class {
         }
         flagList.push('/Fo' + source.objectPrefix + '.res')
         flagList.push('/nologo')
+        //这些命令在末尾
         flagList.push(source.sourcePath)
         let result = await msvc.execute(source.outputPath, msvc.executeRC, ...flagList)
         source.sourceStatus = 'SUCCESS'

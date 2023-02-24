@@ -9,10 +9,11 @@ export default class {
                 flagList.push('/MACHINE:ARM')
                 break
             case 'ARM64':
-                flagList.push('/MACHINE:ARM64')
-                break
-            case 'ARM64EC':
-                flagList.push('/MACHINE:ARM64EC')
+                if (target.buildFeature.WINDOWS_ARM64_CALL_X64) {
+                    flagList.push('/MACHINE:ARM64EC')
+                } else {
+                    flagList.push('/MACHINE:ARM64')
+                }
                 break
             case 'X64':
                 flagList.push('/MACHINE:X64')
