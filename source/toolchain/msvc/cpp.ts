@@ -1,7 +1,7 @@
-import msvc from './msvc'
 import BuildFeature from '../../project/buildFeature'
 import Source from '../../project/source'
 import Target from '../../project/target'
+import msvc from './msvc'
 
 export default class {
     static async build(buildFeature: BuildFeature, target: Target, source: Source) {

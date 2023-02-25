@@ -1,15 +1,16 @@
+import BuildFeature from '../../project/buildFeature'
+import Target from '../../project/target'
 import msvc from './msvc'
-import ToolchainTarget from '../../project/toolchainTarget'
 
 export default class {
-    static async build(target: ToolchainTarget) {
-        let flagList = Array.from(target.optionList)
-        switch (target.buildFeature.MACHINE) {
+    static async build(buildFeature: BuildFeature, target: Target) {
+        let flagList = Array.from(target.linkOptionList)
+        switch (buildFeature.MACHINE) {
             case 'ARM':
                 flagList.push('/MACHINE:ARM')
                 break
             case 'ARM64':
-                if (target.buildFeature.WINDOWS_ARM64_CALL_X64) {
+                if (buildFeature.WINDOWS_ARM64_CALL_X64) {
                     flagList.push('/MACHINE:ARM64EC')
                 } else {
                     flagList.push('/MACHINE:ARM64')
@@ -60,10 +61,10 @@ export default class {
             target.targetStatus = 'SUCCESS'
             return result
         } else {
-            if (target.buildFeature.DEBUG) {
+            if (buildFeature.DEBUG) {
                 flagList.push('/DEBUG')
             } else {
-                if (target.buildFeature.RELEASE_WITH_DEBUG_INFO) {
+                if (buildFeature.RELEASE_WITH_DEBUG_INFO) {
                     flagList.push('/DEBUG')
                 }
                 flagList.push('/INCREMENTAL:NO')
