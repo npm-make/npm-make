@@ -1,14 +1,16 @@
 import msvc from './msvc'
+import BuildFeature from '../../project/buildFeature'
 import Source from '../../project/source'
+import Target from '../../project/target'
 
 export default class {
-    static async build(source: Source) {
+    static async build(buildFeature: BuildFeature, target: Target, source: Source) {
         let flagList = Array.from(source.optionList)
-        if (source.buildFeature.DEBUG) {
-            if (!source.buildFeature.DEBUG_WITHOUT_RTC) {
+        if (buildFeature.DEBUG) {
+            if (!buildFeature.DEBUG_WITHOUT_RTC) {
                 flagList.push('/RTC1')
             }
-            if (source.buildFeature.STATIC_RUNTIME) {
+            if (buildFeature.STATIC_RUNTIME) {
                 flagList.push('/MTd')
             } else {
                 flagList.push('/MDd')
@@ -16,22 +18,22 @@ export default class {
             flagList.push('/Od')
             flagList.push('/Zi')
         } else {
-            if (source.buildFeature.RELEASE_MIN_SIZE) {
+            if (buildFeature.RELEASE_MIN_SIZE) {
                 flagList.push('/O1')
             } else {
                 flagList.push('/O2')
             }
-            if (source.buildFeature.RELEASE_WITH_DEBUG_INFO) {
+            if (buildFeature.RELEASE_WITH_DEBUG_INFO) {
                 flagList.push('/Zi')
             }
-            if (source.buildFeature.STATIC_RUNTIME) {
+            if (buildFeature.STATIC_RUNTIME) {
                 flagList.push('/MT')
             } else {
                 flagList.push('/MD')
             }
         }
         if (source.sourceType === 'CXX') {
-            switch (source.targetFeature.STANDARD_CXX) {
+            switch (target.targetFeature.STANDARD_CXX) {
                 case '14':
                     flagList.push('/std:c++14')
                     break
@@ -48,7 +50,7 @@ export default class {
             }
             flagList.push('/Tp' + source.sourcePath)
         } else {
-            switch (source.targetFeature.STANDARD_C) {
+            switch (target.targetFeature.STANDARD_C) {
                 case '11':
                     flagList.push('/std:c11')
                     break
@@ -61,7 +63,13 @@ export default class {
         for (let definition of source.definitionList) {
             flagList.push('/D' + definition)
         }
+        for (let definition of target.definitionList) {
+            flagList.push('/D' + definition)
+        }
         for (let includePath of source.includePathList) {
+            flagList.push('/I' + includePath)
+        }
+        for (let includePath of target.includePathList) {
             flagList.push('/I' + includePath)
         }
         flagList.push('/c')
