@@ -16,13 +16,6 @@ export default class {
 
     static async build(target: ToolchainTarget) {
         if (target.targetStatus == 'WAIT') {
-            if (target.dependencyTargetList.length > 0) {
-                let waitingList = []
-                for (let dependency of target.dependencyTargetList) {
-                    waitingList.push(this.build(dependency))
-                }
-                await Promise.all(waitingList)
-            }
             if (target.sourceList.length > 0) {
                 let waitingList = []
                 for (let source of target.sourceList) {
