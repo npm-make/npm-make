@@ -1,4 +1,4 @@
-import executeTool from '../../executeTool'
+import executeTool from '../executeTool'
 import msvcAsm from './asm'
 import msvcCpp from './cpp'
 import msvcLink from './link'

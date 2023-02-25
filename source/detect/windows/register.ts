@@ -1,4 +1,4 @@
-import executeTool from '../../executeTool'
+import executeTool from '../../toolchain/executeTool'
 
 export default class Self {
     static async query(path, key) {

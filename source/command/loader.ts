@@ -1,10 +1,11 @@
+import path from 'node:path'
 import url from 'node:url'
-import Project from '../project.ts'
-import searchTool from '../searchTool.ts'
+import Project from '../project'
+import searchTool from './searchTool'
 
 export default class {
     static async loadProject(projectPath, featureMap) {
-        let makeUrl = url.pathToFileURL(projectPath + '/make.mjs')
+        let makeUrl = url.pathToFileURL(path.join(projectPath, 'make.mjs'))
         let makeModule = await import(makeUrl)
         let project = new Project
         project.featureMap = featureMap

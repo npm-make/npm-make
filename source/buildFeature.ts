@@ -1,4 +1,4 @@
-export default class BuildFeature {
+export default interface BuildFeature {
     DEBUG: boolean
     DEBUG_WITHOUT_RTC: boolean
     MACHINE: 'ARM' | 'ARM64' | 'X64' | 'X86'

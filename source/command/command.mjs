@@ -1,5 +1,5 @@
 import process from 'node:process'
-import loader from './loader.mjs'
+import loader from './loader.ts'
 import toolchain from './toolchain/toolchain.mjs'
 import projectTask from './projectTask.mjs'
 import path from 'node:path'
