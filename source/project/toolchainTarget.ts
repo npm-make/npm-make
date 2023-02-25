@@ -1,6 +1,6 @@
 import BuildFeature from './buildFeature'
 import TargetFeature from './targetFeature'
-import ToolchainSource from './toolchainSource'
+import Source from './source'
 
 export default class ToolchainTarget {
     dependencyTargetList: ToolchainTarget[]
@@ -9,7 +9,7 @@ export default class ToolchainTarget {
     libraryPathList: string[]
     optionList: string[]
     outputPath: string
-    sourceList: ToolchainSource[]
+    sourceList: Source[]
     targetFeature: TargetFeature
     targetPrefix: string
     targetStatus: 'WAIT' | 'SUCCESS'

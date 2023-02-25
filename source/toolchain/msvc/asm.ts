@@ -1,8 +1,8 @@
-import ToolchainSource from '../../project/toolchainSource'
+import Source from '../../project/source'
 import msvc from './msvc'
 
 export default class {
-    static async build(source: ToolchainSource) {
+    static async build(source: Source) {
         let flagList = Array.from(source.optionList)
         if (source.buildFeature.MACHINE === 'X86' || source.buildFeature.MACHINE === 'X64') {
             for (let definition of source.definitionList) {
