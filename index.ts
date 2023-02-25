@@ -1,3 +1,3 @@
-import cpp from './source/toolchain/msvc/cpp'
+import temp from './source/command/loader'
 
-cpp.build(null)
+await temp.loadProject(null, null)

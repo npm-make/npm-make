@@ -3,7 +3,7 @@ import msvcAsm from './asm'
 import msvcCpp from './cpp'
 import msvcLink from './link'
 import msvcRc from './rc'
-import ToolchainTarget from '../target'
+import ToolchainTarget from '../../project/toolchainTarget'
 
 export default class {
     static environment

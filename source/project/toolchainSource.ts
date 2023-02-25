@@ -1,5 +1,5 @@
-import BuildFeature from '../buildFeature'
-import TargetFeature from '../targetFeature'
+import BuildFeature from './buildFeature'
+import TargetFeature from './targetFeature'
 
 export default class ToolchainSource {
     buildFeature: BuildFeature

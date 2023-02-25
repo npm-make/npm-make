@@ -1,6 +1,6 @@
-import BuildFeature from '../buildFeature'
-import TargetFeature from '../targetFeature'
-import ToolchainSource from './source'
+import BuildFeature from './buildFeature'
+import TargetFeature from './targetFeature'
+import ToolchainSource from './toolchainSource'
 
 export default class ToolchainTarget {
     dependencyTargetList: ToolchainTarget[]

@@ -1,16 +1,16 @@
 import path from 'node:path'
 import url from 'node:url'
-import Project from '../project'
+import BuildFeature from '../project/buildFeature'
+import Project from '../project/project'
+import ProjectMake from '../project/projectMake'
 import searchTool from './searchTool'
 
 export default class {
-    static async loadProject(projectPath, featureMap) {
-        let makeUrl = url.pathToFileURL(path.join(projectPath, 'make.mjs'))
+    static async loadProject(project: Project, buildFeature: BuildFeature) {
+        let makeUrl = url.pathToFileURL(path.join(project.projectPath, 'make.mjs'))
         let makeModule = await import(makeUrl)
-        let project = new Project
-        project.featureMap = featureMap
-        project.projectPath = projectPath
-        let result = makeModule.default.generate(project)
+        project.projectMake = makeModule.default as ProjectMake
+        let result = makeModule.default.generate(project, project.projectFeature, buildFeature)
         if (result instanceof Promise) {
             await result
         }

@@ -1,5 +1,5 @@
 import msvc from './msvc'
-import ToolchainSource from '../source'
+import ToolchainSource from '../../project/toolchainSource'
 
 export default class {
     static async build(source: ToolchainSource) {
