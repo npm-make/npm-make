@@ -71,6 +71,6 @@ export default class {
         flagList.push('/Fo' + source.objectPrefix + '.obj')
         flagList.push('/nologo')
         flagList.push('/utf-8')
-        return msvc.execute(source.outputPath, msvc.executeCL, ...flagList)
+        return msvc.execute(buildFeature.OUTPUT_PATH, msvc.executeCL, ...flagList)
     }
 }

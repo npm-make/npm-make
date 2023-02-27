@@ -39,6 +39,6 @@ export default class {
                 break
             }
         }
-        return msvc.execute(source.outputPath, msvc.executeASM, ...flagList)
+        return msvc.execute(buildFeature.OUTPUT_PATH, msvc.executeASM, ...flagList)
     }
 }

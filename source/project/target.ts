@@ -1,5 +1,6 @@
-import path from 'node:path'
+import featureTool from '../featureTool'
 import Source from './source'
+import SourceGroup from './sourceGroup'
 import TargetFeature from './targetFeature'
 
 export default class Target {
@@ -10,14 +11,13 @@ export default class Target {
     libraryList: string[]
     libraryPathList: string[]
     linkOptionList: string[]
-    outputPath: string
     sourceList: Source[]
     targetFeature: TargetFeature
     targetName: string
     targetPrefix: string
     targetType: 'EXECUTE' | 'SHARED' | 'STATIC'
 
-    constructor(outputPath: string, targetName: string) {
+    constructor(targetName: string) {
         this.compileOptionList = []
         this.definitionList = []
         this.dependencyTargetList = []
@@ -25,11 +25,49 @@ export default class Target {
         this.libraryList = []
         this.libraryPathList = []
         this.linkOptionList = []
-        this.outputPath = outputPath
         this.sourceList = []
         this.targetFeature = {}
         this.targetName = targetName
-        this.targetPrefix = path.join(outputPath, targetName)
+        this.targetPrefix = targetName
         this.targetType = 'EXECUTE'
+    }
+
+    addCompileOption(...optionList: string[]) {
+        this.compileOptionList.push(...optionList)
+    }
+
+    addDefinition(...definitionList: string[]) {
+        this.definitionList.push(...definitionList)
+    }
+
+    addDependency() {
+    }
+
+    addFeature(...featureList: string[]) {
+        for (let feature of featureList) {
+            featureTool.parse(this.targetFeature, feature)
+        }
+    }
+
+    addIncludePath(...pathList: string[]) {
+        this.includePathList.push(...pathList)
+    }
+
+    addLibrary(...libraryList: string[]) {
+        this.libraryList.push(...libraryList)
+    }
+
+    addLibraryPath(...pathList: string[]) {
+        this.libraryPathList.push(...pathList)
+    }
+
+    addLinkOption(...optionList: string[]) {
+        this.linkOptionList.push(...optionList)
+    }
+
+    addSource(...pathList: string[]): SourceGroup {
+        let result = SourceGroup.fromPathList(this, pathList)
+        this.sourceList.push(...result.sourceList)
+        return result
     }
 }

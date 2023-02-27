@@ -16,6 +16,6 @@ export default class {
         flagList.push('/nologo')
         //这些命令在末尾
         flagList.push(source.sourcePath)
-        return msvc.execute(source.outputPath, msvc.executeRC, ...flagList)
+        return msvc.execute(buildFeature.OUTPUT_PATH, msvc.executeRC, ...flagList)
     }
 }

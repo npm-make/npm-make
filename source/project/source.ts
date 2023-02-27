@@ -1,5 +1,4 @@
 import path from 'node:path'
-import Project from './project'
 import Target from './target'
 
 export default class Source {
@@ -7,18 +6,17 @@ export default class Source {
     includePathList: string[]
     objectPrefix: string
     optionList: string[]
-    outputPath: string
     sourcePath: string
     sourceType: 'ASM' | 'C' | 'CXX' | 'DEF' | 'MANIFEST' | 'RC'
 
-    constructor(project: Project, target: Target, outputPath: string, sourcePath: string) {
-        let sourceParse = path.parse(sourcePath)
+    constructor(target: Target, sourcePath: string) {
         this.definitionList = []
         this.includePathList = []
-        this.objectPrefix = path.join(target.targetName + 'Obj', sourceParse.dir, sourceParse.name)
         this.optionList = []
-        this.outputPath = outputPath
-        this.sourcePath = path.join(project.projectPath, sourcePath)
+        this.sourcePath = sourcePath
+        //通过路径计算
+        let sourceParse = path.parse(sourcePath)
+        this.objectPrefix = path.join(target.targetName + 'Obj', sourceParse.dir, sourceParse.name)
         switch (sourceParse.ext.toLowerCase()) {
             case '.asm':
             case '.s':

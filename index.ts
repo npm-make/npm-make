@@ -1,3 +1,3 @@
-import temp from './source/command/loader'
+import temp from './source/project/target'
 
-await temp.loadProject(null, null)
+new temp

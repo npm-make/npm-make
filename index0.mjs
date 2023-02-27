@@ -1,6 +1,6 @@
 import process from 'node:process'
 import command from './source/command/command.mjs'
-import argumentTool from './source/argumentTool.ts'
+import argumentTool from './source/featureTool.ts'
 
 let inputList = process.argv.slice(2)
 let beforeMethod = new Map
