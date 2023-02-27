@@ -57,9 +57,7 @@ export default class {
         if (target.targetType === 'STATIC') {
             flagList.push('/DEF')
             flagList.push('/OUT:' + target.targetPrefix + '.lib')
-            let result = await msvc.execute(target.outputPath, msvc.executeLIB, ...flagList)
-            target.targetStatus = 'SUCCESS'
-            return result
+            return msvc.execute(target.outputPath, msvc.executeLIB, ...flagList)
         } else {
             if (buildFeature.DEBUG) {
                 flagList.push('/DEBUG')
@@ -76,9 +74,7 @@ export default class {
                 flagList.push('/OUT:' + target.targetPrefix + '.exe')
             }
             flagList.push('/MANIFEST:EMBED')
-            let result = await msvc.execute(target.outputPath, msvc.executeLINK, ...flagList)
-            target.targetStatus = 'SUCCESS'
-            return result
+            return msvc.execute(target.outputPath, msvc.executeLINK, ...flagList)
         }
     }
 }

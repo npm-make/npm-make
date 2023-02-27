@@ -28,13 +28,7 @@ export default class {
                 for (let definition of source.definitionList) {
                     flagList.push('/D' + definition)
                 }
-                for (let definition of target.definitionList) {
-                    flagList.push('/D' + definition)
-                }
                 for (let includePath of source.includePathList) {
-                    flagList.push('/I' + includePath)
-                }
-                for (let includePath of target.includePathList) {
                     flagList.push('/I' + includePath)
                 }
                 flagList.push('/Fo' + source.objectPrefix + '.obj')
@@ -45,8 +39,6 @@ export default class {
                 break
             }
         }
-        let result = await msvc.execute(source.outputPath, msvc.executeASM, ...flagList)
-        source.sourceStatus = 'SUCCESS'
-        return result
+        return msvc.execute(source.outputPath, msvc.executeASM, ...flagList)
     }
 }

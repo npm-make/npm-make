@@ -15,7 +15,6 @@ export default class Target {
     targetFeature: TargetFeature
     targetName: string
     targetPrefix: string
-    targetStatus: 'WAIT' | 'SUCCESS'
     targetType: 'EXECUTE' | 'SHARED' | 'STATIC'
 
     constructor(outputPath: string, targetName: string) {
@@ -31,7 +30,6 @@ export default class Target {
         this.targetFeature = {}
         this.targetName = targetName
         this.targetPrefix = path.join(outputPath, targetName)
-        this.targetStatus = 'WAIT'
         this.targetType = 'EXECUTE'
     }
 }

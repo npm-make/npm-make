@@ -9,7 +9,6 @@ export default class Source {
     optionList: string[]
     outputPath: string
     sourcePath: string
-    sourceStatus: 'WAIT' | 'SUCCESS'
     sourceType: 'ASM' | 'C' | 'CXX' | 'DEF' | 'MANIFEST' | 'RC'
 
     constructor(project: Project, target: Target, outputPath: string, sourcePath: string) {
@@ -20,7 +19,6 @@ export default class Source {
         this.optionList = []
         this.outputPath = outputPath
         this.sourcePath = path.join(project.projectPath, sourcePath)
-        this.sourceStatus = 'WAIT'
         switch (sourceParse.ext.toLowerCase()) {
             case '.asm':
             case '.s':
