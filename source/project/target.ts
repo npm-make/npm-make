@@ -6,6 +6,7 @@ import TargetFeature from './targetFeature'
 export default class Target {
     compileOptionList: string[]
     definitionList: string[]
+    dependencyList: string[]
     dependencyTargetList: Target[]
     includePathList: string[]
     libraryList: string[]
@@ -40,7 +41,8 @@ export default class Target {
         this.definitionList.push(...definitionList)
     }
 
-    addDependency() {
+    addDependency(...dependencyList: string[]) {
+        this.dependencyList.push(...dependencyList)
     }
 
     addFeature(...featureList: string[]) {
