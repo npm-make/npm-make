@@ -9,6 +9,9 @@ export default class Target {
     definitionList: string[]
     dependencyList: string[]
     dependencyTargetList: Target[]
+    exportIncludePathList: string[]
+    exportLibraryList: string[]
+    exportLibraryPathList: string[]
     includePathList: string[]
     libraryList: string[]
     libraryPathList: string[]
@@ -25,6 +28,9 @@ export default class Target {
         this.compileOptionList = []
         this.definitionList = []
         this.dependencyTargetList = []
+        this.exportIncludePathList = []
+        this.exportLibraryList = []
+        this.exportLibraryPathList = []
         this.includePathList = []
         this.libraryList = []
         this.libraryPathList = []
@@ -53,6 +59,21 @@ export default class Target {
 
     addDependency(...dependencyList: string[]): Target {
         this.dependencyList.push(...dependencyList)
+        return this
+    }
+
+    addExportIncludePath(...pathList: string[]): Target {
+        this.exportIncludePathList.push(...pathList)
+        return this
+    }
+
+    addExportLibrary(...libraryList: string[]): Target {
+        this.exportLibraryList.push(...libraryList)
+        return this
+    }
+
+    addExportLibraryPath(...pathList: string[]): Target {
+        this.exportLibraryPathList.push(...pathList)
         return this
     }
 
