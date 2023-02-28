@@ -1,4 +1,5 @@
 import featureTool from '../featureTool'
+import Project from './project'
 import Source from './source'
 import SourceGroup from './sourceGroup'
 import TargetFeature from './targetFeature'
@@ -18,7 +19,7 @@ export default class Target {
     targetPrefix: string
     targetType: 'EXECUTE' | 'SHARED' | 'STATIC'
 
-    constructor(targetName: string) {
+    constructor(project: Project, targetName: string, featureList: string[]) {
         this.compileOptionList = []
         this.definitionList = []
         this.dependencyTargetList = []
@@ -31,6 +32,10 @@ export default class Target {
         this.targetName = targetName
         this.targetPrefix = targetName
         this.targetType = 'EXECUTE'
+        project.targetList.push(this)
+        if (featureList) {
+            this.addFeature(...featureList)
+        }
     }
 
     addCompileOption(...optionList: string[]) {
@@ -68,8 +73,10 @@ export default class Target {
     }
 
     addSource(...pathList: string[]): SourceGroup {
-        let result = SourceGroup.fromPathList(this, pathList)
-        this.sourceList.push(...result.sourceList)
-        return result
+        return new SourceGroup(this, pathList, null)
+    }
+
+    addSourcePattern(...patternList: string[]): SourceGroup {
+        return new SourceGroup(this, null, patternList)
     }
 }

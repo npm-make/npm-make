@@ -1,3 +1,5 @@
-import temp from './source/project/target'
+import temp from './source/project/builder'
 
-new temp
+let temp1 = new temp(null)
+await temp1.addProject('zlib', 'C:\\Project\\npm-make\\zlib')
+
