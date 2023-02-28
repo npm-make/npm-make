@@ -1,10 +1,10 @@
-import BuildFeature from '../../project/buildFeature'
+import BuilderFeature from '../../project/builderFeature'
 import Source from '../../project/source'
 import Target from '../../project/target'
 import msvc from './msvc'
 
 export default class {
-    static async build(buildFeature: BuildFeature, target: Target, source: Source) {
+    static async build(builderFeature: BuilderFeature, target: Target, source: Source) {
         let flagList = Array.from(source.optionList)
         for (let definition of source.definitionList) {
             flagList.push('/d' + definition)
@@ -16,6 +16,6 @@ export default class {
         flagList.push('/nologo')
         //这些命令在末尾
         flagList.push(source.sourcePath)
-        return msvc.execute(buildFeature.OUTPUT_PATH, msvc.executeRC, ...flagList)
+        return msvc.execute(builderFeature.OUTPUT_PATH, msvc.executeRC, ...flagList)
     }
 }

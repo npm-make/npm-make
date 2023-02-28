@@ -1,19 +1,19 @@
-import BuildFeature from '../../project/buildFeature'
+import BuilderFeature from '../../project/builderFeature'
 import Source from '../../project/source'
 import Target from '../../project/target'
 import msvc from './msvc'
 
 export default class {
-    static async build(buildFeature: BuildFeature, target: Target, source: Source) {
+    static async build(builderFeature: BuilderFeature, target: Target, source: Source) {
         let flagList = Array.from(source.optionList)
-        switch (buildFeature.MACHINE) {
+        switch (builderFeature.MACHINE) {
             case 'ARM':
             case 'ARM64': {
                 if (source.includePathList.length > 0) {
                     flagList.push('-i')
                     flagList.push(source.includePathList.join(';'))
                 }
-                if (buildFeature.WINDOWS_ARM64_CALL_X64) {
+                if (builderFeature.WINDOWS_ARM64_CALL_X64) {
                     flagList.push('-machine')
                     flagList.push('ARM64EC')
                 }
@@ -39,6 +39,6 @@ export default class {
                 break
             }
         }
-        return msvc.execute(buildFeature.OUTPUT_PATH, msvc.executeASM, ...flagList)
+        return msvc.execute(builderFeature.OUTPUT_PATH, msvc.executeASM, ...flagList)
     }
 }

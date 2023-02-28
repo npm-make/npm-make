@@ -1,16 +1,16 @@
-import BuildFeature from '../../project/buildFeature'
+import BuilderFeature from '../../project/builderFeature'
 import Source from '../../project/source'
 import Target from '../../project/target'
 import msvc from './msvc'
 
 export default class {
-    static async build(buildFeature: BuildFeature, target: Target, source: Source) {
+    static async build(builderFeature: BuilderFeature, target: Target, source: Source) {
         let flagList = Array.from(source.optionList)
-        if (buildFeature.DEBUG) {
-            if (!buildFeature.DEBUG_WITHOUT_RTC) {
+        if (builderFeature.DEBUG) {
+            if (!builderFeature.DEBUG_WITHOUT_RTC) {
                 flagList.push('/RTC1')
             }
-            if (buildFeature.STATIC_RUNTIME) {
+            if (builderFeature.STATIC_RUNTIME) {
                 flagList.push('/MTd')
             } else {
                 flagList.push('/MDd')
@@ -18,15 +18,15 @@ export default class {
             flagList.push('/Od')
             flagList.push('/Zi')
         } else {
-            if (buildFeature.RELEASE_MIN_SIZE) {
+            if (builderFeature.RELEASE_MIN_SIZE) {
                 flagList.push('/O1')
             } else {
                 flagList.push('/O2')
             }
-            if (buildFeature.RELEASE_WITH_DEBUG_INFO) {
+            if (builderFeature.RELEASE_WITH_DEBUG_INFO) {
                 flagList.push('/Zi')
             }
-            if (buildFeature.STATIC_RUNTIME) {
+            if (builderFeature.STATIC_RUNTIME) {
                 flagList.push('/MT')
             } else {
                 flagList.push('/MD')
@@ -71,6 +71,6 @@ export default class {
         flagList.push('/Fo' + source.objectPrefix + '.obj')
         flagList.push('/nologo')
         flagList.push('/utf-8')
-        return msvc.execute(buildFeature.OUTPUT_PATH, msvc.executeCL, ...flagList)
+        return msvc.execute(builderFeature.OUTPUT_PATH, msvc.executeCL, ...flagList)
     }
 }

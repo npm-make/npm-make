@@ -1,4 +1,4 @@
-import BuildFeature from '../../project/buildFeature'
+import BuilderFeature from '../../project/builderFeature'
 import executeTool from '../../executeTool'
 import Target from '../../project/target'
 import msvcAsm from './asm'
@@ -15,26 +15,26 @@ export default class {
     static executeRC
     static libraryList
 
-    static async build(buildFeature: BuildFeature, target: Target) {
+    static async build(builderFeature: BuilderFeature, target: Target) {
         if (target.sourceList.length > 0) {
             let waitingList = []
             for (let source of target.sourceList) {
                 switch (source.sourceType) {
                     case 'ASM':
-                        waitingList.push(msvcAsm.build(buildFeature, target, source))
+                        waitingList.push(msvcAsm.build(builderFeature, target, source))
                         break
                     case 'C':
                     case 'CXX':
-                        waitingList.push(msvcCpp.build(buildFeature, target, source))
+                        waitingList.push(msvcCpp.build(builderFeature, target, source))
                         break
                     case 'RC':
-                        waitingList.push(msvcRc.build(buildFeature, target, source))
+                        waitingList.push(msvcRc.build(builderFeature, target, source))
                         break
                 }
             }
             await Promise.all(waitingList)
         }
-        await msvcLink.build(buildFeature, target)
+        await msvcLink.build(builderFeature, target)
     }
 
     static async execute(cwd, file, ...args) {
