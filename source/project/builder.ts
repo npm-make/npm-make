@@ -24,4 +24,8 @@ export default class Builder {
         await searchTool.search(project.projectFileList, projectPath, '')
         return project.projectModule.generate(project, project.projectFeature, this.builderFeature)
     }
+
+    asd() {
+        new Project('', {})
+    }
 }

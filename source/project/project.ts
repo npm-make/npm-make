@@ -1,7 +1,9 @@
+import featureTool from '../featureTool'
 import ProjectModule from './projectModule'
 import Target from './target'
 
 export default class Project {
+    dependencyProjectList: Project[]
     projectFeature: object
     projectFileList: string[]
     projectModule: ProjectModule
@@ -9,14 +11,25 @@ export default class Project {
     projectPath: string
     targetList: Target[]
 
-    constructor(projectName: string, projectFeature: object) {
-        this.projectFeature = projectFeature
+    constructor(projectName: string, featureList: string[]) {
+        this.projectFeature = {}
         this.projectFileList = []
         this.projectName = projectName
         this.targetList = []
+        if (featureList) {
+            for (let feature of featureList) {
+                featureTool.parse(this.projectFeature, feature)
+            }
+        }
     }
 
-    addTarget(targetName: string, ...featureList: string[]) {
-        return new Target(this, targetName, featureList)
+    createTarget(targetName: string, ...featureList: string[]): Target {
+        let target = new Target(this, targetName, featureList)
+        this.targetList.push(target)
+        return target
+    }
+
+    importProject(projectName: string, ...featureList: string[]) {
+        this.dependencyProjectList.push(new Project(projectName, featureList))
     }
 }

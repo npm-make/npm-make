@@ -13,6 +13,7 @@ export default class Target {
     libraryList: string[]
     libraryPathList: string[]
     linkOptionList: string[]
+    projectFileList: string[]
     sourceList: Source[]
     targetFeature: TargetFeature
     targetName: string
@@ -27,49 +28,57 @@ export default class Target {
         this.libraryList = []
         this.libraryPathList = []
         this.linkOptionList = []
+        this.projectFileList = project.projectFileList
         this.sourceList = []
         this.targetFeature = {}
         this.targetName = targetName
         this.targetPrefix = targetName
         this.targetType = 'EXECUTE'
-        project.targetList.push(this)
         if (featureList) {
             this.addFeature(...featureList)
         }
     }
 
-    addCompileOption(...optionList: string[]) {
+    addCompileOption(...optionList: string[]): Target {
         this.compileOptionList.push(...optionList)
+        return this
     }
 
-    addDefinition(...definitionList: string[]) {
+    addDefinition(...definitionList: string[]): Target {
         this.definitionList.push(...definitionList)
+        return this
     }
 
-    addDependency(...dependencyList: string[]) {
+    addDependency(...dependencyList: string[]): Target {
         this.dependencyList.push(...dependencyList)
+        return this
     }
 
-    addFeature(...featureList: string[]) {
+    addFeature(...featureList: string[]): Target {
         for (let feature of featureList) {
             featureTool.parse(this.targetFeature, feature)
         }
+        return this
     }
 
-    addIncludePath(...pathList: string[]) {
+    addIncludePath(...pathList: string[]): Target {
         this.includePathList.push(...pathList)
+        return this
     }
 
-    addLibrary(...libraryList: string[]) {
+    addLibrary(...libraryList: string[]): Target {
         this.libraryList.push(...libraryList)
+        return this
     }
 
-    addLibraryPath(...pathList: string[]) {
+    addLibraryPath(...pathList: string[]): Target {
         this.libraryPathList.push(...pathList)
+        return this
     }
 
-    addLinkOption(...optionList: string[]) {
+    addLinkOption(...optionList: string[]): Target {
         this.linkOptionList.push(...optionList)
+        return this
     }
 
     addSource(...pathList: string[]): SourceGroup {
