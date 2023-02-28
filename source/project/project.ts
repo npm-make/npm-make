@@ -17,19 +17,20 @@ export default class Project {
         this.projectName = projectName
         this.targetList = []
         if (featureList) {
-            for (let feature of featureList) {
+            for (const feature of featureList) {
                 featureTool.parse(this.projectFeature, feature)
             }
         }
     }
 
     createTarget(targetName: string, ...featureList: string[]): Target {
-        let target = new Target(this, targetName, featureList)
+        const target = new Target(this, targetName, featureList)
         this.targetList.push(target)
         return target
     }
 
-    importProject(projectName: string, ...featureList: string[]) {
+    importProject(projectName: string, ...featureList: string[]): Project {
         this.dependencyProjectList.push(new Project(projectName, featureList))
+        return this
     }
 }

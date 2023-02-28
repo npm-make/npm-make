@@ -17,8 +17,8 @@ export default class Builder {
     }
 
     async loadProject(project: Project, projectPath: string) {
-        let moduleUrl = url.pathToFileURL(path.join(projectPath, 'make.mjs'))
-        let moduleImport = await import(moduleUrl)
+        const moduleUrl = url.pathToFileURL(path.join(projectPath, 'make.mjs'))
+        const moduleImport = await import(moduleUrl)
         project.projectPath = projectPath
         project.projectModule = moduleImport.default
         await searchTool.search(project.projectFileList, projectPath, '')

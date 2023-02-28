@@ -5,7 +5,7 @@ import msvc from './msvc'
 
 export default class {
     static async build(builderFeature: BuilderFeature, target: Target, source: Source) {
-        let flagList = Array.from(source.optionList)
+        const flagList = Array.from(source.optionList)
         if (builderFeature.DEBUG) {
             if (!builderFeature.DEBUG_WITHOUT_RTC) {
                 flagList.push('/RTC1')
@@ -60,10 +60,10 @@ export default class {
             }
             flagList.push('/Tc' + source.sourcePath)
         }
-        for (let definition of source.definitionList) {
+        for (const definition of source.definitionList) {
             flagList.push('/D' + definition)
         }
-        for (let includePath of source.includePathList) {
+        for (const includePath of source.includePathList) {
             flagList.push('/I' + includePath)
         }
         flagList.push('/c')

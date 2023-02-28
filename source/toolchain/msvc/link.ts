@@ -4,7 +4,7 @@ import msvc from './msvc'
 
 export default class {
     static async build(builderFeature: BuilderFeature, target: Target) {
-        let flagList = Array.from(target.linkOptionList)
+        const flagList = Array.from(target.linkOptionList)
         switch (builderFeature.MACHINE) {
             case 'ARM':
                 flagList.push('/MACHINE:ARM')
@@ -26,16 +26,16 @@ export default class {
         if (target.targetFeature.WIN32_MAIN) {
             flagList.push('/SUBSYSTEM:WINDOWS')
         }
-        for (let libraryPath of target.libraryPathList) {
+        for (const libraryPath of target.libraryPathList) {
             flagList.push('/LIBPATH:' + libraryPath)
         }
-        for (let library of target.libraryList) {
+        for (const library of target.libraryList) {
             flagList.push(library)
         }
-        for (let library of msvc.libraryList) {
+        for (const library of msvc.libraryList) {
             flagList.push(library)
         }
-        for (let source of target.sourceList) {
+        for (const source of target.sourceList) {
             switch (source.sourceType) {
                 case 'ASM':
                 case 'C':

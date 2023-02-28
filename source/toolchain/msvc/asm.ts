@@ -5,7 +5,7 @@ import msvc from './msvc'
 
 export default class {
     static async build(builderFeature: BuilderFeature, target: Target, source: Source) {
-        let flagList = Array.from(source.optionList)
+        const flagList = Array.from(source.optionList)
         switch (builderFeature.MACHINE) {
             case 'ARM':
             case 'ARM64': {
@@ -25,10 +25,10 @@ export default class {
             }
             case 'X64':
             case 'X86': {
-                for (let definition of source.definitionList) {
+                for (const definition of source.definitionList) {
                     flagList.push('/D' + definition)
                 }
-                for (let includePath of source.includePathList) {
+                for (const includePath of source.includePathList) {
                     flagList.push('/I' + includePath)
                 }
                 flagList.push('/Fo' + source.objectPrefix + '.obj')

@@ -17,8 +17,8 @@ export default class {
 
     static async build(builderFeature: BuilderFeature, target: Target) {
         if (target.sourceList.length > 0) {
-            let waitingList = []
-            for (let source of target.sourceList) {
+            const waitingList = []
+            for (const source of target.sourceList) {
                 switch (source.sourceType) {
                     case 'ASM':
                         waitingList.push(msvcAsm.build(builderFeature, target, source))
@@ -38,7 +38,7 @@ export default class {
     }
 
     static async execute(cwd, file, ...args) {
-        let result = await executeTool.execute({cwd, env: this.environment}, file, ...args)
+        const result = await executeTool.execute({cwd, env: this.environment}, file, ...args)
         console.log(result.stdout)
         if (result.error) {
             throw new Error(result.stdout)

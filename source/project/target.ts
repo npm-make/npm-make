@@ -15,6 +15,7 @@ export default class Target {
     linkOptionList: string[]
     projectFileList: string[]
     sourceList: Source[]
+    sourceGroupList: SourceGroup[]
     targetFeature: TargetFeature
     targetName: string
     targetPrefix: string
@@ -30,6 +31,7 @@ export default class Target {
         this.linkOptionList = []
         this.projectFileList = project.projectFileList
         this.sourceList = []
+        this.sourceGroupList = []
         this.targetFeature = {}
         this.targetName = targetName
         this.targetPrefix = targetName
@@ -55,7 +57,7 @@ export default class Target {
     }
 
     addFeature(...featureList: string[]): Target {
-        for (let feature of featureList) {
+        for (const feature of featureList) {
             featureTool.parse(this.targetFeature, feature)
         }
         return this
@@ -82,10 +84,14 @@ export default class Target {
     }
 
     addSource(...pathList: string[]): SourceGroup {
-        return new SourceGroup(this, pathList, null)
+        const group = new SourceGroup(this, pathList, null)
+        this.sourceGroupList.push(group)
+        return group
     }
 
     addSourcePattern(...patternList: string[]): SourceGroup {
-        return new SourceGroup(this, null, patternList)
+        const group = new SourceGroup(this, null, patternList)
+        this.sourceGroupList.push(group)
+        return group
     }
 }

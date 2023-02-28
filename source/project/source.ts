@@ -15,7 +15,7 @@ export default class Source {
         this.optionList = []
         this.sourcePath = sourcePath
         //通过路径计算
-        let sourceParse = path.parse(sourcePath)
+        const sourceParse = path.parse(sourcePath)
         this.objectPrefix = path.join(target.targetName + 'Obj', sourceParse.dir, sourceParse.name)
         switch (sourceParse.ext.toLowerCase()) {
             case '.asm':

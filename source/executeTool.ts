@@ -16,7 +16,7 @@ export default class Self {
             function thisTask() {
                 function taskDone(error, stdout, stderr) {
                     resolve({error, stdout, stderr})
-                    let nextTask = Self.queue.shift()
+                    const nextTask = Self.queue.shift()
                     if (nextTask) {
                         nextTask()
                     } else {

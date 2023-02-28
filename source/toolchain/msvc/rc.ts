@@ -5,11 +5,11 @@ import msvc from './msvc'
 
 export default class {
     static async build(builderFeature: BuilderFeature, target: Target, source: Source) {
-        let flagList = Array.from(source.optionList)
-        for (let definition of source.definitionList) {
+        const flagList = Array.from(source.optionList)
+        for (const definition of source.definitionList) {
             flagList.push('/d' + definition)
         }
-        for (let includePath of source.includePathList) {
+        for (const includePath of source.includePathList) {
             flagList.push('/i' + includePath)
         }
         flagList.push('/fo' + source.objectPrefix + '.res')
