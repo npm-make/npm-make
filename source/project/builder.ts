@@ -25,7 +25,19 @@ export default class Builder {
         return project.projectModule.generate(project, project.projectFeature, this.builderFeature)
     }
 
-    asd() {
-        new Project('', {})
+    beforeBuildTarget(target: Target) {
+        for (const dependencyTarget of target.dependencyTargetList) {
+            target.includePathList.push(...dependencyTarget.exportIncludePathList)
+            target.libraryList.push(...dependencyTarget.exportLibraryList)
+            target.libraryPathList.push(...dependencyTarget.exportLibraryPathList)
+        }
+        for (const sourceGroup of target.sourceGroupList) {
+            target.sourceList.push(...sourceGroup.sourceList)
+        }
+        for (const source of target.sourceList) {
+            source.definitionList.push(...target.definitionList)
+            source.includePathList.push(...target.includePathList)
+            source.optionList.push(...target.compileOptionList)
+        }
     }
 }

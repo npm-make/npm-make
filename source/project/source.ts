@@ -1,22 +1,14 @@
 import path from 'node:path'
-import Target from './target'
 
 export default class Source {
-    definitionList: string[]
-    includePathList: string[]
     objectPrefix: string
-    optionList: string[]
     sourcePath: string
     sourceType: 'ASM' | 'C' | 'CXX' | 'DEF' | 'MANIFEST' | 'RC'
 
-    constructor(target: Target, sourcePath: string) {
-        this.definitionList = []
-        this.includePathList = []
-        this.optionList = []
-        this.sourcePath = sourcePath
-        //通过路径计算
+    constructor(targetName: string, sourcePath: string) {
         const sourceParse = path.parse(sourcePath)
-        this.objectPrefix = path.join(target.targetName + 'Obj', sourceParse.dir, sourceParse.name)
+        this.objectPrefix = path.join(targetName + 'Obj', sourceParse.dir, sourceParse.name)
+        this.sourcePath = sourcePath
         switch (sourceParse.ext.toLowerCase()) {
             case '.asm':
             case '.s':

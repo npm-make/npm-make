@@ -1,13 +1,20 @@
+import regexTool from '../regexTool'
 import Source from './source'
 import Target from './target'
 
 export default class SourceGroup {
+    compileOptionList: string[]
+    definitionList: string[]
+    projectFileList: string[]
     sourceList: Source[]
-    target: Target
+    targetName: string
 
     constructor(target: Target, pathList: string[], patternList: string[]) {
+        this.compileOptionList = []
+        this.definitionList = []
+        this.projectFileList = target.projectFileList
         this.sourceList = []
-        this.target = target
+        this.targetName = target.targetName
         if (pathList) {
             this.addSource(...pathList)
         }
@@ -17,34 +24,31 @@ export default class SourceGroup {
     }
 
     addCompileOption(...optionList: string[]): SourceGroup {
-        for (const source of this.sourceList) {
-            source.optionList.push(...optionList)
-        }
+        this.compileOptionList.push(...optionList)
         return this
     }
 
     addDefinition(...definitionList: string[]): SourceGroup {
-        for (const source of this.sourceList) {
-            source.definitionList.push(...definitionList)
-        }
+        this.definitionList.push(...definitionList)
         return this
     }
 
-    addIncludePath(...pathList: string[]): SourceGroup {
-        for (const source of this.sourceList) {
-            source.includePathList.push(...pathList)
-        }
-        return this
-    }
-
-    addSource(...pathList: string[]): SourceGroup {
-        for (const path of pathList) {
-            this.sourceList.push(new Source(this.target, path))
+    addSource(...inputList: string[]): SourceGroup {
+        for (const input of inputList) {
+            this.sourceList.push(new Source(this.targetName, input))
         }
         return this
     }
 
     addSourcePattern(...patternList: string[]): SourceGroup {
+        for (const pattern of patternList) {
+            const regex = regexTool.path(pattern)
+            for (const projectFile of this.projectFileList) {
+                if (regex.test(projectFile)) {
+                    this.sourceList.push(new Source(this.targetName, projectFile))
+                }
+            }
+        }
         return this
     }
 }
