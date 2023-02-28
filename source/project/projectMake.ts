@@ -1,6 +1,6 @@
-import BuildFeature from './buildFeature'
+import BuilderFeature from './builderFeature'
 import Project from './project'
 
 export default interface ProjectMake {
-    generate(project: Project, projectFeature: object, buildFeature: BuildFeature): void | Promise<void>
+    generate(project: Project, projectFeature: object, builderFeature: BuilderFeature): void | Promise<void>
 }
