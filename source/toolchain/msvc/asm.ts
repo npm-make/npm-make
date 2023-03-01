@@ -5,17 +5,17 @@ import msvc from './msvc'
 
 export default class {
     static async build(builderFeature: BuilderFeature, target: Target, source: Source) {
-        const flagList = Array.from(source.optionList)
+        const flagList = Array.from(source.compileOptionList)
         switch (builderFeature.MACHINE) {
             case 'ARM':
             case 'ARM64': {
-                if (source.includePathList.length > 0) {
-                    flagList.push('-i')
-                    flagList.push(source.includePathList.join(';'))
-                }
                 if (builderFeature.WINDOWS_ARM64_CALL_X64) {
                     flagList.push('-machine')
                     flagList.push('ARM64EC')
+                }
+                if (target.includePathList.length > 0) {
+                    flagList.push('-i')
+                    flagList.push(target.includePathList.join(';'))
                 }
                 flagList.push('-nologo')
                 //这些命令在末尾
@@ -25,11 +25,11 @@ export default class {
             }
             case 'X64':
             case 'X86': {
+                for (const includePath of target.includePathList) {
+                    flagList.push('/I' + includePath)
+                }
                 for (const definition of source.definitionList) {
                     flagList.push('/D' + definition)
-                }
-                for (const includePath of source.includePathList) {
-                    flagList.push('/I' + includePath)
                 }
                 flagList.push('/Fo' + source.objectPrefix + '.obj')
                 flagList.push('/nologo')

@@ -1,15 +1,19 @@
 import path from 'node:path'
 
 export default class Source {
+    compileOptionList: string[]
+    definitionList: string[]
     objectPrefix: string
     sourcePath: string
     sourceType: 'ASM' | 'C' | 'CXX' | 'DEF' | 'MANIFEST' | 'RC'
 
     constructor(targetName: string, sourcePath: string) {
-        const sourceParse = path.parse(sourcePath)
-        this.objectPrefix = path.join(targetName + 'Obj', sourceParse.dir, sourceParse.name)
+        const pathParse = path.parse(sourcePath)
+        this.compileOptionList = []
+        this.definitionList = []
+        this.objectPrefix = path.join(targetName + 'Obj', pathParse.dir, pathParse.name)
         this.sourcePath = sourcePath
-        switch (sourceParse.ext.toLowerCase()) {
+        switch (pathParse.ext.toLowerCase()) {
             case '.asm':
             case '.s':
                 this.sourceType = 'ASM'

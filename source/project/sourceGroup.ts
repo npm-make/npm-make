@@ -1,6 +1,5 @@
 import regexTool from '../regexTool'
 import Source from './source'
-import Target from './target'
 
 export default class SourceGroup {
     compileOptionList: string[]
@@ -9,18 +8,12 @@ export default class SourceGroup {
     sourceList: Source[]
     targetName: string
 
-    constructor(target: Target, pathList: string[], patternList: string[]) {
+    constructor(targetName: string, projectFileList: string[]) {
         this.compileOptionList = []
         this.definitionList = []
-        this.projectFileList = target.projectFileList
+        this.projectFileList = projectFileList
         this.sourceList = []
-        this.targetName = target.targetName
-        if (pathList) {
-            this.addSource(...pathList)
-        }
-        if (patternList) {
-            this.addSourcePattern(...patternList)
-        }
+        this.targetName = targetName
     }
 
     addCompileOption(...optionList: string[]): SourceGroup {

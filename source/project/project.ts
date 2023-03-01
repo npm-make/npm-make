@@ -1,8 +1,8 @@
-import featureTool from '../featureTool'
 import ProjectModule from './projectModule'
 import Target from './target'
 
 export default class Project {
+    dependencyList: string[]
     dependencyProjectList: Project[]
     projectFeature: object
     projectFileList: string[]
@@ -11,26 +11,22 @@ export default class Project {
     projectPath: string
     targetList: Target[]
 
-    constructor(projectName: string, featureList: string[]) {
-        this.projectFeature = {}
+    constructor(projectName: string, projectFeature: object) {
+        this.projectFeature = projectFeature
         this.projectFileList = []
         this.projectName = projectName
         this.targetList = []
-        if (featureList) {
-            for (const feature of featureList) {
-                featureTool.parse(this.projectFeature, feature)
-            }
-        }
     }
 
-    createTarget(targetName: string, ...featureList: string[]): Target {
-        const target = new Target(this, targetName, featureList)
-        this.targetList.push(target)
-        return target
-    }
-
-    importProject(projectName: string, ...featureList: string[]): Project {
-        this.dependencyProjectList.push(new Project(projectName, featureList))
+    addProject(projectInput: string): Project {
+        this.dependencyList.push(projectInput)
         return this
     }
+
+    // addTarget(targetInput: string): Target {
+    //     const parse = querystring.parse('name=' + targetInput, ' ')
+    //     const target = new Target(this, parse.name, parse)
+    //     this.targetList.push(target)
+    //     return target
+    // }
 }

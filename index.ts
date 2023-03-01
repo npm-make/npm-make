@@ -1,5 +1,8 @@
-import temp from './source/project/builder'
+import Builder from './source/project/builder'
+import Project from './source/project/project'
 
-let temp1 = new temp(null)
-// await temp1.addProject('zlib', 'C:\\Project\\npm-make\\zlib')
+let builder = new Builder({})
+let project = new Project('zlib', [])
+await builder.loadProject(project, 'C:\\Project\\npm-make\\zlib')
 
+console.log(project)

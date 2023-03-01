@@ -1,5 +1,3 @@
-import featureTool from '../featureTool'
-import Project from './project'
 import Source from './source'
 import SourceGroup from './sourceGroup'
 import TargetFeature from './targetFeature'
@@ -24,7 +22,7 @@ export default class Target {
     targetPrefix: string
     targetType: 'EXECUTE' | 'SHARED' | 'STATIC'
 
-    constructor(project: Project, targetName: string, featureList: string[]) {
+    constructor(targetName: string, targetFeature: TargetFeature, projectFileList: string[]) {
         this.compileOptionList = []
         this.definitionList = []
         this.dependencyTargetList = []
@@ -35,16 +33,13 @@ export default class Target {
         this.libraryList = []
         this.libraryPathList = []
         this.linkOptionList = []
-        this.projectFileList = project.projectFileList
+        this.projectFileList = projectFileList
         this.sourceList = []
         this.sourceGroupList = []
-        this.targetFeature = {}
+        this.targetFeature = targetFeature
         this.targetName = targetName
         this.targetPrefix = targetName
         this.targetType = 'EXECUTE'
-        if (featureList) {
-            this.addFeature(...featureList)
-        }
     }
 
     addCompileOption(...optionList: string[]): Target {
@@ -77,13 +72,6 @@ export default class Target {
         return this
     }
 
-    addFeature(...featureList: string[]): Target {
-        for (const feature of featureList) {
-            featureTool.parse(this.targetFeature, feature)
-        }
-        return this
-    }
-
     addIncludePath(...pathList: string[]): Target {
         this.includePathList.push(...pathList)
         return this
@@ -104,14 +92,16 @@ export default class Target {
         return this
     }
 
-    addSource(...pathList: string[]): SourceGroup {
-        const group = new SourceGroup(this, pathList, null)
+    addSource(...inputList: string[]): SourceGroup {
+        const group = new SourceGroup(this.targetName, this.projectFileList)
+        group.addSource(...inputList)
         this.sourceGroupList.push(group)
         return group
     }
 
     addSourcePattern(...patternList: string[]): SourceGroup {
-        const group = new SourceGroup(this, null, patternList)
+        const group = new SourceGroup(this.targetName, this.projectFileList)
+        group.addSourcePattern(...patternList)
         this.sourceGroupList.push(group)
         return group
     }

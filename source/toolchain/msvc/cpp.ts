@@ -5,7 +5,7 @@ import msvc from './msvc'
 
 export default class {
     static async build(builderFeature: BuilderFeature, target: Target, source: Source) {
-        const flagList = Array.from(source.optionList)
+        const flagList = Array.from(source.compileOptionList)
         if (builderFeature.DEBUG) {
             if (!builderFeature.DEBUG_WITHOUT_RTC) {
                 flagList.push('/RTC1')
@@ -60,11 +60,11 @@ export default class {
             }
             flagList.push('/Tc' + source.sourcePath)
         }
+        for (const includePath of target.includePathList) {
+            flagList.push('/I' + includePath)
+        }
         for (const definition of source.definitionList) {
             flagList.push('/D' + definition)
-        }
-        for (const includePath of source.includePathList) {
-            flagList.push('/I' + includePath)
         }
         flagList.push('/c')
         flagList.push('/Fd' + source.objectPrefix + '.pdb')
