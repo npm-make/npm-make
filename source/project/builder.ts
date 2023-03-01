@@ -1,4 +1,3 @@
-import path from 'node:path'
 import url from 'node:url'
 import searchTool from '../searchTool'
 import BuilderFeature from './builderFeature'
@@ -17,18 +16,10 @@ export default class Builder {
     }
 
     async loadProject(project: Project, projectPath: string) {
-        const moduleUrl = url.pathToFileURL(path.join(projectPath, 'make.mjs'))
-        const moduleImport = await import(moduleUrl)
+        const moduleImport = await import(url.pathToFileURL(projectPath + '/make.mjs'))
         project.projectPath = projectPath
         project.projectModule = moduleImport.default
         await searchTool.search(project.projectFileList, projectPath, '')
         return project.projectModule.generate(project, project.projectFeature, this.builderFeature)
-    }
-
-    async loadProjectTree(projectList: Project[]) {
-        let nextList = []
-        for (const project of projectList) {
-
-        }
     }
 }
