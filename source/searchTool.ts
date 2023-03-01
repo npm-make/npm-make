@@ -3,7 +3,7 @@ import fs from 'node:fs/promises'
 export default class Self {
     private static ignoreDir = /^node_modules$|^npm_make$|^\./i
 
-    static async search(output, base, prefix) {
+    static async search(output: string[], base: string, prefix: string) {
         const dir = await fs.opendir(base + prefix)
         for await (const item of dir) {
             if (item.isDirectory()) {

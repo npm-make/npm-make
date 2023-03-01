@@ -24,7 +24,7 @@ export default class Target {
     targetPrefix: string
     targetType: 'EXECUTE' | 'SHARED' | 'STATIC'
 
-    constructor(targetName: string, targetFeature: TargetFeature, projectPath: string, projectFileList: string[]) {
+    constructor(projectPath: string, projectFileList: string[], targetName: string, targetFeature?: TargetFeature) {
         this.compileOptionList = []
         this.definitionList = []
         this.dependencyTargetList = []
@@ -104,14 +104,14 @@ export default class Target {
     }
 
     addSource(...inputList: string[]): SourceGroup {
-        const group = new SourceGroup(this.targetName, this.projectPath, this.projectFileList)
+        const group = new SourceGroup(this.projectPath, this.projectFileList, this.targetName)
         group.addSource(...inputList)
         this.sourceGroupList.push(group)
         return group
     }
 
     addSourcePattern(...patternList: string[]): SourceGroup {
-        const group = new SourceGroup(this.targetName, this.projectPath, this.projectFileList)
+        const group = new SourceGroup(this.projectPath, this.projectFileList, this.targetName)
         group.addSourcePattern(...patternList)
         this.sourceGroupList.push(group)
         return group

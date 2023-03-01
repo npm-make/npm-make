@@ -9,7 +9,7 @@ export default class SourceGroup {
     sourceList: Source[]
     targetName: string
 
-    constructor(targetName: string, projectPath: string, projectFileList: string[]) {
+    constructor(projectPath: string, projectFileList: string[], targetName: string) {
         this.compileOptionList = []
         this.definitionList = []
         this.projectFileList = projectFileList
@@ -30,7 +30,7 @@ export default class SourceGroup {
 
     addSource(...inputList: string[]): SourceGroup {
         for (const input of inputList) {
-            this.sourceList.push(new Source(this.targetName, this.projectPath, input))
+            this.sourceList.push(new Source(this.projectPath, this.targetName, input))
         }
         return this
     }
@@ -40,7 +40,7 @@ export default class SourceGroup {
             const regex = regexTool.path(pattern)
             for (const projectFile of this.projectFileList) {
                 if (regex.test(projectFile)) {
-                    this.sourceList.push(new Source(this.targetName, this.projectPath, projectFile))
+                    this.sourceList.push(new Source(this.projectPath, this.targetName, projectFile))
                 }
             }
         }

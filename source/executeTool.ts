@@ -11,7 +11,7 @@ export default class Self {
         }
     }
 
-    static async execute(options, file, ...args) {
+    static async execute(options: object, file: string, ...args: string[]) {
         function invoke(resolve) {
             function thisTask() {
                 function taskDone(error, stdout, stderr) {
