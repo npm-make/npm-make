@@ -1,3 +1,4 @@
+import crypto from 'node:crypto'
 import path from 'node:path'
 
 export default class Source {
@@ -8,12 +9,14 @@ export default class Source {
     sourceType: 'ASM' | 'C' | 'CXX' | 'DEF' | 'MANIFEST' | 'RC'
 
     constructor(targetName: string, projectPath: string, sourcePath: string) {
-        const pathParse = path.parse(sourcePath)
+        const pathHash = crypto.createHash('md5')
+            .update(sourcePath)
+            .digest('base64url')
         this.compileOptionList = []
         this.definitionList = []
-        this.objectPrefix = path.join(targetName + 'Obj', pathParse.dir, pathParse.name)
+        this.objectPrefix = path.join(targetName + 'Obj', pathHash)
         this.sourcePath = path.join(projectPath, sourcePath)
-        switch (pathParse.ext.toLowerCase()) {
+        switch (path.extname(sourcePath.toLowerCase())) {
             case '.asm':
             case '.s':
                 this.sourceType = 'ASM'
