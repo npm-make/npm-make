@@ -1,5 +1,6 @@
-import url from 'node:url'
-import querystring from 'node:querystring'
+import path from 'node:path'
 
-console.log(url.parse('zlib shared win32Main'))
-console.log(querystring.parse('name=' + ' zlib=3 SHARED WIN32_MAIN', ' '))
+console.log(path.parse('s.c'))
+console.log(path.parse('.ignore'))
+console.log(path.parse('/asdasd/sdd/cc.d'))
+console.log(path.parse('asdasd/sdd/cc.d'))

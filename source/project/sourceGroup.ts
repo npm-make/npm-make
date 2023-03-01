@@ -5,13 +5,15 @@ export default class SourceGroup {
     compileOptionList: string[]
     definitionList: string[]
     projectFileList: string[]
+    projectPath: string
     sourceList: Source[]
     targetName: string
 
-    constructor(targetName: string, projectFileList: string[]) {
+    constructor(targetName: string, projectPath: string, projectFileList: string[]) {
         this.compileOptionList = []
         this.definitionList = []
         this.projectFileList = projectFileList
+        this.projectPath = projectPath
         this.sourceList = []
         this.targetName = targetName
     }
@@ -28,7 +30,7 @@ export default class SourceGroup {
 
     addSource(...inputList: string[]): SourceGroup {
         for (const input of inputList) {
-            this.sourceList.push(new Source(this.targetName, input))
+            this.sourceList.push(new Source(this.targetName, this.projectPath, input))
         }
         return this
     }
@@ -38,7 +40,7 @@ export default class SourceGroup {
             const regex = regexTool.path(pattern)
             for (const projectFile of this.projectFileList) {
                 if (regex.test(projectFile)) {
-                    this.sourceList.push(new Source(this.targetName, projectFile))
+                    this.sourceList.push(new Source(this.targetName, this.projectPath, projectFile))
                 }
             }
         }

@@ -7,12 +7,12 @@ export default class Source {
     sourcePath: string
     sourceType: 'ASM' | 'C' | 'CXX' | 'DEF' | 'MANIFEST' | 'RC'
 
-    constructor(targetName: string, sourcePath: string) {
+    constructor(targetName: string, projectPath: string, sourcePath: string) {
         const pathParse = path.parse(sourcePath)
         this.compileOptionList = []
         this.definitionList = []
         this.objectPrefix = path.join(targetName + 'Obj', pathParse.dir, pathParse.name)
-        this.sourcePath = sourcePath
+        this.sourcePath = path.join(projectPath, sourcePath)
         switch (pathParse.ext.toLowerCase()) {
             case '.asm':
             case '.s':

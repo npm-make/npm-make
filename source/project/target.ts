@@ -1,3 +1,4 @@
+import path from 'node:path'
 import Source from './source'
 import SourceGroup from './sourceGroup'
 import TargetFeature from './targetFeature'
@@ -15,6 +16,7 @@ export default class Target {
     libraryPathList: string[]
     linkOptionList: string[]
     projectFileList: string[]
+    projectPath: string
     sourceList: Source[]
     sourceGroupList: SourceGroup[]
     targetFeature: TargetFeature
@@ -22,7 +24,7 @@ export default class Target {
     targetPrefix: string
     targetType: 'EXECUTE' | 'SHARED' | 'STATIC'
 
-    constructor(targetName: string, targetFeature: TargetFeature, projectFileList: string[]) {
+    constructor(targetName: string, targetFeature: TargetFeature, projectPath: string, projectFileList: string[]) {
         this.compileOptionList = []
         this.definitionList = []
         this.dependencyTargetList = []
@@ -34,6 +36,7 @@ export default class Target {
         this.libraryPathList = []
         this.linkOptionList = []
         this.projectFileList = projectFileList
+        this.projectPath = projectPath
         this.sourceList = []
         this.sourceGroupList = []
         this.targetFeature = targetFeature
@@ -57,8 +60,10 @@ export default class Target {
         return this
     }
 
-    addExportIncludePath(...pathList: string[]): Target {
-        this.exportIncludePathList.push(...pathList)
+    addExportIncludePath(...inputList: string[]): Target {
+        for (const input of inputList) {
+            this.exportIncludePathList.push(path.join(this.projectPath, input))
+        }
         return this
     }
 
@@ -67,13 +72,17 @@ export default class Target {
         return this
     }
 
-    addExportLibraryPath(...pathList: string[]): Target {
-        this.exportLibraryPathList.push(...pathList)
+    addExportLibraryPath(...inputList: string[]): Target {
+        for (const input of inputList) {
+            this.exportLibraryPathList.push(path.join(this.projectPath, input))
+        }
         return this
     }
 
-    addIncludePath(...pathList: string[]): Target {
-        this.includePathList.push(...pathList)
+    addIncludePath(...inputList: string[]): Target {
+        for (const input of inputList) {
+            this.includePathList.push(path.join(this.projectPath, input))
+        }
         return this
     }
 
@@ -82,8 +91,10 @@ export default class Target {
         return this
     }
 
-    addLibraryPath(...pathList: string[]): Target {
-        this.libraryPathList.push(...pathList)
+    addLibraryPath(...inputList: string[]): Target {
+        for (const input of inputList) {
+            this.libraryPathList.push(path.join(this.projectPath, input))
+        }
         return this
     }
 
@@ -93,14 +104,14 @@ export default class Target {
     }
 
     addSource(...inputList: string[]): SourceGroup {
-        const group = new SourceGroup(this.targetName, this.projectFileList)
+        const group = new SourceGroup(this.targetName, this.projectPath, this.projectFileList)
         group.addSource(...inputList)
         this.sourceGroupList.push(group)
         return group
     }
 
     addSourcePattern(...patternList: string[]): SourceGroup {
-        const group = new SourceGroup(this.targetName, this.projectFileList)
+        const group = new SourceGroup(this.targetName, this.projectPath, this.projectFileList)
         group.addSourcePattern(...patternList)
         this.sourceGroupList.push(group)
         return group
