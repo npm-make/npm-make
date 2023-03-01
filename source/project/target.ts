@@ -39,7 +39,7 @@ export default class Target {
         this.projectPath = projectPath
         this.sourceList = []
         this.sourceGroupList = []
-        this.targetFeature = targetFeature
+        this.targetFeature = targetFeature || {}
         this.targetName = targetName
         this.targetPrefix = targetName
         this.targetType = 'EXECUTE'

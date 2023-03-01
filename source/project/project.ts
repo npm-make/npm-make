@@ -1,5 +1,6 @@
 import ProjectModule from './projectModule'
 import Target from './target'
+import TargetFeature from './targetFeature'
 
 export default class Project {
     dependencyList: string[]
@@ -23,8 +24,8 @@ export default class Project {
         return this
     }
 
-    addTarget(targetInput: string): Target {
-        const target = new Target('', {}, this.projectPath, this.projectFileList)
+    addTarget(targetName: string, targetFeature?: TargetFeature): Target {
+        const target = new Target(targetName, targetFeature, this.projectPath, this.projectFileList)
         this.targetList.push(target)
         return target
     }
