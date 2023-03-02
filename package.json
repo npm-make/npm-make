@@ -3,6 +3,7 @@
   "version": "0.0.6",
   "license": "MIT",
   "repository": "https://github.com/npm-make/npm-make",
+  "type": "module",
   "bin": {
     "npm-make": "bundle.mjs"
   },

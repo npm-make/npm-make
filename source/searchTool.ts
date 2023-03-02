@@ -3,16 +3,35 @@ import fs from 'node:fs/promises'
 export default class Self {
     static #ignoreDir = /^node_modules$|^npm_make$|^\./i
 
-    static async search(output: string[], base: string, prefix: string) {
-        const dir = await fs.opendir(base + prefix)
-        for await (const item of dir) {
+    static async searchProject(outputList: string[], basePath: string, thisPath: string): Promise<void> {
+        const directory = await fs.opendir(basePath + thisPath)
+        for await (const item of directory) {
             if (item.isDirectory()) {
-                if (!Self.#ignoreDir.test(item.name)) {
-                    await this.search(output, base, prefix + '/' + item.name)
+                if (!this.#ignoreDir.test(item.name)) {
+                    await this.searchProject(outputList, basePath, thisPath + '/' + item.name)
                 }
             } else {
-                output.push(prefix + '/' + item.name)
+                outputList.push(thisPath + '/' + item.name)
+            }
+        }
+    }
+
+    static async searchPackage(output: Map<string, string>, thisPath: string): Promise<void> {
+        const directory = await fs.opendir(thisPath)
+        for await (const item of directory) {
+            if (item.isDirectory()) {
+                const link = await fs.stat(directory.path + '/' + item.name)
+                console.log(link)
+                // if (item.) {
+                // } else {
+                //     output.set(item.name, thisPath + '/' + item.name)
+                // }
             }
         }
     }
 }
+
+let a = new Map
+await Self.searchPackage(a, 'C:\\Project\\demo1')
+console.log(a)
+
