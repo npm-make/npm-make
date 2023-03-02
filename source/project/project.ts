@@ -11,7 +11,9 @@ export default class Project {
     projectPath: string
     targetList: Target[]
 
-    constructor(projectName: string) {
+    constructor(projectName: string, packageList: string[]) {
+        this.dependencyList = []
+        this.packageList = packageList
         this.projectFileList = []
         this.projectName = projectName
         this.targetList = []

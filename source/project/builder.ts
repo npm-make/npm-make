@@ -15,11 +15,12 @@ export default class Builder {
         this.targetMap = new Map()
     }
 
-    async loadProject(project: Project, projectPath: string) {
-        const moduleImport = await import(url.pathToFileURL(projectPath + '/make.mjs'))
-        project.projectPath = projectPath
-        project.projectModule = moduleImport.default
-        await searchTool.search(project.projectFileList, projectPath, '')
-        return project.projectModule.generate(project, project.projectFeature, this.builderFeature)
-    }
+    // async loadProject(project: Project, projectPath: string) {
+    //     const moduleImport = await import(url.pathToFileURL(projectPath + '/make.mjs').href)
+    //     project.projectPath = projectPath
+    //     project.projectModule = moduleImport.default
+    //     await searchTool.search(project.projectFileList, projectPath, '')
+    //
+    //     return project.projectModule.generate(project, project.projectFeature, this.builderFeature)
+    // }
 }
