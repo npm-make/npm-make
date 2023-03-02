@@ -3,29 +3,31 @@ import Target from './target'
 import TargetFeature from './targetFeature'
 
 export default class Project {
-    dependencyProjectList: Project[]
-    projectFeature: object
+    dependencyList: string[]
+    packageList: string[]
     projectFileList: string[]
     projectModule: ProjectModule
     projectName: string
     projectPath: string
     targetList: Target[]
 
-    constructor(projectName: string, projectFeature: object) {
-        this.projectFeature = projectFeature || {}
+    constructor(projectName: string) {
         this.projectFileList = []
         this.projectName = projectName
         this.targetList = []
-    }
-
-    addProject(projectName: string, projectFeature?: object): Project {
-        this.dependencyProjectList.push(new Project(projectName, projectFeature))
-        return this
     }
 
     addTarget(targetName: string, targetFeature?: TargetFeature): Target {
         const target = new Target(this.projectPath, this.projectFileList, targetName, targetFeature)
         this.targetList.push(target)
         return target
+    }
+
+    hasProject(projectName: string): boolean {
+        return this.packageList.includes(projectName)
+    }
+
+    useProject(projectName: string): void {
+        this.dependencyList.push(projectName)
     }
 }
