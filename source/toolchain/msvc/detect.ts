@@ -1,3 +1,147 @@
+import path from 'node:path'
+import { MachineType } from '../../type'
+
+class MSVC {
+
+}
+
+class SDK {
+    executeRC: string
+    executePath: string
+    includePathList: string[]
+    libraryList: string[]
+    libraryPathList: string[]
+    version: string
+    versionNumber: BigInt
+
+    constructor() {
+        this.includePathList = []
+        this.libraryList = []
+        this.libraryPathList = []
+    }
+}
+
+class SDK7 extends SDK {
+    async detect7(installPath: string, targetMachine: MachineType, version: string) {
+        this.version = version
+        this.includePathList.push(path.join(installPath, version, 'Include'))
+        switch (targetMachine) {
+            case 'X64':
+                this.executeRC = path.join(installPath, version, 'Bin', 'x64', 'rc.exe')
+                this.executePath = path.join(installPath, version, 'Bin', 'x64')
+                this.libraryPathList.push(path.join(installPath, version, 'Lib', 'x64'))
+                break
+            case 'X86':
+                this.executeRC = path.join(installPath, version, 'Bin', 'rc.exe')
+                this.executePath = path.join(installPath, version, 'Bin')
+                this.libraryPathList.push(path.join(installPath, version, 'Lib'))
+                break
+        }
+    }
+
+    async detect8(installPath: string, localMachine: MachineType, targetMachine: MachineType, version: string) {
+        this.version = version
+        this.executeRC = path.join(installPath, 'bin', localMachine, 'rc.exe')
+        this.executePath = path.join(installPath, 'bin', localMachine)
+        this.includePathList.push(path.join(installPath, 'Include', 'shared'))
+        this.includePathList.push(path.join(installPath, 'Include', 'um'))
+        this.includePathList.push(path.join(installPath, 'Include', 'winrt'))
+        switch (version) {
+            case '8.0':
+                this.libraryPathList.push(path.join(installPath, 'Lib', 'winv6.2', 'um', targetMachine))
+                break
+            case '8.1':
+                this.libraryPathList.push(path.join(installPath, 'Lib', 'winv6.3', 'um', targetMachine))
+                break
+        }
+    }
+}
+
+class SDK10 extends SDK {
+    detectSdk(installPath: string, localMachine: MachineType, targetMachine: MachineType, version: string) {
+        this.version = version
+        this.versionNumber = this.parseVersion(version)
+        this.executePath = path.join(installPath, 'bin', version, localMachine)
+        this.executeRC = path.join(this.executePath, 'rc.exe')
+        this.includePathList.push(path.join(installPath, 'Include', version, 'cppwinrt'))
+        this.includePathList.push(path.join(installPath, 'Include', version, 'shared'))
+        this.includePathList.push(path.join(installPath, 'Include', version, 'ucrt'))
+        this.includePathList.push(path.join(installPath, 'Include', version, 'um'))
+        this.includePathList.push(path.join(installPath, 'Include', version, 'winrt'))
+        this.libraryPathList.push(path.join(installPath, 'Lib', version, 'ucrt', targetMachine))
+        this.libraryPathList.push(path.join(installPath, 'Lib', version, 'um', targetMachine))
+    }
+
+    parseVersion(version: string): BigInt {
+        const match = /^(\d+)\.(\d+)\.(\d+)\.(\d+)$/.exec(version)
+        if (match) {
+            const ver1 = BigInt(match.at(1))
+            const ver2 = BigInt(match.at(2))
+            const ver3 = BigInt(match.at(3))
+            const ver4 = BigInt(match.at(4))
+            return ver1 << 48n | ver2 << 32n | ver3 << 16n | ver4
+        }
+    }
+}
+
+export default class {
+
+}
+
+
+// import process from 'node:process'
+// import detectWindows from './windows/detect.mjs'
+// import msvc from '../toolchain/msvc/msvc.ts'
+//
+// export default class {
+//     static async detect(targetMachine, expectMsvc, expectSdk) {
+//         this.executeASM = ''
+//         this.executeCL = ''
+//         this.executeLIB = ''
+//         this.executeLINK = ''
+//         this.executePathList = []
+//         this.executeRC = ''
+//         this.includePathList = []
+//         this.libraryList = []
+//         this.libraryPathList = []
+//         this.versionMsvc = ''
+//         this.versionSdk = ''
+//         switch (process.platform) {
+//             case 'win32':
+//                 await detectWindows.detect(targetMachine, expectMsvc, expectSdk)
+//                 break
+//         }
+//         this.environment = {}
+//         this.environment.INCLUDE = this.includePathList.join(';')
+//         this.environment.LIB = this.libraryPathList.join(';')
+//         this.environment.PATH = this.executePathList.join(';')
+//     }
+//
+//     static async detect(targetMachine, expectMsvc, expectSdk) {
+//         msvc.libraryList.push('advapi32.lib')
+//         msvc.libraryList.push('comdlg32.lib')
+//         msvc.libraryList.push('gdi32.lib')
+//         msvc.libraryList.push('kernel32.lib')
+//         msvc.libraryList.push('ole32.lib')
+//         msvc.libraryList.push('oleaut32.lib')
+//         msvc.libraryList.push('shell32.lib')
+//         msvc.libraryList.push('user32.lib')
+//         msvc.libraryList.push('uuid.lib')
+//         msvc.libraryList.push('winspool.lib')
+//         switch (process.arch) {
+//             case 'ia32':
+//                 await this.#detectMsvc('C:\\Program Files', 'x86', targetMachine, expectMsvc)
+//                 await this.#detectSdk('C:\\Program Files', 'x86', targetMachine, expectSdk)
+//                 break
+//             case 'x64':
+//                 await this.#detectMsvc('C:\\Program Files (x86)', 'x64', targetMachine, expectMsvc)
+//                 await this.#detectSdk('C:\\Program Files (x86)', 'x64', targetMachine, expectSdk)
+//                 break
+//         }
+//     }
+//
+//
+// }
 // import fs from 'node:fs/promises'
 // import path from 'node:path'
 // import process from 'node:process'
@@ -193,51 +337,4 @@
 //     //     } catch {
 //     //     }
 //     // }
-//
-//     static #detectSdk7Base(installPath, targetMachine, version) {
-//         msvc.versionSdk = version
-//         msvc.includePathList.push(path.join(installPath, version, 'Include'))
-//         switch (targetMachine) {
-//             case 'x64':
-//                 msvc.executeRC = path.join(installPath, version, 'Bin', 'x64', 'rc.exe')
-//                 msvc.executePathList.push(path.join(installPath, version, 'Bin', 'x64'))
-//                 msvc.libraryPathList.push(path.join(installPath, version, 'Lib', 'x64'))
-//                 break
-//             case 'x86':
-//                 msvc.executeRC = path.join(installPath, version, 'Bin', 'rc.exe')
-//                 msvc.executePathList.push(path.join(installPath, version, 'Bin'))
-//                 msvc.libraryPathList.push(path.join(installPath, version, 'Lib'))
-//                 break
-//         }
-//     }
-//
-//     static #detectSdk8Base(installPath, localMachine, targetMachine, version) {
-//         msvc.versionSdk = version
-//         msvc.executeRC = path.join(installPath, 'bin', localMachine, 'rc.exe')
-//         msvc.executePathList.push(path.join(installPath, 'bin', localMachine))
-//         msvc.includePathList.push(path.join(installPath, 'Include', 'shared'))
-//         msvc.includePathList.push(path.join(installPath, 'Include', 'um'))
-//         msvc.includePathList.push(path.join(installPath, 'Include', 'winrt'))
-//         switch (version) {
-//             case '8.0':
-//                 msvc.libraryPathList.push(path.join(installPath, 'Lib', 'winv6.2', 'um', targetMachine))
-//                 break
-//             case '8.1':
-//                 msvc.libraryPathList.push(path.join(installPath, 'Lib', 'winv6.3', 'um', targetMachine))
-//                 break
-//         }
-//     }
-//
-//     static #detectSdk10Base(installPath, localMachine, targetMachine, version) {
-//         msvc.versionSdk = version
-//         msvc.executeRC = path.join(installPath, 'bin', version, localMachine, 'rc.exe')
-//         msvc.executePathList.push(path.join(installPath, 'bin', version, localMachine))
-//         msvc.includePathList.push(path.join(installPath, 'Include', version, 'cppwinrt'))
-//         msvc.includePathList.push(path.join(installPath, 'Include', version, 'shared'))
-//         msvc.includePathList.push(path.join(installPath, 'Include', version, 'ucrt'))
-//         msvc.includePathList.push(path.join(installPath, 'Include', version, 'um'))
-//         msvc.includePathList.push(path.join(installPath, 'Include', version, 'winrt'))
-//         msvc.libraryPathList.push(path.join(installPath, 'Lib', version, 'ucrt', targetMachine))
-//         msvc.libraryPathList.push(path.join(installPath, 'Lib', version, 'um', targetMachine))
-//     }
 // }
