@@ -1,6 +1,7 @@
 import child_process from 'node:child_process'
 import process from 'node:process'
 
+// noinspection SpellCheckingInspection
 export default class Self {
     static #queue = []
     static #limit = 10
@@ -11,11 +12,15 @@ export default class Self {
         }
     }
 
-    static async execute(options: any, file: string, ...args: string[]): Promise<any> {
-        function invoke(resolve) {
+    static async execute(options: any, file: string, ...args: string[]): Promise<string> {
+        function invoke(resolve, reject) {
             function thisTask() {
-                function taskDone(error, stdout, stderr) {
-                    resolve({error, stdout, stderr})
+                function taskDone(error, message, errorMessage) {
+                    if (error) {
+                        reject(errorMessage)
+                    } else {
+                        resolve(message)
+                    }
                     if (Self.#queue.length > 0) {
                         const queuedTask = Self.#queue.shift()
                         queuedTask()
@@ -36,5 +41,13 @@ export default class Self {
         }
 
         return new Promise(invoke)
+    }
+
+    static async queryRegister(path: string, key: string): Promise<string> {
+        let result = await this.execute(null, 'reg', 'QUERY', path, '/v', key)
+        const match = /REG_\w+\s+(.*)/.exec(result)
+        if (match) {
+            return match.at(1)
+        }
     }
 }
