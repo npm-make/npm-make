@@ -11,14 +11,14 @@ export default class Self {
         }
     }
 
-    static async execute(options: object, file: string, ...args: string[]) {
+    static async execute(options: any, file: string, ...args: string[]): Promise<any> {
         function invoke(resolve) {
             function thisTask() {
                 function taskDone(error, stdout, stderr) {
                     resolve({error, stdout, stderr})
-                    const nextTask = Self.#queue.shift()
-                    if (nextTask) {
-                        nextTask()
+                    if (Self.#queue.length > 0) {
+                        const queuedTask = Self.#queue.shift()
+                        queuedTask()
                     } else {
                         Self.#running--
                     }
