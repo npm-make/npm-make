@@ -58,7 +58,7 @@ async function detectSdk8(detect: Detect, installPath: string) {
         for await (const subItem of subDir) {
             switch (subItem.name.toUpperCase()) {
                 case 'BIN':
-                    await detectSdk8Bin(detect, subDir.path + '/' + subItem.name, verItem.name)
+                    await detectSdk8Bin(detect, subDir.path + '/' + subItem.name, verItem.name, true)
                     break
                 case 'INCLUDE':
                     await detectSdk8Inc(detect, subDir.path + '/' + subItem.name, verItem.name)
@@ -71,20 +71,14 @@ async function detectSdk8(detect: Detect, installPath: string) {
     }
 }
 
-async function detectSdk8Bin(detect: Detect, binPath: string, version: string) {
-    const verDir = await fs.opendir(binPath)
-    for await (const verItem of verDir) {
-        if (checkLocalMachine(verItem.name)) {
-            detect.add(null, 'WinSDK', version, 'executePath', verDir.path + '/' + verItem.name)
-            await detect.tryAdd(null, 'WinSDK', version, 'executeRC', verDir.path + '/' + verItem.name + '/rc.exe')
-        } else {
-            const archDir = await fs.opendir(verDir.path + '/' + verItem.name)
-            for await (const archItem of archDir) {
-                if (checkLocalMachine(archItem.name)) {
-                    detect.add(null, 'WinSDK', verItem.name, 'executePath', archDir.path + '/' + archItem.name)
-                    await detect.tryAdd(null, 'WinSDK', verItem.name, 'executeRC', archDir.path + '/' + archItem.name + '/rc.exe')
-                }
-            }
+async function detectSdk8Bin(detect: Detect, binPath: string, version: string, firstCall: boolean) {
+    const archDir = await fs.opendir(binPath)
+    for await (const archItem of archDir) {
+        if (checkLocalMachine(archItem.name)) {
+            detect.add(null, 'WinSDK', version, 'executePath', archDir.path + '/' + archItem.name)
+            await detect.tryAdd(null, 'WinSDK', version, 'executeRC', archDir.path + '/' + archItem.name + '/rc.exe')
+        } else if (firstCall) {
+            await detectSdk8Bin(detect, binPath, archItem.name, false)
         }
     }
 }

@@ -37,3 +37,13 @@ export default class {
     //     }
     // }
 }
+//         msvc.libraryList.push('advapi32.lib')
+//         msvc.libraryList.push('comdlg32.lib')
+//         msvc.libraryList.push('gdi32.lib')
+//         msvc.libraryList.push('kernel32.lib')
+//         msvc.libraryList.push('ole32.lib')
+//         msvc.libraryList.push('oleaut32.lib')
+//         msvc.libraryList.push('shell32.lib')
+//         msvc.libraryList.push('user32.lib')
+//         msvc.libraryList.push('uuid.lib')
+//         msvc.libraryList.push('winspool.lib')
