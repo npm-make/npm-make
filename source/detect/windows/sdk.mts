@@ -28,16 +28,6 @@ function checkLocalMachine(input: string) {
     }
 }
 
-function parseTargetMachine(input: string) {
-    switch (input.toUpperCase()) {
-        case 'ARM':
-        case 'ARM64':
-        case 'X64':
-        case 'X86':
-            return input.toUpperCase()
-    }
-}
-
 async function detectSdk7(detect: Detect, installPath: string) {
     const verDir = await fs.opendir(installPath)
     for await (const verItem of verDir) {
@@ -104,9 +94,14 @@ async function detectSdk8Lib(detect: Detect, libPath: string) {
         for await (const subItem of subDir) {
             const archDir = await fs.opendir(subDir.path + '/' + subItem.name)
             for await (const archItem of archDir) {
-                const machine = parseTargetMachine(archItem.name)
-                if (machine) {
-                    detect.add(machine, 'WinSDK', verItem.name, 'libraryPath', archDir.path + '/' + archItem.name)
+                const machine = archItem.name.toUpperCase()
+                switch (machine) {
+                    case 'ARM':
+                    case 'ARM64':
+                    case 'X64':
+                    case 'X86':
+                        detect.add(machine, 'WinSDK', verItem.name, 'libraryPath', archDir.path + '/' + archItem.name)
+                        break
                 }
             }
         }
