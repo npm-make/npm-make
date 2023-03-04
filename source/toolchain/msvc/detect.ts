@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { MachineType } from '../../type'
+import { MachineType } from '../../type.mjs'
 
 class MSVC {
 
@@ -91,7 +91,7 @@ export default class {
 
 // import process from 'node:process'
 // import detectWindows from './windows/detect.mjs'
-// import msvc from '../toolchain/msvc/msvc.ts'
+// import msvc from '../toolchain/msvc/sdk.mts'
 //
 // export default class {
 //     static async detect(targetMachine, expectMsvc, expectSdk) {
@@ -145,7 +145,7 @@ export default class {
 // import fs from 'node:fs/promises'
 // import path from 'node:path'
 // import process from 'node:process'
-// import msvc from '../../toolchain/msvc/msvc.ts'
+// import msvc from '../../toolchain/msvc/sdk.mts'
 //
 // export default class Self {
 //     // static async #detectMsvc(programRoot, localMachine, targetMachine, expectMsvc) {

@@ -24,3 +24,18 @@
 //     //     return project.projectModule.generate(project, project.projectFeature, this.builderFeature)
 //     // }
 // }
+//
+// import { MachineType, PlatformType, ToolchainType } from '../type'
+//
+// export interface BuilderFeature {
+//     DEBUG?: boolean
+//     DEBUG_WITHOUT_RTC?: boolean
+//     MACHINE?: MachineType
+//     OUTPUT_PATH?: string
+//     PLATFORM?: PlatformType
+//     RELEASE_WITH_DEBUG_INFO?: boolean
+//     RELEASE_MIN_SIZE?: boolean
+//     STATIC_RUNTIME?: boolean
+//     TOOLCHAIN?: ToolchainType
+//     WINDOWS_ARM64_CALL_X64?: boolean
+// }
