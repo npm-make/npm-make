@@ -57,38 +57,6 @@ class SDK7 extends SDK {
     }
 }
 
-class SDK10 extends SDK {
-    detectSdk(installPath: string, localMachine: MachineType, targetMachine: MachineType, version: string) {
-        this.version = version
-        this.versionNumber = this.parseVersion(version)
-        this.executePath = path.join(installPath, 'bin', version, localMachine)
-        this.executeRC = path.join(this.executePath, 'rc.exe')
-        this.includePathList.push(path.join(installPath, 'Include', version, 'cppwinrt'))
-        this.includePathList.push(path.join(installPath, 'Include', version, 'shared'))
-        this.includePathList.push(path.join(installPath, 'Include', version, 'ucrt'))
-        this.includePathList.push(path.join(installPath, 'Include', version, 'um'))
-        this.includePathList.push(path.join(installPath, 'Include', version, 'winrt'))
-        this.libraryPathList.push(path.join(installPath, 'Lib', version, 'ucrt', targetMachine))
-        this.libraryPathList.push(path.join(installPath, 'Lib', version, 'um', targetMachine))
-    }
-
-    parseVersion(version: string): BigInt {
-        const match = /^(\d+)\.(\d+)\.(\d+)\.(\d+)$/.exec(version)
-        if (match) {
-            const ver1 = BigInt(match.at(1))
-            const ver2 = BigInt(match.at(2))
-            const ver3 = BigInt(match.at(3))
-            const ver4 = BigInt(match.at(4))
-            return ver1 << 48n | ver2 << 32n | ver3 << 16n | ver4
-        }
-    }
-}
-
-export default class {
-
-}
-
-
 // import process from 'node:process'
 // import detectWindows from './windows/detect.mjs'
 // import msvc from '../toolchain/msvc/sdk.mts'

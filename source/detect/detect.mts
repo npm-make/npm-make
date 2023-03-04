@@ -24,7 +24,6 @@ export class Detect {
             await fs.access(itemValue)
             this.itemList.push({itemType, itemValue, machine, product, version})
         } catch {
-            console.log(itemValue + '不存在')
         }
     }
 }
