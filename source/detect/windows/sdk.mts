@@ -2,16 +2,6 @@ import fs from 'node:fs/promises'
 import process from 'node:process'
 import { Detect } from '../detect.mjs'
 
-function parseMachine(input: string) {
-    switch (input.toUpperCase()) {
-        case 'ARM':
-        case 'ARM64':
-        case 'X64':
-        case 'X86':
-            return input.toUpperCase()
-    }
-}
-
 export async function detectSdk(detect: Detect) {
     switch (process.arch) {
         case 'ia32':
@@ -22,6 +12,29 @@ export async function detectSdk(detect: Detect) {
             await detectSdk7(detect, 'C:\\Program Files (x86)\\Microsoft SDKs\\Windows')
             await detectSdk8(detect, 'C:\\Program Files (x86)\\Windows Kits')
             break
+    }
+}
+
+function checkLocalMachine(input: string) {
+    switch (input.toUpperCase()) {
+        case 'ARM':
+            return process.arch === 'arm'
+        case 'ARM64':
+            return process.arch === 'arm64'
+        case 'X64':
+            return process.arch === 'x64'
+        case 'X86':
+            return process.arch === 'ia32'
+    }
+}
+
+function parseTargetMachine(input: string) {
+    switch (input.toUpperCase()) {
+        case 'ARM':
+        case 'ARM64':
+        case 'X64':
+        case 'X86':
+            return input.toUpperCase()
     }
 }
 
@@ -61,17 +74,15 @@ async function detectSdk8(detect: Detect, installPath: string) {
 async function detectSdk8Bin(detect: Detect, binPath: string, version: string) {
     const verDir = await fs.opendir(binPath)
     for await (const verItem of verDir) {
-        const machine1 = parseMachine(verItem.name)
-        if (machine1) {
-            detect.add(machine1, 'WinSDK', version, 'executePath', verDir.path + '/' + verItem.name)
-            await detect.tryAdd(machine1, 'WinSDK', version, 'executeRC', verDir.path + '/' + verItem.name + '/rc.exe')
+        if (checkLocalMachine(verItem.name)) {
+            detect.add(null, 'WinSDK', version, 'executePath', verDir.path + '/' + verItem.name)
+            await detect.tryAdd(null, 'WinSDK', version, 'executeRC', verDir.path + '/' + verItem.name + '/rc.exe')
         } else {
             const archDir = await fs.opendir(verDir.path + '/' + verItem.name)
             for await (const archItem of archDir) {
-                const machine2 = parseMachine(archItem.name)
-                if (machine2) {
-                    detect.add(machine2, 'WinSDK', verItem.name, 'executePath', archDir.path + '/' + archItem.name)
-                    await detect.tryAdd(machine2, 'WinSDK', verItem.name, 'executeRC', archDir.path + '/' + archItem.name + '/rc.exe')
+                if (checkLocalMachine(archItem.name)) {
+                    detect.add(null, 'WinSDK', verItem.name, 'executePath', archDir.path + '/' + archItem.name)
+                    await detect.tryAdd(null, 'WinSDK', verItem.name, 'executeRC', archDir.path + '/' + archItem.name + '/rc.exe')
                 }
             }
         }
@@ -99,7 +110,7 @@ async function detectSdk8Lib(detect: Detect, libPath: string) {
         for await (const subItem of subDir) {
             const archDir = await fs.opendir(subDir.path + '/' + subItem.name)
             for await (const archItem of archDir) {
-                const machine = parseMachine(archItem.name)
+                const machine = parseTargetMachine(archItem.name)
                 if (machine) {
                     detect.add(machine, 'WinSDK', verItem.name, 'libraryPath', archDir.path + '/' + archItem.name)
                 }
