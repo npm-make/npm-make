@@ -1,24 +1,11 @@
-import { MachineType } from '../type.mjs'
+import fs from 'node:fs/promises'
 
-enum DetectItemType {
-    executeASM,
-    executeC,
-    executeLIB,
-    executeLINK,
-    executePath,
-    executeRC,
-    library,
-    libraryPath,
-}
-
-class DetectItem {
-    itemType: DetectItemType
+interface DetectItem {
+    itemType: string
     itemValue: string
-    targetMachine: MachineType
+    machine: string
+    product: string
     version: string
-
-    constructor(itemType: DetectItemType, itemValue: string, targetMachine: MachineType, version: string) {
-    }
 }
 
 export class Detect {
@@ -28,7 +15,16 @@ export class Detect {
         this.itemList = []
     }
 
-    push(item: DetectItem) {
-        this.itemList.push(item)
+    add(machine: string, product: string, version: string, itemType: string, itemValue: string) {
+        this.itemList.push({itemType, itemValue, machine, product, version})
+    }
+
+    async tryAdd(machine: string, product: string, version: string, itemType: string, itemValue: string) {
+        try {
+            await fs.access(itemValue)
+            this.itemList.push({itemType, itemValue, machine, product, version})
+        } catch {
+            console.log(itemValue + '不存在')
+        }
     }
 }

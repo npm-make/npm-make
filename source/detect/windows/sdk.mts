@@ -1,57 +1,55 @@
 import fs from 'node:fs/promises'
-import path from 'node:path'
-import { MachineType } from '../../type.mjs'
 import { Detect } from '../detect.mjs'
 
-function detectSdk(installPath: string, localMachine: MachineType, targetMachine: MachineType, version: string) {
-    this.version = version
-    this.versionNumber = this.parseVersion(version)
-    this.executePath = path.join(installPath, 'bin', version, localMachine)
-    this.executeRC = path.join(this.executePath, 'rc.exe')
-    this.includePathList.push(path.join(installPath, 'Include', version, 'cppwinrt'))
-    this.includePathList.push(path.join(installPath, 'Include', version, 'shared'))
-    this.includePathList.push(path.join(installPath, 'Include', version, 'ucrt'))
-    this.includePathList.push(path.join(installPath, 'Include', version, 'um'))
-    this.includePathList.push(path.join(installPath, 'Include', version, 'winrt'))
-    this.libraryPathList.push(path.join(installPath, 'Lib', version, 'ucrt', targetMachine))
-    this.libraryPathList.push(path.join(installPath, 'Lib', version, 'um', targetMachine))
+function parseMachine(input: string) {
+    switch (input) {
+        case 'arm':
+            return 'ARM'
+        case 'arm64':
+            return 'ARM64'
+        case 'arm64ec':
+            return 'ARM64EC'
+        case 'x64':
+            return 'X64'
+        case 'x86':
+            return 'X86'
+    }
 }
 
 async function detectSdk10(detect: Detect, installPath: string) {
-    const verDir = await fs.opendir(installPath + '/bin')
-    for await (const verItem of verDir) {
-        if (/^\d+\.\d+\.\d+\.\d+$/.test(verItem.name)) {
-            const archDir = await fs.opendir(verDir.path + '/' + verItem.name)
+    const binDir = await fs.opendir(installPath + '/bin')
+    for await (const binItem of binDir) {
+        const machine1 = parseMachine(binItem.name)
+        if (machine1) {
+            detect.add(machine1, 'WinSDK', null, 'executePath', binDir.path + '/' + binItem.name)
+            await detect.tryAdd(machine1, 'WinSDK', null, 'executeRC', binDir.path + '/' + binItem.name + '/rc.exe')
+        } else {
+            const archDir = await fs.opendir(binDir.path + '/' + binItem.name)
             for await (const archItem of archDir) {
-                switch (archItem.name) {
-                    case 'arm':
-                        detect.push({
-                            version: verItem.name,
-                            localMachine: 'ARM',
-                            executePath: archDir.path + '/' + archItem.name
-                        })
-                        break
-                    case 'arm64':
-                        detect.push({
-                            version: verItem.name,
-                            localMachine: 'ARM64',
-                            executePath: archDir.path + '/' + archItem.name
-                        })
-                        break
-                    case 'x64':
-                        detect.push({
-                            version: verItem.name,
-                            localMachine: 'X64',
-                            executePath: archDir.path + '/' + archItem.name
-                        })
-                        break
-                    case 'x86':
-                        detect.push({
-                            version: verItem.name,
-                            localMachine: 'X86',
-                            executePath: archDir.path + '/' + archItem.name
-                        })
-                        break
+                const machine2 = parseMachine(archItem.name)
+                if (machine2) {
+                    detect.add(machine2, 'WinSDK', binItem.name, 'executePath', archDir.path + '/' + archItem.name)
+                    await detect.tryAdd(machine2, 'WinSDK', binItem.name, 'executeRC', archDir.path + '/' + archItem.name + '/rc.exe')
+                }
+            }
+        }
+    }
+    const incDir = await fs.opendir(installPath + '/Include')
+    for await (const incItem of incDir) {
+        const subDir = await fs.opendir(incDir.path + '/' + incItem.name)
+        for await (const subItem of subDir) {
+            detect.add(null, 'WinSDK', incItem.name, 'includePath', subDir.path + '/' + subItem.name)
+        }
+    }
+    const libDir = await fs.opendir(installPath + '/Lib')
+    for await (const libItem of libDir) {
+        const subDir = await fs.opendir(libDir.path + '/' + libItem.name)
+        for await (const subItem of subDir) {
+            const archDir = await fs.opendir(subDir.path + '/' + subItem.name)
+            for await (const archItem of archDir) {
+                const machine = parseMachine(archItem.name)
+                if (machine) {
+                    detect.add(machine, 'WinSDK', libItem.name, 'libraryPath', archDir.path + '/' + archItem.name)
                 }
             }
         }
