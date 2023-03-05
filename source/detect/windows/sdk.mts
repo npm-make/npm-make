@@ -15,6 +15,19 @@ export async function detectSdk(detect: Detect) {
     }
 }
 
+function checkLocalMachine(input: string) {
+    switch (input) {
+        case 'arm':
+            return process.arch === 'arm'
+        case 'arm64':
+            return process.arch === 'arm64'
+        case 'x64':
+            return process.arch === 'x64'
+        case 'x86':
+            return process.arch === 'ia32'
+    }
+}
+
 async function detectSdk7(detect: Detect, installPath: string) {
     const verDir = await fs.opendir(installPath)
     for await (const verItem of verDir) {
@@ -31,59 +44,25 @@ async function detectSdk7(detect: Detect, installPath: string) {
 async function detectSdk8(detect: Detect, installPath: string) {
     const verDir = await fs.opendir(installPath)
     for await (const verItem of verDir) {
-        const subDir = await fs.opendir(verDir.path + '/' + verItem.name)
-        for await (const subItem of subDir) {
-            switch (subItem.name.toUpperCase()) {
-                case 'BIN':
-                    await detectSdk8Bin(detect, subDir.path + '/' + subItem.name, verItem.name, true)
-                    break
-                case 'INCLUDE':
-                    await detectSdk8Inc(detect, subDir.path + '/' + subItem.name, verItem.name)
-                    break
-                case 'LIB':
-                    await detectSdk8Lib(detect, subDir.path + '/' + subItem.name)
-                    break
-            }
+        try {
+            await detectSdk8Bin(detect, verDir.path + '/' + verItem.name + '/bin', verItem.name, true)
+            await detectSdk8Inc(detect, verDir.path + '/' + verItem.name + '/Include', verItem.name)
+            await detectSdk8Lib(detect, verDir.path + '/' + verItem.name + '/Lib')
+        } catch {
         }
     }
 }
 
 async function detectSdk8Bin(detect: Detect, binPath: string, version: string, firstCall: boolean) {
-    // const archDir = await fs.opendir(binPath)
-    // for await (const archItem of archDir) {
-    //     switch (archItem.name.toUpperCase()) {
-    //         case 'ARM':
-    //             if (process.arch === 'arm') {
-    //
-    //             }
-    //             break
-    //         case 'ARM64':
-    //             return process.arch === 'arm64'
-    //         case 'X64':
-    //             return process.arch === 'x64'
-    //         case 'X86':
-    //             return process.arch === 'ia32'
-    //
-    //     }
-    //     if (checkLocalMachine(archItem.name)) {
-    //         detect.add('WinSDK', version, null, 'executePath', archDir.path + '/' + archItem.name)
-    //         await detect.tryAdd('WinSDK', version, null, 'executeRC', archDir.path + '/' + archItem.name + '/rc.exe')
-    //     } else if (firstCall) {
-    //         await detectSdk8Bin(detect, binPath, archItem.name, false)
-    //     }
-    // }
-    // function checkLocalMachine(input: string) {
-    //     switch (input.toUpperCase()) {
-    //         case 'ARM':
-    //             return process.arch === 'arm'
-    //         case 'ARM64':
-    //             return process.arch === 'arm64'
-    //         case 'X64':
-    //             return process.arch === 'x64'
-    //         case 'X86':
-    //             return process.arch === 'ia32'
-    //     }
-    // }
+    const archDir = await fs.opendir(binPath)
+    for await (const archItem of archDir) {
+        if (checkLocalMachine(archItem.name)) {
+            detect.add('WinSDK', version, null, 'executePath', archDir.path + '/' + archItem.name)
+            await detect.tryAdd('WinSDK', version, null, 'executeRC', archDir.path + '/' + archItem.name + '/rc.exe')
+        } else if (firstCall) {
+            await detectSdk8Bin(detect, binPath, archItem.name, false)
+        }
+    }
 }
 
 async function detectSdk8Inc(detect: Detect, incPath: string, version: string) {
