@@ -1,11 +1,11 @@
 import fs from 'node:fs/promises'
 
 interface DetectItem {
-    itemType: string
-    itemValue: string
-    machine: string
     product: string
     version: string
+    machine: string
+    itemType: string
+    itemValue: string
 }
 
 export class Detect {
@@ -15,14 +15,14 @@ export class Detect {
         this.itemList = []
     }
 
-    add(machine: string, product: string, version: string, itemType: string, itemValue: string) {
-        this.itemList.push({itemType, itemValue, machine, product, version})
+    add(product: string, version: string, machine: string, itemType: string, itemValue: string) {
+        this.itemList.push({product, version, machine, itemType, itemValue})
     }
 
-    async tryAdd(machine: string, product: string, version: string, itemType: string, itemValue: string) {
+    async tryAdd(product: string, version: string, machine: string, itemType: string, itemValue: string) {
         try {
             await fs.access(itemValue)
-            this.itemList.push({itemType, itemValue, machine, product, version})
+            this.itemList.push({product, version, machine, itemType, itemValue})
         } catch {
         }
     }
