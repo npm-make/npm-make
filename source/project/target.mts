@@ -3,7 +3,13 @@
 // import SourceGroup from './sourceGroup'
 // import TargetFeature from './targetFeature'
 //
-// export default class Target {
+export class Target {
+    LIBRARY: boolean
+    NAME: string
+    OUTPUT_NAME: string
+    OUTPUT_PATH: string
+    VERSION: string
+
 //     compileOptionList: string[]
 //     definitionList: string[]
 //     dependencyList: string[]
@@ -124,4 +130,4 @@
 //     STANDARD_CXX?: string
 //     STATIC?: boolean
 //     WIN32_MAIN?: boolean
-// }
+}
