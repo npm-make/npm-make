@@ -1,80 +1,74 @@
-// import BuilderFeature from '../../project/builderFeature'
-// import Target from '../../project/target'
-// import msvc from './msvc'
-//
-// export default class {
-//     static async build(builderFeature: BuilderFeature, target: Target) {
-//         const flagList = Array.from(target.linkOptionList)
-//         switch (builderFeature.MACHINE) {
-//             case 'ARM':
-//                 flagList.push('/MACHINE:ARM')
-//                 break
-//             case 'ARM64':
-//                 if (builderFeature.WINDOWS_ARM64_CALL_X64) {
-//                     flagList.push('/MACHINE:ARM64EC')
-//                 } else {
-//                     flagList.push('/MACHINE:ARM64')
-//                 }
-//                 break
-//             case 'X64':
-//                 flagList.push('/MACHINE:X64')
-//                 break
-//             case 'X86':
-//                 flagList.push('/MACHINE:X86')
-//                 break
-//         }
-//         if (target.targetFeature.WIN32_MAIN) {
-//             flagList.push('/SUBSYSTEM:WINDOWS')
-//         }
-//         for (const libraryPath of target.libraryPathList) {
-//             flagList.push('/LIBPATH:' + libraryPath)
-//         }
-//         for (const library of target.libraryList) {
-//             flagList.push(library)
-//         }
-//         for (const library of msvc.libraryList) {
-//             flagList.push(library)
-//         }
-//         for (const source of target.sourceList) {
-//             switch (source.sourceType) {
-//                 case 'ASM':
-//                 case 'C':
-//                 case 'CXX':
-//                     flagList.push(source.objectPrefix + '.obj')
-//                     break
-//                 case 'DEF':
-//                     flagList.push('/DEF:' + source.sourcePath)
-//                     break
-//                 case 'MANIFEST':
-//                     flagList.push('/MANIFESTINPUT:' + source.sourcePath)
-//                     break
-//                 case 'RC':
-//                     flagList.push(source.objectPrefix + '.res')
-//                     break
-//             }
-//         }
-//         flagList.push('/NOLOGO')
-//         if (target.targetType === 'STATIC') {
-//             flagList.push('/DEF')
-//             flagList.push('/OUT:' + target.targetPrefix + '.lib')
-//             return msvc.execute(builderFeature.OUTPUT_PATH, msvc.executeLIB, ...flagList)
-//         } else {
-//             if (builderFeature.DEBUG) {
-//                 flagList.push('/DEBUG')
-//             } else {
-//                 if (builderFeature.RELEASE_WITH_DEBUG_INFO) {
-//                     flagList.push('/DEBUG')
-//                 }
-//                 flagList.push('/INCREMENTAL:NO')
-//             }
-//             if (target.targetType === 'SHARED') {
-//                 flagList.push('/DLL')
-//                 flagList.push('/OUT:' + target.targetPrefix + '.dll')
-//             } else {
-//                 flagList.push('/OUT:' + target.targetPrefix + '.exe')
-//             }
-//             flagList.push('/MANIFEST:EMBED')
-//             return msvc.execute(builderFeature.OUTPUT_PATH, msvc.executeLINK, ...flagList)
-//         }
-//     }
-// }
+import { Builder } from '../../project/builder.mjs'
+import { Source, Target } from '../../project/target.mjs'
+
+function msvcLib(builder: Builder, target: Target, source: Source) {
+    const flagList = Array.from(target._LINK_OPTION_LIST)
+    if (target.WIN32_MAIN) {
+        flagList.push('/SUBSYSTEM:WINDOWS')
+    }
+    for (const libraryPath of target._LIBRARY_PATH_LIST) {
+        flagList.push('/LIBPATH:' + libraryPath)
+    }
+    for (const library of target._LIBRARY_LIST) {
+        flagList.push(library)
+    }
+    for (const source of target._SOURCE_LIST) {
+        switch (source._SOURCE_TYPE) {
+            case 'ASM':
+            case 'C':
+            case 'CPP':
+                flagList.push(source._OBJECT_PREFIX + '.obj')
+                break
+            case 'DEF':
+                flagList.push('/DEF:' + source._SOURCE_PATH)
+                break
+            case 'MANIFEST':
+                flagList.push('/MANIFESTINPUT:' + source._SOURCE_PATH)
+                break
+            case 'RC':
+                flagList.push(source._OBJECT_PREFIX + '.res')
+                break
+        }
+    }
+    flagList.push('advapi32.lib')
+    flagList.push('comdlg32.lib')
+    flagList.push('gdi32.lib')
+    flagList.push('kernel32.lib')
+    flagList.push('ole32.lib')
+    flagList.push('oleaut32.lib')
+    flagList.push('shell32.lib')
+    flagList.push('user32.lib')
+    flagList.push('uuid.lib')
+    flagList.push('winspool.lib')
+    flagList.push('/NOLOGO')
+    flagList.push('/OUT:' + target.OUTPUT_NAME)
+    return flagList
+}
+
+function msvcLink(builder: Builder, target: Target, source: Source) {
+    const flagList = msvcLib(builder, target, source)
+    if (builder.DEBUG) {
+        flagList.push('/DEBUG')
+    } else {
+        if (builder.RELEASE_WITH_DEBUG_INFO) {
+            flagList.push('/DEBUG')
+        }
+        flagList.push('/INCREMENTAL:NO')
+    }
+    flagList.push('/MANIFEST:EMBED')
+    return flagList
+}
+
+export async function msvcLinkExecute(builder: Builder, target: Target, source: Source) {
+    const flagList = msvcLink(builder, target, source)
+}
+
+export async function msvcLinkShared(builder: Builder, target: Target, source: Source) {
+    const flagList = msvcLink(builder, target, source)
+    flagList.push('/DLL')
+}
+
+export async function msvcLinkStatic(builder: Builder, target: Target, source: Source) {
+    const flagList = msvcLib(builder, target, source)
+    flagList.push('/DEF')
+}

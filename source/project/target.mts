@@ -11,7 +11,7 @@ export class Source {
     _INCLUDE_PATH_LIST: string[]
     _OBJECT_PREFIX: string
     _SOURCE_PATH: string
-    _SOURCE_TYPE: 'ASM' | 'C' | 'CXX' | 'DEF' | 'MANIFEST' | 'RC'
+    _SOURCE_TYPE: 'ASM' | 'C' | 'CPP' | 'DEF' | 'MANIFEST' | 'RC'
 //
 //     constructor(projectPath: string, targetName: string, sourcePath: string) {
 //         const pathParse = path.parse(sourcePath)
@@ -73,12 +73,16 @@ export class Target extends SourceGroup {
     LIBRARY: boolean
     OUTPUT_NAME: string
     OUTPUT_PATH: string
-    STANDARD_C: string
-    STANDARD_CPP: string
+    STANDARD_C: '11' | '17'
+    STANDARD_CPP: '14' | '17' | '20' | 'latest'
     TARGET_NAME: string
     TARGET_VERSION: string
     WIN32_MAIN: boolean
+    _LIBRARY_LIST: string[]
+    _LIBRARY_PATH_LIST: string[]
+    _LINK_OPTION_LIST: string[]
     _PROJECT_FILE_LIST: string[]
+    _SOURCE_LIST: Source[]
 
 
 //     dependencyList: string[]
@@ -86,16 +90,7 @@ export class Target extends SourceGroup {
 //     exportIncludePathList: string[]
 //     exportLibraryList: string[]
 //     exportLibraryPathList: string[]
-//     libraryList: string[]
-//     libraryPathList: string[]
-//     linkOptionList: string[]
-//     projectFileList: string[]
-//     projectPath: string
-//     sourceList: Source[]
 //     sourceGroupList: SourceGroup[]
-//     targetFeature: TargetFeature
-//     targetName: string
-//     targetPrefix: string
 //     targetType: 'EXECUTE' | 'SHARED' | 'STATIC'
 //
 //     constructor(projectPath: string, projectFileList: string[], targetName: string, targetFeature?: TargetFeature) {
