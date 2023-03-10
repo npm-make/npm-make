@@ -1,53 +1,39 @@
-import child_process from 'node:child_process'
-import process from 'node:process'
+import { Buffer } from 'node:buffer'
+import { execFile } from 'node:child_process'
 
-// noinspection SpellCheckingInspection
-export default class Self {
-    static #queue = []
-    static #limit = 10
-    static #running = 0
-    static {
-        if (process.platform === 'win32') {
-            child_process.execSync('chcp 65001')
+const taskQueue: (() => void)[] = []
+let taskLimit = 10
+let taskRunning = 0
+
+export function executeTask(thisTask: () => void) {
+    if (thisTask) {
+        if (taskRunning < taskLimit) {
+            taskRunning++
+            thisTask()
+        } else {
+            taskQueue.push(thisTask)
+        }
+    } else {
+        if (taskQueue.length > 0) {
+            const queuedTask = taskQueue.shift()
+            queuedTask()
+        } else {
+            taskRunning--
         }
     }
+}
 
-    static async execute(options: any, file: string, ...args: string[]): Promise<string> {
-        function invoke(resolve, reject) {
-            function thisTask() {
-                function taskDone(error, message, errorMessage) {
-                    if (error) {
-                        reject(errorMessage)
-                    } else {
-                        resolve(message)
-                    }
-                    if (Self.#queue.length > 0) {
-                        const queuedTask = Self.#queue.shift()
-                        queuedTask()
-                    } else {
-                        Self.#running--
-                    }
+export async function executeProcess(options: any, file: string, ...args: string[]): Promise<Buffer> {
+    return new Promise((resolve, reject) => {
+        executeTask(() => {
+            execFile(file, args, options, (error, message, errorMessage) => {
+                if (error) {
+                    reject(errorMessage)
+                } else {
+                    resolve(message)
                 }
-
-                child_process.execFile(file, args, options, taskDone)
-            }
-
-            if (Self.#running < Self.#limit) {
-                Self.#running++
-                thisTask()
-            } else {
-                Self.#queue.push(thisTask)
-            }
-        }
-
-        return new Promise(invoke)
-    }
-
-    static async queryRegister(path: string, key: string): Promise<string> {
-        let result = await this.execute(null, 'reg', 'QUERY', path, '/v', key)
-        const match = /REG_\w+\s+(.*)/.exec(result)
-        if (match) {
-            return match.at(1)
-        }
-    }
+                executeTask(null)
+            })
+        })
+    })
 }

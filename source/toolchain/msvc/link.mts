@@ -1,7 +1,8 @@
+import { Target } from '../../project/target.mjs'
 import { Builder } from '../../project/builder.mjs'
-import { Source, Target } from '../../project/target.mjs'
+import { Msvc } from './msvc.mjs'
 
-function msvcLib(builder: Builder, target: Target, source: Source) {
+function baseLib(target: Target) {
     const flagList = Array.from(target._LINK_OPTION_LIST)
     if (target.WIN32_MAIN) {
         flagList.push('/SUBSYSTEM:WINDOWS')
@@ -30,6 +31,22 @@ function msvcLib(builder: Builder, target: Target, source: Source) {
                 break
         }
     }
+    flagList.push('/NOLOGO')
+    flagList.push('/OUT:' + target.OUTPUT_NAME)
+    return flagList
+}
+
+function baseLink(builder: Builder, target: Target) {
+    const flagList = baseLib(target)
+    if (builder.DEBUG) {
+        flagList.push('/DEBUG')
+    } else {
+        if (builder.RELEASE_WITH_DEBUG_INFO) {
+            flagList.push('/DEBUG')
+        }
+        flagList.push('/INCREMENTAL:NO')
+    }
+    flagList.push('/MANIFEST:EMBED')
     flagList.push('advapi32.lib')
     flagList.push('comdlg32.lib')
     flagList.push('gdi32.lib')
@@ -40,35 +57,19 @@ function msvcLib(builder: Builder, target: Target, source: Source) {
     flagList.push('user32.lib')
     flagList.push('uuid.lib')
     flagList.push('winspool.lib')
-    flagList.push('/NOLOGO')
-    flagList.push('/OUT:' + target.OUTPUT_NAME)
     return flagList
 }
 
-function msvcLink(builder: Builder, target: Target, source: Source) {
-    const flagList = msvcLib(builder, target, source)
-    if (builder.DEBUG) {
-        flagList.push('/DEBUG')
+export async function buildLink(msvc: Msvc, builder: Builder, target: Target) {
+    if (target.STATIC) {
+        const flagList = baseLib(target)
+        flagList.push('/DEF')
+        return msvc.execute(target.OUTPUT_PATH, msvc.EXECUTE_LIB, ...flagList)
     } else {
-        if (builder.RELEASE_WITH_DEBUG_INFO) {
-            flagList.push('/DEBUG')
+        const flagList = baseLink(builder, target)
+        if (target.SHARED) {
+            flagList.push('/DLL')
         }
-        flagList.push('/INCREMENTAL:NO')
+        return msvc.execute(target.OUTPUT_PATH, msvc.EXECUTE_LINK, ...flagList)
     }
-    flagList.push('/MANIFEST:EMBED')
-    return flagList
-}
-
-export async function msvcLinkExecute(builder: Builder, target: Target, source: Source) {
-    const flagList = msvcLink(builder, target, source)
-}
-
-export async function msvcLinkShared(builder: Builder, target: Target, source: Source) {
-    const flagList = msvcLink(builder, target, source)
-    flagList.push('/DLL')
-}
-
-export async function msvcLinkStatic(builder: Builder, target: Target, source: Source) {
-    const flagList = msvcLib(builder, target, source)
-    flagList.push('/DEF')
 }

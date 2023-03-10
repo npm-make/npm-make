@@ -1,7 +1,8 @@
 import { Builder } from '../../project/builder.mjs'
 import { Source, Target } from '../../project/target.mjs'
+import { Msvc } from './msvc.mjs'
 
-function msvcCl(builder: Builder, target: Target, source: Source) {
+function baseCl(builder: Builder, source: Source) {
     const flagList = Array.from(source._COMPILE_OPTION_LIST)
     if (builder.DEBUG) {
         if (!builder.DEBUG_WITHOUT_RTC) {
@@ -43,8 +44,8 @@ function msvcCl(builder: Builder, target: Target, source: Source) {
     return flagList
 }
 
-export async function msvcBuildC(builder: Builder, target: Target, source: Source) {
-    const flagList = msvcCl(builder, target, source)
+export async function buildC(msvc: Msvc, builder: Builder, target: Target, source: Source) {
+    const flagList = baseCl(builder, source)
     switch (target.STANDARD_C) {
         case '11':
             flagList.push('/std:c11')
@@ -54,10 +55,11 @@ export async function msvcBuildC(builder: Builder, target: Target, source: Sourc
             break
     }
     flagList.push('/Tc' + source._SOURCE_PATH)
+    return msvc.execute(target.OUTPUT_PATH, msvc.EXECUTE_CL, ...flagList)
 }
 
-export async function msvcBuildCPP(builder: Builder, target: Target, source: Source) {
-    const flagList = msvcCl(builder, target, source)
+export async function buildCPP(msvc: Msvc, builder: Builder, target: Target, source: Source) {
+    const flagList = baseCl(builder, source)
     switch (target.STANDARD_CPP) {
         case '14':
             flagList.push('/std:c++14')
@@ -73,4 +75,5 @@ export async function msvcBuildCPP(builder: Builder, target: Target, source: Sou
             break
     }
     flagList.push('/Tp' + source._SOURCE_PATH)
+    return msvc.execute(target.OUTPUT_PATH, msvc.EXECUTE_CL, ...flagList)
 }

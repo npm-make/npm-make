@@ -70,11 +70,12 @@ export class SourceGroup extends Source {
 }
 
 export class Target extends SourceGroup {
-    LIBRARY: boolean
     OUTPUT_NAME: string
     OUTPUT_PATH: string
-    STANDARD_C: '11' | '17'
-    STANDARD_CPP: '14' | '17' | '20' | 'latest'
+    SHARED: boolean
+    STANDARD_C: '89' | '99' | '11' | '17'
+    STANDARD_CPP: '98' | '03' | '11' | '14' | '17' | '20' | 'latest'
+    STATIC: boolean
     TARGET_NAME: string
     TARGET_VERSION: string
     WIN32_MAIN: boolean
