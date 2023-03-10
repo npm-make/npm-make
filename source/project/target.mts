@@ -3,21 +3,89 @@
 // import SourceGroup from './sourceGroup'
 // import TargetFeature from './targetFeature'
 //
-export class Target {
+import path from 'node:path'
+
+export class Source {
+    _COMPILE_OPTION_LIST: string[]
+    _DEFINITION_LIST: string[]
+    _INCLUDE_PATH_LIST: string[]
+    _OBJECT_PREFIX: string
+    _SOURCE_PATH: string
+    _SOURCE_TYPE: 'ASM' | 'C' | 'CXX' | 'DEF' | 'MANIFEST' | 'RC'
+//
+//     constructor(projectPath: string, targetName: string, sourcePath: string) {
+//         const pathParse = path.parse(sourcePath)
+//         this.compileOptionList = []
+//         this.definitionList = []
+//         this.objectPrefix = path.join(targetName + 'Obj', pathParse.dir, pathParse.name)
+//         this.sourcePath = path.join(projectPath, sourcePath)
+//         switch (pathParse.ext.toLowerCase()) {
+//             case '.asm':
+//             case '.s':
+//                 this.sourceType = 'ASM'
+//                 break
+//             case '.c':
+//                 this.sourceType = 'C'
+//                 break
+//             case '.cc':
+//             case '.cpp':
+//             case '.cxx':
+//             case '.ixx':
+//                 this.sourceType = 'CXX'
+//                 break
+//             case '.def':
+//                 this.sourceType = 'DEF'
+//                 break
+//             case '.manifest':
+//                 this.sourceType = 'MANIFEST'
+//                 break
+//             case '.rc':
+//                 this.sourceType = 'RC'
+//                 break
+//         }
+//     }
+}
+
+export class SourceGroup extends Source {
+    _PROJECT_PATH: string
+    _SOURCE_PATTERN_LIST: string[]
+
+    addCompileOption(...optionList: string[]) {
+        this._COMPILE_OPTION_LIST.push(...optionList)
+    }
+
+    addDefinition(...definitionList: string[]) {
+        this._DEFINITION_LIST.push(...definitionList)
+    }
+
+    addIncludeDirectory(...directoryList: string[]) {
+        for (const directory of directoryList) {
+            this._INCLUDE_PATH_LIST.push(path.join(this._PROJECT_PATH, directory))
+        }
+    }
+
+    addSource(...patternList: string[]) {
+        this._SOURCE_PATTERN_LIST.push(...patternList)
+    }
+}
+
+export class Target extends SourceGroup {
     LIBRARY: boolean
-    NAME: string
     OUTPUT_NAME: string
     OUTPUT_PATH: string
-    VERSION: string
+    STANDARD_C: string
+    STANDARD_CPP: string
+    TARGET_NAME: string
+    TARGET_VERSION: string
+    WIN32_MAIN: boolean
+    _PROJECT_FILE_LIST: string[]
 
-//     compileOptionList: string[]
-//     definitionList: string[]
+
 //     dependencyList: string[]
 //     dependencyTargetList: Target[]
 //     exportIncludePathList: string[]
 //     exportLibraryList: string[]
 //     exportLibraryPathList: string[]
-//     includePathList: string[]
 //     libraryList: string[]
 //     libraryPathList: string[]
 //     linkOptionList: string[]
@@ -51,16 +119,6 @@ export class Target {
 //         this.targetType = 'EXECUTE'
 //     }
 //
-//     addCompileOption(...optionList: string[]): Target {
-//         this.compileOptionList.push(...optionList)
-//         return this
-//     }
-//
-//     addDefinition(...definitionList: string[]): Target {
-//         this.definitionList.push(...definitionList)
-//         return this
-//     }
-//
 //     addDependency(...dependencyList: string[]): Target {
 //         this.dependencyList.push(...dependencyList)
 //         return this
@@ -81,13 +139,6 @@ export class Target {
 //     addExportLibraryPath(...inputList: string[]): Target {
 //         for (const input of inputList) {
 //             this.exportLibraryPathList.push(path.join(this.projectPath, input))
-//         }
-//         return this
-//     }
-//
-//     addIncludePath(...inputList: string[]): Target {
-//         for (const input of inputList) {
-//             this.includePathList.push(path.join(this.projectPath, input))
 //         }
 //         return this
 //     }
@@ -125,9 +176,4 @@ export class Target {
 // }
 //
 // export interface TargetFeature {
-//     SHARED?: boolean
-//     STANDARD_C?: string
-//     STANDARD_CXX?: string
-//     STATIC?: boolean
-//     WIN32_MAIN?: boolean
 }
