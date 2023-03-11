@@ -46,17 +46,19 @@ function baseLink(builder: Builder, target: Target) {
         }
         flagList.push('/INCREMENTAL:NO')
     }
+    if (!builder.MSVC_WITHOUT_CORE_LIBRARY) {
+        flagList.push('advapi32.lib')
+        flagList.push('comdlg32.lib')
+        flagList.push('gdi32.lib')
+        flagList.push('kernel32.lib')
+        flagList.push('ole32.lib')
+        flagList.push('oleaut32.lib')
+        flagList.push('shell32.lib')
+        flagList.push('user32.lib')
+        flagList.push('uuid.lib')
+        flagList.push('winspool.lib')
+    }
     flagList.push('/MANIFEST:EMBED')
-    flagList.push('advapi32.lib')
-    flagList.push('comdlg32.lib')
-    flagList.push('gdi32.lib')
-    flagList.push('kernel32.lib')
-    flagList.push('ole32.lib')
-    flagList.push('oleaut32.lib')
-    flagList.push('shell32.lib')
-    flagList.push('user32.lib')
-    flagList.push('uuid.lib')
-    flagList.push('winspool.lib')
     return flagList
 }
 

@@ -19,6 +19,7 @@ export class Builder {
     //msvc
     MSVC_STATIC_RUNTIME: boolean
     MSVC_VERSION: string
+    MSVC_WITHOUT_CORE_LIBRARY: boolean
 
 
 //     builderFeature: BuilderFeature
