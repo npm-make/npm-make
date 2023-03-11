@@ -1,13 +1,15 @@
-import { Buffer } from 'node:buffer'
 import { execFile } from 'node:child_process'
+import { platform } from 'node:process'
 
-const taskQueue: (() => void)[] = []
-let taskLimit = 10
+const taskQueue: Function[] = []
 let taskRunning = 0
+if (platform === 'win32') {
+    await executeProcess(undefined, 'chcp', '65001')
+}
 
-export function executeTask(thisTask: () => void) {
+export function executeTask(thisTask: Function) {
     if (thisTask) {
-        if (taskRunning < taskLimit) {
+        if (taskRunning < 16) {
             taskRunning++
             thisTask()
         } else {
@@ -15,15 +17,14 @@ export function executeTask(thisTask: () => void) {
         }
     } else {
         if (taskQueue.length > 0) {
-            const queuedTask = taskQueue.shift()
-            queuedTask()
+            taskQueue.shift()()
         } else {
             taskRunning--
         }
     }
 }
 
-export async function executeProcess(options: any, file: string, ...args: string[]): Promise<Buffer> {
+export async function executeProcess(options: any, file: string, ...args: string[]): Promise<any> {
     return new Promise((resolve, reject) => {
         executeTask(() => {
             execFile(file, args, options, (error, message, errorMessage) => {
