@@ -79,6 +79,8 @@ export class Target extends SourceGroup {
     TARGET_NAME: string
     TARGET_VERSION: string
     WIN32_MAIN: boolean
+    WIN32_REQUIRED_ADMIN: boolean
+    WIN32_WITHOUT_CORE_LIBRARY: boolean
     _LIBRARY_LIST: string[]
     _LIBRARY_PATH_LIST: string[]
     _LINK_OPTION_LIST: string[]

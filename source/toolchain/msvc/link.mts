@@ -7,6 +7,9 @@ function baseLib(target: Target) {
     if (target.WIN32_MAIN) {
         flagList.push('/SUBSYSTEM:WINDOWS')
     }
+    if (target.WIN32_REQUIRED_ADMIN) {
+        flagList.push('/MANIFESTUAC:level=\'requireAdministrator\'')
+    }
     for (const libraryPath of target._LIBRARY_PATH_LIST) {
         flagList.push('/LIBPATH:' + libraryPath)
     }
@@ -46,7 +49,7 @@ function baseLink(builder: Builder, target: Target) {
         }
         flagList.push('/INCREMENTAL:NO')
     }
-    if (!builder.MSVC_WITHOUT_CORE_LIBRARY) {
+    if (!target.WIN32_WITHOUT_CORE_LIBRARY) {
         flagList.push('advapi32.lib')
         flagList.push('comdlg32.lib')
         flagList.push('gdi32.lib')
