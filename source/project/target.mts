@@ -3,7 +3,7 @@
 // import SourceGroup from './sourceGroup'
 // import TargetFeature from './targetFeature'
 //
-import path from 'node:path'
+import { join } from 'node:path'
 
 export class Source {
     _COMPILE_OPTION_LIST: string[]
@@ -60,7 +60,7 @@ export class SourceGroup extends Source {
 
     addIncludeDirectory(...directoryList: string[]) {
         for (const directory of directoryList) {
-            this._INCLUDE_PATH_LIST.push(path.join(this._PROJECT_PATH, directory))
+            this._INCLUDE_PATH_LIST.push(join(this._PROJECT_PATH, directory))
         }
     }
 
@@ -141,22 +141,20 @@ export class Target extends SourceGroup {
 //         return this
 //     }
 //
-//     addLibrary(...libraryList: string[]): Target {
-//         this.libraryList.push(...libraryList)
-//         return this
-//     }
-//
-//     addLibraryPath(...inputList: string[]): Target {
-//         for (const input of inputList) {
-//             this.libraryPathList.push(path.join(this.projectPath, input))
-//         }
-//         return this
-//     }
-//
-//     addLinkOption(...optionList: string[]): Target {
-//         this.linkOptionList.push(...optionList)
-//         return this
-//     }
+    addLibrary(...libraryList: string[]) {
+        this._LIBRARY_LIST.push(...libraryList)
+    }
+
+    addLibraryDirectory(...directoryList: string[]) {
+        for (const directory of directoryList) {
+            this._LIBRARY_PATH_LIST.push(join(this._PROJECT_PATH, directory))
+        }
+    }
+
+    addLinkOption(...optionList: string[]) {
+        this._LINK_OPTION_LIST.push(...optionList)
+    }
+
 //
 //     addSource(...inputList: string[]): SourceGroup {
 //         const group = new SourceGroup(this.projectPath, this.projectFileList, this.targetName)
