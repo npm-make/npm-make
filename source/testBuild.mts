@@ -1,6 +1,7 @@
 import { Msvc } from './toolchain/msvc/msvc.mjs'
 import { Builder } from './project/builder.mjs'
-import { Source, Target } from './project/target.mjs'
+import { Source } from './project/source.mjs'
+import { Target } from './project/target.mjs'
 import * as path from 'node:path'
 import * as fs from 'node:fs/promises'
 

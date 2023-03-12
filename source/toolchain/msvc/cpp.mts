@@ -1,5 +1,6 @@
 import { Builder } from '../../project/builder.mjs'
-import { Source, Target } from '../../project/target.mjs'
+import { Source } from '../../project/source.mjs'
+import { Target } from '../../project/target.mjs'
 import { Msvc } from './msvc.mjs'
 
 function baseCl(builder: Builder, target: Target, source: Source) {

@@ -1,5 +1,5 @@
-import { Target } from '../../project/target.mjs'
 import { Builder } from '../../project/builder.mjs'
+import { Target } from '../../project/target.mjs'
 import { Msvc } from './msvc.mjs'
 
 function baseLib(target: Target) {

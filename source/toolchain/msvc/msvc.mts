@@ -1,6 +1,7 @@
 import { executeProcess } from '../../executeTool.mjs'
 import { Builder } from '../../project/builder.mjs'
-import { Source, Target } from '../../project/target.mjs'
+import { Source } from '../../project/source.mjs'
+import { Target } from '../../project/target.mjs'
 import { buildC, buildCPP } from './cpp.mjs'
 import { buildLink } from './link.mjs'
 import { buildRC } from './rc.mjs'
