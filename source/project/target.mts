@@ -3,12 +3,12 @@ import { Source } from './source.mjs'
 import { SourceGroup } from './sourceGroup.mjs'
 
 export class Target {
+    LIBRARY: boolean
     OUTPUT_NAME: string
     OUTPUT_PATH: string
     SHARED: boolean
     STANDARD_C: '89' | '99' | '11' | '17'
     STANDARD_CPP: '98' | '03' | '11' | '14' | '17' | '20' | 'latest'
-    STATIC: boolean
     TARGET_NAME: string
     WIN32_MAIN: boolean
     WIN32_REQUIRED_ADMIN: boolean

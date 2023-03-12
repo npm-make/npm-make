@@ -70,7 +70,7 @@ function baseLink(builder: Builder, target: Target) {
 }
 
 export async function buildLink(msvc: Msvc, builder: Builder, target: Target) {
-    if (target.STATIC) {
+    if (target.LIBRARY) {
         const flagList = baseLib(target)
         return msvc.execute(target.OUTPUT_PATH, msvc.EXECUTE_LIB, ...flagList)
     } else {

@@ -6,6 +6,7 @@
 //
 export class Builder {
     CLANG_VERSION: string
+    CONFIG_NAME: string
     DEBUG: boolean
     DEBUG_WITHOUT_RTC: boolean
     GCC_VERSION: string
