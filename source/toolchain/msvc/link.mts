@@ -28,6 +28,12 @@ function baseLink(builder: Builder, target: Target) {
         }
         flagList.push('/INCREMENTAL:NO')
     }
+    if (target.WIN32_MAIN) {
+        flagList.push('/SUBSYSTEM:WINDOWS')
+    }
+    if (target.WIN32_REQUIRED_ADMIN) {
+        flagList.push('/MANIFESTUAC:level=\'requireAdministrator\'')
+    }
     if (!target.WIN32_WITHOUT_CORE_LIBRARY) {
         flagList.push('advapi32.lib')
         flagList.push('comdlg32.lib')
@@ -71,13 +77,6 @@ export async function buildLink(msvc: Msvc, builder: Builder, target: Target) {
         const flagList = baseLink(builder, target)
         if (target.SHARED) {
             flagList.push('/DLL')
-        } else {
-            if (target.WIN32_MAIN) {
-                flagList.push('/SUBSYSTEM:WINDOWS')
-            }
-            if (target.WIN32_REQUIRED_ADMIN) {
-                flagList.push('/MANIFESTUAC:level=\'requireAdministrator\'')
-            }
         }
         return msvc.execute(target.OUTPUT_PATH, msvc.EXECUTE_LINK, ...flagList)
     }
