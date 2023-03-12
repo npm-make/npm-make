@@ -27,16 +27,10 @@ async function addTarget(outputPath, outputName, srcList) {
     target.OUTPUT_PATH = outputPath
     target.OUTPUT_NAME = outputName
     target.STATIC = true
-    target._LIBRARY_LIST = []
-    target._LIBRARY_PATH_LIST = []
-    target._LINK_OPTION_LIST = []
-    target._SOURCE_LIST = []
     for (const src of srcList) {
         const parse1 = path.parse(src)
         const source = new Source()
-        source._COMPILE_OPTION_LIST = []
         source._DEFINITION_LIST = ['ZLIB_DLL']
-        source._INCLUDE_PATH_LIST = []
         source._OBJECT_PREFIX = path.join('obj', parse1.name)
         source._SOURCE_PATH = src
         switch (parse1.ext.toLowerCase()) {
