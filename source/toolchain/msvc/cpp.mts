@@ -2,7 +2,7 @@ import { Builder } from '../../project/builder.mjs'
 import { Source, Target } from '../../project/target.mjs'
 import { Msvc } from './msvc.mjs'
 
-function baseCl(builder: Builder, source: Source) {
+function baseCl(builder: Builder, target: Target, source: Source) {
     const flagList = Array.from(source._COMPILE_OPTION_LIST)
     if (builder.DEBUG) {
         if (!builder.DEBUG_WITHOUT_RTC) {
@@ -31,11 +31,16 @@ function baseCl(builder: Builder, source: Source) {
             flagList.push('/MD')
         }
     }
-    for (const includePath of source._INCLUDE_PATH_LIST) {
-        flagList.push('/I' + includePath)
-    }
     for (const definition of source._DEFINITION_LIST) {
         flagList.push('/D' + definition)
+    }
+    for (const includePath of target._INCLUDE_PATH_LIST) {
+        flagList.push('/I' + includePath)
+    }
+    for (const dependency of target._DEPENDENCY_TARGET_LIST) {
+        for (const includePath of target._EXPORT_INCLUDE_PATH_LIST) {
+            flagList.push('/I' + includePath)
+        }
     }
     flagList.push('/c')
     flagList.push('/Fd' + source._OBJECT_PREFIX + '.pdb')
@@ -46,7 +51,7 @@ function baseCl(builder: Builder, source: Source) {
 }
 
 export async function buildC(msvc: Msvc, builder: Builder, target: Target, source: Source) {
-    const flagList = baseCl(builder, source)
+    const flagList = baseCl(builder, target, source)
     switch (target.STANDARD_C) {
         case '11':
             flagList.push('/std:c11')
@@ -60,7 +65,7 @@ export async function buildC(msvc: Msvc, builder: Builder, target: Target, sourc
 }
 
 export async function buildCPP(msvc: Msvc, builder: Builder, target: Target, source: Source) {
-    const flagList = baseCl(builder, source)
+    const flagList = baseCl(builder, target, source)
     switch (target.STANDARD_CPP) {
         case '14':
             flagList.push('/std:c++14')

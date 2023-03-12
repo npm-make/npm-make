@@ -3,7 +3,6 @@ import { join } from 'node:path'
 export class Source {
     _COMPILE_OPTION_LIST: string[]
     _DEFINITION_LIST: string[]
-    _INCLUDE_PATH_LIST: string[]
     _OBJECT_PREFIX: string
     _SOURCE_PATH: string
     _SOURCE_TYPE: 'ASM' | 'C' | 'CPP' | 'DEF' | 'MANIFEST' | 'RC'
@@ -41,9 +40,16 @@ export class Source {
 //     }
 }
 
-export class SourceGroup extends Source {
-    _PROJECT_PATH: string
+export class SourceGroup {
+    _COMPILE_OPTION_LIST: string[]
+    _DEFINITION_LIST: string[]
     _SOURCE_PATTERN_LIST: string[]
+
+    constructor(patternList: string[]) {
+        this._COMPILE_OPTION_LIST = []
+        this._DEFINITION_LIST = []
+        this._SOURCE_PATTERN_LIST = patternList
+    }
 
     addCompileOption(...optionList: string[]) {
         this._COMPILE_OPTION_LIST.push(...optionList)
@@ -51,12 +57,6 @@ export class SourceGroup extends Source {
 
     addDefinition(...definitionList: string[]) {
         this._DEFINITION_LIST.push(...definitionList)
-    }
-
-    addIncludeDirectory(...directoryList: string[]) {
-        for (const directory of directoryList) {
-            this._INCLUDE_PATH_LIST.push(join(this._PROJECT_PATH, directory))
-        }
     }
 
     addSource(...patternList: string[]) {
@@ -81,10 +81,12 @@ export class Target extends SourceGroup {
     _EXPORT_INCLUDE_PATH_LIST: string[]
     _EXPORT_LIBRARY_LIST: string[]
     _EXPORT_LIBRARY_PATH_LIST: string[]
+    _INCLUDE_PATH_LIST: string[]
     _LIBRARY_LIST: string[]
     _LIBRARY_PATH_LIST: string[]
     _LINK_OPTION_LIST: string[]
     _PROJECT_FILE_LIST: string[]
+    _PROJECT_PATH: string
     _SOURCE_LIST: Source[]
     _SOURCE_GROUP_LIST: SourceGroup[]
 //
@@ -113,7 +115,7 @@ export class Target extends SourceGroup {
         this._DEPENDENCY_LIST.push(...dependencyList)
     }
 
-    addExportIncludePath(...directoryList: string[]) {
+    addExportIncludeDirectory(...directoryList: string[]) {
         for (const directory of directoryList) {
             this._EXPORT_INCLUDE_PATH_LIST.push(join(this._PROJECT_PATH, directory))
         }
@@ -126,6 +128,12 @@ export class Target extends SourceGroup {
     addExportLibraryDirectory(...directoryList: string[]) {
         for (const directory of directoryList) {
             this._EXPORT_LIBRARY_PATH_LIST.push(join(this._PROJECT_PATH, directory))
+        }
+    }
+
+    addIncludeDirectory(...directoryList: string[]) {
+        for (const directory of directoryList) {
+            this._INCLUDE_PATH_LIST.push(join(this._PROJECT_PATH, directory))
         }
     }
 
@@ -144,8 +152,7 @@ export class Target extends SourceGroup {
     }
 
     addSource(...patternList: string[]): SourceGroup {
-        const group = new SourceGroup()
-        group.addSource(...patternList)
+        const group = new SourceGroup(patternList)
         this._SOURCE_GROUP_LIST.push(group)
         return group
     }
