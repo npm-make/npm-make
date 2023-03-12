@@ -10,7 +10,6 @@ export class Target {
     STANDARD_CPP: '98' | '03' | '11' | '14' | '17' | '20' | 'latest'
     STATIC: boolean
     TARGET_NAME: string
-    TARGET_VERSION: string
     WIN32_MAIN: boolean
     WIN32_REQUIRED_ADMIN: boolean
     WIN32_WITHOUT_CORE_LIBRARY: boolean
@@ -25,12 +24,13 @@ export class Target {
     _LIBRARY_LIST: string[]
     _LIBRARY_PATH_LIST: string[]
     _LINK_OPTION_LIST: string[]
-    _PROJECT_FILE_LIST: string[]
     _PROJECT_PATH: string
     _SOURCE_LIST: Source[]
     _SOURCE_GROUP_LIST: SourceGroup[]
 
-    constructor() {
+    constructor(projectOutputPath: string, projectPath: string, targetName: string) {
+        this.OUTPUT_PATH = join(projectOutputPath, targetName)
+        this.TARGET_NAME = targetName
         this._COMPILE_OPTION_LIST = []
         this._DEFINITION_LIST = []
         this._DEPENDENCY_LIST = []
@@ -42,7 +42,7 @@ export class Target {
         this._LIBRARY_LIST = []
         this._LIBRARY_PATH_LIST = []
         this._LINK_OPTION_LIST = []
-        this._PROJECT_FILE_LIST = []
+        this._PROJECT_PATH = projectPath
         this._SOURCE_LIST = []
         this._SOURCE_GROUP_LIST = []
     }
@@ -106,8 +106,7 @@ export class Target {
     }
 
     addSource(...patternList: string[]): SourceGroup {
-        const group = new SourceGroup()
-        group._SOURCE_PATTERN_LIST.push(...patternList)
+        const group = new SourceGroup(patternList)
         this._SOURCE_GROUP_LIST.push(group)
         return group
     }

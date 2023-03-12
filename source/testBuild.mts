@@ -19,15 +19,14 @@ msvc.EXECUTE_RC = 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.22000.0\
 const builder = new Builder()
 builder.DEBUG = true
 builder.MACHINE = 'X64'
-builder.MSVC_VERSION = '14.34.31933'
+builder.MSVC_VERSION = '14.35.32215'
 builder.PLATFORM = 'WINDOWS'
 builder.TOOLCHAIN = 'MSVC'
 
-async function addTarget(outputPath, outputName, srcList) {
-    const target = new Target()
-    target.OUTPUT_PATH = outputPath
-    target.OUTPUT_NAME = outputName
+async function addTarget(projectOutputPath, projectPath, outputName, srcList) {
+    const target = new Target(projectOutputPath, projectPath, outputName)
     target.SHARED = true
+    target.OUTPUT_NAME = 'zlib1.dll'
     for (const src of srcList) {
         const parse1 = path.parse(src)
         const source = new Source()
@@ -60,13 +59,14 @@ async function addTarget(outputPath, outputName, srcList) {
         }
         target._SOURCE_LIST.push(source)
     }
-    await fs.mkdir(outputPath + '/obj', { recursive: true })
+    await fs.mkdir(target.OUTPUT_PATH + '/obj', { recursive: true })
     return target
 }
 
 const target1 = await addTarget(
-    'C:\\Project\\npm-make\\zlib\\npm_make\\default\\zlib',
-    'zlib1.dll',
+    'C:\\Project\\npm-make\\zlib\\npm_make\\default',
+    'C:\\Project\\npm-make\\zlib',
+    'zlib',
     [
         'C:\\Project\\npm-make\\zlib\\adler32.c',
         'C:\\Project\\npm-make\\zlib\\compress.c',
