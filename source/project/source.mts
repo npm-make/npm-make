@@ -3,7 +3,7 @@ export class Source {
     _DEFINITION_LIST: string[]
     _OBJECT_PREFIX: string
     _SOURCE_PATH: string
-    _SOURCE_TYPE: 'ASM' | 'C' | 'CPP' | 'DEF' | 'MANIFEST' | 'RC'
+    _SOURCE_TYPE: 'ASM' | 'C' | 'CPP' | 'DEF' | 'MANIFEST' | 'MAP' | 'RC'
 
     constructor() {
         this._COMPILE_OPTION_LIST = []

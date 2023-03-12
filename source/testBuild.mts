@@ -71,6 +71,9 @@ async function loadProject(projectPath) {
                             case '.manifest':
                                 source._SOURCE_TYPE = 'MANIFEST'
                                 break
+                            case '.map':
+                                source._SOURCE_TYPE = 'MAP'
+                                break
                             case '.rc':
                                 source._SOURCE_TYPE = 'RC'
                                 break
