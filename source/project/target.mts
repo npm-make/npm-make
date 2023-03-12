@@ -1,8 +1,3 @@
-// import path from 'node:path'
-// import Source from './source'
-// import SourceGroup from './sourceGroup'
-// import TargetFeature from './targetFeature'
-//
 import { join } from 'node:path'
 
 export class Source {
@@ -81,20 +76,17 @@ export class Target extends SourceGroup {
     WIN32_MAIN: boolean
     WIN32_REQUIRED_ADMIN: boolean
     WIN32_WITHOUT_CORE_LIBRARY: boolean
+    _DEPENDENCY_LIST: string[]
+    _DEPENDENCY_TARGET_LIST: Target[]
+    _EXPORT_INCLUDE_PATH_LIST: string[]
+    _EXPORT_LIBRARY_LIST: string[]
+    _EXPORT_LIBRARY_PATH_LIST: string[]
     _LIBRARY_LIST: string[]
     _LIBRARY_PATH_LIST: string[]
     _LINK_OPTION_LIST: string[]
     _PROJECT_FILE_LIST: string[]
     _SOURCE_LIST: Source[]
-
-
-//     dependencyList: string[]
-//     dependencyTargetList: Target[]
-//     exportIncludePathList: string[]
-//     exportLibraryList: string[]
-//     exportLibraryPathList: string[]
-//     sourceGroupList: SourceGroup[]
-//     targetType: 'EXECUTE' | 'SHARED' | 'STATIC'
+    _SOURCE_GROUP_LIST: SourceGroup[]
 //
 //     constructor(projectPath: string, projectFileList: string[], targetName: string, targetFeature?: TargetFeature) {
 //         this.compileOptionList = []
@@ -116,31 +108,27 @@ export class Target extends SourceGroup {
 //         this.targetPrefix = targetName
 //         this.targetType = 'EXECUTE'
 //     }
-//
-//     addDependency(...dependencyList: string[]): Target {
-//         this.dependencyList.push(...dependencyList)
-//         return this
-//     }
-//
-//     addExportIncludePath(...inputList: string[]): Target {
-//         for (const input of inputList) {
-//             this.exportIncludePathList.push(path.join(this.projectPath, input))
-//         }
-//         return this
-//     }
-//
-//     addExportLibrary(...libraryList: string[]): Target {
-//         this.exportLibraryList.push(...libraryList)
-//         return this
-//     }
-//
-//     addExportLibraryPath(...inputList: string[]): Target {
-//         for (const input of inputList) {
-//             this.exportLibraryPathList.push(path.join(this.projectPath, input))
-//         }
-//         return this
-//     }
-//
+
+    addDependency(...dependencyList: string[]) {
+        this._DEPENDENCY_LIST.push(...dependencyList)
+    }
+
+    addExportIncludePath(...directoryList: string[]) {
+        for (const directory of directoryList) {
+            this._EXPORT_INCLUDE_PATH_LIST.push(join(this._PROJECT_PATH, directory))
+        }
+    }
+
+    addExportLibrary(...libraryList: string[]) {
+        this._EXPORT_LIBRARY_LIST.push(...libraryList)
+    }
+
+    addExportLibraryDirectory(...directoryList: string[]) {
+        for (const directory of directoryList) {
+            this._EXPORT_LIBRARY_PATH_LIST.push(join(this._PROJECT_PATH, directory))
+        }
+    }
+
     addLibrary(...libraryList: string[]) {
         this._LIBRARY_LIST.push(...libraryList)
     }
@@ -155,21 +143,10 @@ export class Target extends SourceGroup {
         this._LINK_OPTION_LIST.push(...optionList)
     }
 
-//
-//     addSource(...inputList: string[]): SourceGroup {
-//         const group = new SourceGroup(this.projectPath, this.projectFileList, this.targetName)
-//         group.addSource(...inputList)
-//         this.sourceGroupList.push(group)
-//         return group
-//     }
-//
-//     addSourcePattern(...patternList: string[]): SourceGroup {
-//         const group = new SourceGroup(this.projectPath, this.projectFileList, this.targetName)
-//         group.addSourcePattern(...patternList)
-//         this.sourceGroupList.push(group)
-//         return group
-//     }
-// }
-//
-// export interface TargetFeature {
+    addSource(...patternList: string[]): SourceGroup {
+        const group = new SourceGroup()
+        group.addSource(...patternList)
+        this._SOURCE_GROUP_LIST.push(group)
+        return group
+    }
 }
