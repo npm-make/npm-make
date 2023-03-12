@@ -4,33 +4,12 @@ import { Msvc } from './msvc.mjs'
 
 function baseLib(target: Target) {
     const flagList = Array.from(target._LINK_OPTION_LIST)
-    if (target.WIN32_MAIN) {
-        flagList.push('/SUBSYSTEM:WINDOWS')
-    }
-    if (target.WIN32_REQUIRED_ADMIN) {
-        flagList.push('/MANIFESTUAC:level=\'requireAdministrator\'')
-    }
-    for (const libraryPath of target._LIBRARY_PATH_LIST) {
-        flagList.push('/LIBPATH:' + libraryPath)
-    }
-    for (const library of target._LIBRARY_LIST) {
-        flagList.push(library)
-    }
     for (const source of target._SOURCE_LIST) {
         switch (source._SOURCE_TYPE) {
             case 'ASM':
             case 'C':
             case 'CPP':
                 flagList.push(source._OBJECT_PREFIX + '.obj')
-                break
-            case 'DEF':
-                flagList.push('/DEF:' + source._SOURCE_PATH)
-                break
-            case 'MANIFEST':
-                flagList.push('/MANIFESTINPUT:' + source._SOURCE_PATH)
-                break
-            case 'RC':
-                flagList.push(source._OBJECT_PREFIX + '.res')
                 break
         }
     }
@@ -61,6 +40,25 @@ function baseLink(builder: Builder, target: Target) {
         flagList.push('uuid.lib')
         flagList.push('winspool.lib')
     }
+    for (const libraryPath of target._LIBRARY_PATH_LIST) {
+        flagList.push('/LIBPATH:' + libraryPath)
+    }
+    for (const library of target._LIBRARY_LIST) {
+        flagList.push(library)
+    }
+    for (const source of target._SOURCE_LIST) {
+        switch (source._SOURCE_TYPE) {
+            case 'DEF':
+                flagList.push('/DEF:' + source._SOURCE_PATH)
+                break
+            case 'MANIFEST':
+                flagList.push('/MANIFESTINPUT:' + source._SOURCE_PATH)
+                break
+            case 'RC':
+                flagList.push(source._OBJECT_PREFIX + '.res')
+                break
+        }
+    }
     flagList.push('/MANIFEST:EMBED')
     return flagList
 }
@@ -68,12 +66,18 @@ function baseLink(builder: Builder, target: Target) {
 export async function buildLink(msvc: Msvc, builder: Builder, target: Target) {
     if (target.STATIC) {
         const flagList = baseLib(target)
-        flagList.push('/DEF')
         return msvc.execute(target.OUTPUT_PATH, msvc.EXECUTE_LIB, ...flagList)
     } else {
         const flagList = baseLink(builder, target)
         if (target.SHARED) {
             flagList.push('/DLL')
+        } else {
+            if (target.WIN32_MAIN) {
+                flagList.push('/SUBSYSTEM:WINDOWS')
+            }
+            if (target.WIN32_REQUIRED_ADMIN) {
+                flagList.push('/MANIFESTUAC:level=\'requireAdministrator\'')
+            }
         }
         return msvc.execute(target.OUTPUT_PATH, msvc.EXECUTE_LINK, ...flagList)
     }

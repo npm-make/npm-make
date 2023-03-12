@@ -1,3 +1,4 @@
+import { executeProcess } from '../../executeTool.mjs'
 import { Builder } from '../../project/builder.mjs'
 import { Source, Target } from '../../project/target.mjs'
 import { buildC, buildCPP } from './cpp.mjs'
@@ -11,14 +12,10 @@ export class Msvc {
     EXECUTE_LIB: string
     EXECUTE_LINK: string
     EXECUTE_RC: string
-    LIBRARY_LIST: string[]
 
     async execute(cwd, file, ...args) {
-        // const result = await executeTool.execute({cwd, env: this.environment}, file, ...args)
-        // console.log(result.stdout)
-        // if (result.error) {
-        //     throw new Error(result.stdout)
-        // }
+        const result = await executeProcess({ cwd, env: this.ENVIRONMENT }, file, ...args)
+        console.log(file, args.join(' '), result)
     }
 
     async buildSource(builder: Builder, target: Target, source: Source) {

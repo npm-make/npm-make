@@ -19,6 +19,7 @@ function baseCl(builder: Builder, source: Source) {
         if (builder.RELEASE_MIN_SIZE) {
             flagList.push('/O1')
         } else {
+            flagList.push('/GL')
             flagList.push('/O2')
         }
         if (builder.RELEASE_WITH_DEBUG_INFO) {

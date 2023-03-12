@@ -27,9 +27,9 @@ export function executeTask(thisTask: Function) {
 export async function executeProcess(options: any, file: string, ...args: string[]): Promise<any> {
     return new Promise((resolve, reject) => {
         executeTask(() => {
-            execFile(file, args, options, (error, message, errorMessage) => {
+            execFile(file, args, options, (error, message) => {
                 if (error) {
-                    reject(errorMessage)
+                    reject(message)
                 } else {
                     resolve(message)
                 }
