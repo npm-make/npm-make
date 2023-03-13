@@ -1,4 +1,4 @@
-import { Msvc } from './toolchain/msvc/msvc.mjs'
+import { Msvc } from './toolchain/msvc.mjs'
 import { Builder } from './project/builder.mjs'
 import { Source } from './project/source.mjs'
 import { Target } from './project/target.mjs'
@@ -115,6 +115,9 @@ try {
     const project1 = await loadProject('C:\\Project\\npm-make\\zlib')
     for (const target1 of project1._TARGET_LIST) {
         await mkdir(target1.OUTPUT_PATH + '/obj', { recursive: true })
+        for (const source1 of target1._SOURCE_LIST) {
+            await msvc.compileSource(builder, target1, source1)
+        }
         await msvc.buildTarget(builder, target1)
     }
 } catch (error) {

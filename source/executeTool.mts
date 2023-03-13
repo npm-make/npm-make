@@ -4,7 +4,7 @@ import { platform } from 'node:process'
 const taskQueue: Function[] = []
 let taskRunning = 0
 if (platform === 'win32') {
-    await executeProcess(undefined, 'chcp', '65001')
+    await executeProcess(null, 'chcp', '65001')
 }
 
 export function executeTask(thisTask: Function) {
