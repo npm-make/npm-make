@@ -29,14 +29,14 @@ export class Msvc {
             if (target.SHARED) {
                 const flagList = this.prepareLink(builder, target)
                 flagList.push('/DLL')
-                return this.execute(target.OUTPUT_PATH, this.EXECUTE_LIB, ...flagList)
+                return this.execute(target.OUTPUT_PATH, this.EXECUTE_LINK, ...flagList)
             } else {
                 const flagList = this.prepareLib(builder, target)
                 return this.execute(target.OUTPUT_PATH, this.EXECUTE_LIB, ...flagList)
             }
         } else {
             const flagList = this.prepareLink(builder, target)
-            return this.execute(target.OUTPUT_PATH, this.EXECUTE_LIB, ...flagList)
+            return this.execute(target.OUTPUT_PATH, this.EXECUTE_LINK, ...flagList)
         }
     }
 
