@@ -2,8 +2,9 @@ import { executeProcess } from '../executeTool.mjs'
 import { Builder } from '../project/builder.mjs'
 import { Source } from '../project/source.mjs'
 import { Target } from '../project/target.mjs'
+import { Toolchain } from './toolchain.mjs'
 
-export class Msvc {
+export class Msvc implements Toolchain {
     ENVIRONMENT: object
     EXECUTE_ASM: string
     EXECUTE_CL: string

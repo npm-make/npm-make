@@ -19,8 +19,8 @@ export class Project {
         this._TARGET_LIST = []
     }
 
-    createTarget(targetName: string, options?: object): Target {
-        const target = new Target(this.OUTPUT_PATH, this.PROJECT_PATH, targetName)
+    createTarget(name: string, options?: object): Target {
+        const target = new Target(this.OUTPUT_PATH, this.PROJECT_PATH, name)
         this._TARGET_LIST.push(target)
         return Object.assign(target, options)
     }

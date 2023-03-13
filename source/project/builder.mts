@@ -1,3 +1,7 @@
+import { Target } from './target.mjs'
+import { SourceGroup } from './sourceGroup.mjs'
+import { Toolchain } from '../toolchain/toolchain.mjs'
+
 export class Builder {
     CLANG_VERSION: string
     CONFIG_NAME: string
@@ -11,4 +15,9 @@ export class Builder {
     RELEASE_WITH_DEBUG_INFO: boolean
     RELEASE_MIN_SIZE: boolean
     TOOLCHAIN: 'CLANG' | 'GCC' | 'MSVC'
+    _TOOLCHAIN_IMPL: Toolchain
+
+    async tryCompile(code: string, target: Target, group?: SourceGroup, suffix?: string): Promise<boolean> {
+        return true
+    }
 }
