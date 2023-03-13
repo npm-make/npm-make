@@ -25,6 +25,7 @@ export class Target {
     _LIBRARY_PATH_LIST: string[]
     _LINK_OPTION_LIST: string[]
     _PROJECT_PATH: string
+    _PROMISE: Promise<void>
     _SOURCE_LIST: Source[]
     _SOURCE_GROUP_LIST: SourceGroup[]
 

@@ -5,7 +5,7 @@ import { Target } from './project/target.mjs'
 import { Project } from './project/project.mjs'
 import { join, parse } from 'node:path'
 import { pathToFileURL } from 'node:url'
-import { opendir, mkdir } from 'node:fs/promises'
+import { opendir, mkdir, readFile, realpath } from 'node:fs/promises'
 
 const msvc = new Msvc()
 msvc.ENVIRONMENT = {
@@ -26,10 +26,65 @@ builder.MSVC_VERSION = '14.35.32215'
 builder.PLATFORM = 'WINDOWS'
 builder.TOOLCHAIN = 'MSVC'
 const config = {}
+const projectMap = new Map<string, Project>()
+const targetMap = new Map<string, Target>()
+let outputPath
 
-async function loadProject(projectPath) {
+async function loadMain(mainProjectPath) {
+    outputPath = join(mainProjectPath, 'npm_make', builder.CONFIG_NAME)
+    const mainProject = await loadProject(mainProjectPath)
+    await loadDependencyProject([mainProject])
+    for (const target of targetMap.values()) {
+        for (const dependency of target._DEPENDENCY_LIST) {
+            if (targetMap.has(dependency)) {
+                target._DEPENDENCY_TARGET_LIST.push(targetMap.get(dependency))
+            } else {
+                throw new Error('需要target:' + dependency)
+            }
+        }
+    }
+    return mainProject
+}
+
+async function loadDependencyProject(projectList: Project[]) {
+    const resultList = []
+    for (const project of projectList) {
+        for (const dependency of project._DEPENDENCY_LIST) {
+            if (!projectMap.has(dependency)) {
+                let project2
+                project.PROJECT_PATH = await realpath(project.PROJECT_PATH)
+                try {
+                    project2 = await loadProject(join(project.PROJECT_PATH, 'node_modules', dependency))
+                } catch (cause) {
+                    try {
+                        if (project.PROJECT_NAME.startsWith('@')) {
+                            project2 = await loadProject(join(project.PROJECT_PATH, '..', '..', dependency))
+                        } else {
+                            project2 = await loadProject(join(project.PROJECT_PATH, '..', dependency))
+                        }
+                    } catch (cause2) {
+                        console.log(cause)
+                        console.log(cause2)
+                        throw new Error('没有找到' + dependency)
+                    }
+                }
+                resultList.push(project2)
+                projectMap.set(project2.PROJECT_NAME, project2)
+            }
+        }
+    }
+    if (resultList.length > 0) {
+        await loadDependencyProject(resultList)
+    }
+}
+
+async function loadProject(projectPath: string) {
+    const packageData = await readFile(join(projectPath, 'package.json'), { encoding: 'utf-8' })
+    const packageJson = JSON.parse(packageData)
     const project = new Project()
-    project.OUTPUT_PATH = join(projectPath, 'npm_make', builder.CONFIG_NAME)
+    project.OUTPUT_PATH = outputPath
+    project.PROJECT_NAME = packageJson.name
+    project.PROJECT_VERSION = packageJson.version
     project.PROJECT_PATH = projectPath
     project._PROJECT_MODULE = (await import(pathToFileURL(join(projectPath, 'make.mjs')).href)).default
     const result = project._PROJECT_MODULE.generate(builder, project, config)
@@ -83,6 +138,30 @@ async function loadProject(projectPath) {
                 }
             }
         }
+        if (!target.OUTPUT_NAME) {
+            if (builder.PLATFORM === 'WINDOWS') {
+                if (target.LIBRARY) {
+                    target.OUTPUT_NAME = target.TARGET_NAME + '.lib'
+                } else if (target.SHARED) {
+                    target.OUTPUT_NAME = target.TARGET_NAME + '.dll'
+                } else {
+                    target.OUTPUT_NAME = target.TARGET_NAME + '.exe'
+                }
+            } else {
+                if (target.LIBRARY) {
+                    target.OUTPUT_NAME = target.TARGET_NAME + '.a'
+                } else if (target.SHARED) {
+                    target.OUTPUT_NAME = target.TARGET_NAME + '.so'
+                } else {
+                    target.OUTPUT_NAME = target.TARGET_NAME + '.o'
+                }
+            }
+        }
+        if (!targetMap.has(target.TARGET_NAME)) {
+            targetMap.set(target.TARGET_NAME, target)
+        } else {
+            throw Error('重复的target:' + target.TARGET_NAME)
+        }
     }
     return project
 }
@@ -111,15 +190,35 @@ function searchRegex(patternList: string[]): RegExp {
     return new RegExp(resultList.join('|'))
 }
 
-try {
-    const project1 = await loadProject('C:\\Project\\npm-make\\zlib')
-    for (const target1 of project1._TARGET_LIST) {
-        await mkdir(target1.OUTPUT_PATH + '/obj', { recursive: true })
-        for (const source1 of target1._SOURCE_LIST) {
-            await msvc.compileSource(builder, target1, source1)
+async function buildTargetList(targetList: Target[]) {
+    if (targetList.length > 0) {
+        const waitingList = []
+        for (const dependency of targetList) {
+            waitingList.push(buildTarget(dependency))
         }
-        await msvc.buildTarget(builder, target1)
+        await Promise.all(waitingList)
     }
+}
+
+async function buildTarget(target: Target) {
+    if (!target._PROMISE) {
+        target._PROMISE = buildTargetReal(target)
+    }
+    await target._PROMISE
+}
+
+async function buildTargetReal(target: Target) {
+    await buildTargetList(target._DEPENDENCY_TARGET_LIST)
+    await mkdir(target.OUTPUT_PATH + '/obj', { recursive: true })
+    for (const source1 of target._SOURCE_LIST) {
+        await msvc.compileSource(builder, target, source1)
+    }
+    await msvc.buildTarget(builder, target)
+}
+
+try {
+    const mainProj = await loadMain('C:\\Project\\npm-make\\npm-make\\debug')
+    await buildTargetList(mainProj._TARGET_LIST)
 } catch (error) {
     console.log(error)
 }
