@@ -1,5 +1,3 @@
-import { parse, join } from 'node:path'
-import { executeProcess } from '../executeTool.mjs'
 import { Builder } from '../project/builder.mjs'
 import { Source } from '../project/source.mjs'
 import { Target } from '../project/target.mjs'
@@ -12,33 +10,71 @@ export class Msvc extends Toolchain {
     EXECUTE_LINK: string
     EXECUTE_RC: string
 
-    async compileSource(builder: Builder, target: Target, source: Source) {
-        switch (source._SOURCE_TYPE) {
-            case 'ASM':
-                return this.compileASM(builder, target, source)
-            case 'C':
-                return this.compileC(builder, target, source)
-            case 'CPP':
-                return this.compileCPP(builder, target, source)
-            case 'RC':
-                return this.compileRC(builder, target, source)
+    async compileC(builder: Builder, target: Target, source: Source) {
+        const flagList = this.prepareCl(builder, target, source)
+        switch (target.STANDARD_C) {
+            case 'c11':
+                flagList.push('/std:c11')
+                break
+            case 'c17':
+                flagList.push('/std:c17')
+                break
         }
+        flagList.push('/Tc' + source._SOURCE_PATH)
+        return this.execute(target.OUTPUT_PATH, this.EXECUTE_CL, ...flagList)
     }
 
-    async buildTarget(builder: Builder, target: Target) {
-        if (target.LIBRARY) {
-            if (target.SHARED) {
-                const flagList = this.prepareLink(builder, target)
-                flagList.push('/DLL')
-                return this.execute(target.OUTPUT_PATH, this.EXECUTE_LINK, ...flagList)
-            } else {
-                const flagList = this.prepareLib(builder, target)
-                return this.execute(target.OUTPUT_PATH, this.EXECUTE_LIB, ...flagList)
-            }
-        } else {
-            const flagList = this.prepareLink(builder, target)
-            return this.execute(target.OUTPUT_PATH, this.EXECUTE_LINK, ...flagList)
+    async compileCPP(builder: Builder, target: Target, source: Source) {
+        const flagList = this.prepareCl(builder, target, source)
+        switch (target.STANDARD_CPP) {
+            case 'c++14':
+                flagList.push('/std:c++14')
+                break
+            case 'c++17':
+                flagList.push('/std:c++17')
+                break
+            case 'c++20':
+                flagList.push('/std:c++20')
+                break
+            case 'c++latest':
+                flagList.push('/std:c++latest')
+                break
         }
+        flagList.push('/Tp' + source._SOURCE_PATH)
+        return this.execute(target.OUTPUT_PATH, this.EXECUTE_CL, ...flagList)
+    }
+
+    async compileRC(builder: Builder, target: Target, source: Source) {
+        const flagList = Array.from(source._COMPILE_OPTION_LIST)
+        for (const definition of source._DEFINITION_LIST) {
+            flagList.push('/D' + definition)
+        }
+        flagList.push('/Fo' + source._OBJECT_PREFIX + '.res')
+        flagList.push('/nologo')
+        //这些命令在末尾
+        flagList.push(source._SOURCE_PATH)
+        return this.execute(target.OUTPUT_PATH, this.EXECUTE_RC, ...flagList)
+    }
+
+    async buildExecute(builder: Builder, target: Target) {
+        const flagList = this.prepareLink(builder, target)
+        flagList.push('/OUT:' + target.OUTPUT_NAME)
+        flagList.push('/IMPLIB:' + target._LINK_NAME)
+        return this.execute(target.OUTPUT_PATH, this.EXECUTE_LINK, ...flagList)
+    }
+
+    async buildShared(builder: Builder, target: Target) {
+        const flagList = this.prepareLink(builder, target)
+        flagList.push('/DLL')
+        flagList.push('/OUT:' + target.OUTPUT_NAME)
+        flagList.push('/IMPLIB:' + target._LINK_NAME)
+        return this.execute(target.OUTPUT_PATH, this.EXECUTE_LINK, ...flagList)
+    }
+
+    async buildStatic(builder: Builder, target: Target) {
+        const flagList = this.prepareLib(builder, target)
+        flagList.push('/OUT:' + target._LINK_NAME)
+        return this.execute(target.OUTPUT_PATH, this.EXECUTE_LIB, ...flagList)
     }
 
     prepareCl(builder: Builder, target: Target, source: Source) {
@@ -101,11 +137,9 @@ export class Msvc extends Toolchain {
             }
         }
         for (const dependency of target._DEPENDENCY_TARGET_LIST) {
-            const parse1 = parse(dependency.OUTPUT_NAME)
-            flagList.push(join(dependency.OUTPUT_PATH, parse1.name + '.lib'))
+            flagList.push(dependency._LINK_NAME)
         }
         flagList.push('/NOLOGO')
-        flagList.push('/OUT:' + target.OUTPUT_NAME)
         return flagList
     }
 
@@ -158,89 +192,5 @@ export class Msvc extends Toolchain {
         }
         flagList.push('/MANIFEST:EMBED')
         return flagList
-    }
-
-    async compileASM(builder: Builder, target: Target, source: Source) {
-//         const flagList = Array.from(source.compileOptionList)
-//         switch (builderFeature.MACHINE) {
-//             case 'ARM':
-//             case 'ARM64': {
-//                 if (builderFeature.WINDOWS_ARM64_CALL_X64) {
-//                     flagList.push('-machine')
-//                     flagList.push('ARM64EC')
-//                 }
-//                 if (target.includePathList.length > 0) {
-//                     flagList.push('-i')
-//                     flagList.push(target.includePathList.join(';'))
-//                 }
-//                 flagList.push('-nologo')
-//                 //这些命令在末尾
-//                 flagList.push(source.sourcePath)
-//                 flagList.push(source.objectPrefix + '.obj')
-//                 break
-//             }
-//             case 'X64':
-//             case 'X86': {
-//                 for (const includePath of target.includePathList) {
-//                     flagList.push('/I' + includePath)
-//                 }
-//                 for (const definition of source.definitionList) {
-//                     flagList.push('/D' + definition)
-//                 }
-//                 flagList.push('/Fo' + source.objectPrefix + '.obj')
-//                 flagList.push('/nologo')
-//                 //这些命令在末尾
-//                 flagList.push('/c')
-//                 flagList.push(source.sourcePath)
-//                 break
-//             }
-//         }
-//         return msvc.execute(builderFeature.OUTPUT_PATH, msvc.executeASM, ...flagList)
-    }
-
-    async compileC(builder: Builder, target: Target, source: Source) {
-        const flagList = this.prepareCl(builder, target, source)
-        switch (target.STANDARD_C) {
-            case '11':
-                flagList.push('/std:c11')
-                break
-            case '17':
-                flagList.push('/std:c17')
-                break
-        }
-        flagList.push('/Tc' + source._SOURCE_PATH)
-        return this.execute(target.OUTPUT_PATH, this.EXECUTE_CL, ...flagList)
-    }
-
-    async compileCPP(builder: Builder, target: Target, source: Source) {
-        const flagList = this.prepareCl(builder, target, source)
-        switch (target.STANDARD_CPP) {
-            case '14':
-                flagList.push('/std:c++14')
-                break
-            case '17':
-                flagList.push('/std:c++17')
-                break
-            case '20':
-                flagList.push('/std:c++20')
-                break
-            case 'latest':
-                flagList.push('/std:c++latest')
-                break
-        }
-        flagList.push('/Tp' + source._SOURCE_PATH)
-        return this.execute(target.OUTPUT_PATH, this.EXECUTE_CL, ...flagList)
-    }
-
-    async compileRC(builder: Builder, target: Target, source: Source) {
-        const flagList = Array.from(source._COMPILE_OPTION_LIST)
-        for (const definition of source._DEFINITION_LIST) {
-            flagList.push('/D' + definition)
-        }
-        flagList.push('/Fo' + source._OBJECT_PREFIX + '.res')
-        flagList.push('/nologo')
-        //这些命令在末尾
-        flagList.push(source._SOURCE_PATH)
-        return this.execute(target.OUTPUT_PATH, this.EXECUTE_RC, ...flagList)
     }
 }

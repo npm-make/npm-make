@@ -3,13 +3,12 @@ import { Source } from './source.mjs'
 import { SourceGroup } from './sourceGroup.mjs'
 
 export class Target {
-    LIBRARY: boolean
     OUTPUT_NAME: string
     OUTPUT_PATH: string
-    SHARED: boolean
-    STANDARD_C: '89' | '99' | '11' | '17'
-    STANDARD_CPP: '98' | '03' | '11' | '14' | '17' | '20' | 'latest'
+    STANDARD_C: 'c89' | 'c99' | 'c11' | 'c17'
+    STANDARD_CPP: 'c++98' | 'c++03' | 'c++11' | 'c++14' | 'c++17' | 'c++20' | 'c++latest'
     TARGET_NAME: string
+    TARGET_TYPE: 'EXECUTE' | 'SHARED' | 'STATIC'
     WIN32_MAIN: boolean
     WIN32_REQUIRED_ADMIN: boolean
     WIN32_WITHOUT_CORE_LIBRARY: boolean
@@ -25,13 +24,17 @@ export class Target {
     _LIBRARY_PATH_LIST: string[]
     _LINK_OPTION_LIST: string[]
     _PROJECT_PATH: string
-    _PROMISE: Promise<void>
     _SOURCE_LIST: Source[]
     _SOURCE_GROUP_LIST: SourceGroup[]
+    //debug
+    _PROMISE: Promise<void>
+    _LINK_NAME: string
 
-    constructor(projectOutputPath: string, projectPath: string, targetName: string) {
-        this.OUTPUT_PATH = join(projectOutputPath, targetName)
+
+    constructor(outputPath: string, projectPath: string, targetName: string, targetType: any) {
+        this.OUTPUT_PATH = outputPath
         this.TARGET_NAME = targetName
+        this.TARGET_TYPE = targetType
         this._COMPILE_OPTION_LIST = []
         this._DEFINITION_LIST = []
         this._DEPENDENCY_LIST = []

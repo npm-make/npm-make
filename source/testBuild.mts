@@ -3,28 +3,68 @@ import { Builder } from './project/builder.mjs'
 import { Source } from './project/source.mjs'
 import { Target } from './project/target.mjs'
 import { Project } from './project/project.mjs'
-import { join, parse } from 'node:path'
+import { join, parse, dirname } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { opendir, mkdir, readFile, realpath } from 'node:fs/promises'
+import { Gcc } from './toolchain/gcc.mjs'
+import { Clang } from './toolchain/clang.mjs'
 
-const msvc = new Msvc()
-msvc.ENVIRONMENT = {
-    INCLUDE: 'C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.35.32215\\include;C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.35.32215\\ATLMFC\\include;C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Auxiliary\\VS\\include;C:\\Program Files (x86)\\Windows Kits\\10\\include\\10.0.22000.0\\ucrt;C:\\Program Files (x86)\\Windows Kits\\10\\\\include\\10.0.22000.0\\\\um;C:\\Program Files (x86)\\Windows Kits\\10\\\\include\\10.0.22000.0\\\\shared;C:\\Program Files (x86)\\Windows Kits\\10\\\\include\\10.0.22000.0\\\\winrt;C:\\Program Files (x86)\\Windows Kits\\10\\\\include\\10.0.22000.0\\\\cppwinrt',
-    LIB: 'C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.35.32215\\lib\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.22000.0\\ucrt\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\\\lib\\10.0.22000.0\\\\um\\x64',
-    Path: 'C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.35.32215\\bin\\HostX64\\x64;C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\VC\\VCPackages;C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow;C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\MSBuild\\Current\\bin\\Roslyn;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.22000.0\\\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\\\x64;C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\\\MSBuild\\Current\\Bin\\amd64;C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319;C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\;C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\Tools\\;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\Users\\name\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\name\\OneDrive\\Apps\\mingw64;;C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\VC\\Linux\\bin\\ConnectionManagerExe'
+function createMsvc() {
+    const msvc = new Msvc()
+    msvc.ENVIRONMENT = {
+        INCLUDE: 'C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.35.32215\\include;C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.35.32215\\ATLMFC\\include;C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Auxiliary\\VS\\include;C:\\Program Files (x86)\\Windows Kits\\10\\include\\10.0.22000.0\\ucrt;C:\\Program Files (x86)\\Windows Kits\\10\\\\include\\10.0.22000.0\\\\um;C:\\Program Files (x86)\\Windows Kits\\10\\\\include\\10.0.22000.0\\\\shared;C:\\Program Files (x86)\\Windows Kits\\10\\\\include\\10.0.22000.0\\\\winrt;C:\\Program Files (x86)\\Windows Kits\\10\\\\include\\10.0.22000.0\\\\cppwinrt',
+        LIB: 'C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.35.32215\\lib\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\lib\\10.0.22000.0\\ucrt\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\\\lib\\10.0.22000.0\\\\um\\x64',
+        Path: 'C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.35.32215\\bin\\HostX64\\x64;C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\VC\\VCPackages;C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow;C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\MSBuild\\Current\\bin\\Roslyn;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.22000.0\\\\x64;C:\\Program Files (x86)\\Windows Kits\\10\\bin\\\\x64;C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\\\MSBuild\\Current\\Bin\\amd64;C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319;C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\;C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\Tools\\;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\Users\\name\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\name\\OneDrive\\Apps\\mingw64;;C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\VC\\Linux\\bin\\ConnectionManagerExe'
+    }
+    msvc.EXECUTE_ASM = 'C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.35.32215\\bin\\Hostx64\\x64\\ml64.exe'
+    msvc.EXECUTE_CL = 'C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.35.32215\\bin\\Hostx64\\x64\\cl.exe'
+    msvc.EXECUTE_LIB = 'C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.35.32215\\bin\\Hostx64\\x64\\lib.exe'
+    msvc.EXECUTE_LINK = 'C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.35.32215\\bin\\Hostx64\\x64\\link.exe'
+    msvc.EXECUTE_RC = 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.22000.0\\x64\\rc.exe'
+    const builder = new Builder()
+    builder.CONFIG_NAME = 'msvc'
+    builder.DEBUG = true
+    builder.MACHINE = 'X64'
+    builder.MSVC_VERSION = '14.35.32215'
+    builder.PLATFORM = 'WINDOWS'
+    builder.TOOLCHAIN = 'MSVC'
+    builder._TOOLCHAIN_IMPL = msvc
+    return builder
 }
-msvc.EXECUTE_ASM = 'C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.35.32215\\bin\\Hostx64\\x64\\ml64.exe'
-msvc.EXECUTE_CL = 'C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.35.32215\\bin\\Hostx64\\x64\\cl.exe'
-msvc.EXECUTE_LIB = 'C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.35.32215\\bin\\Hostx64\\x64\\lib.exe'
-msvc.EXECUTE_LINK = 'C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.35.32215\\bin\\Hostx64\\x64\\link.exe'
-msvc.EXECUTE_RC = 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.22000.0\\x64\\rc.exe'
-const builder = new Builder()
-builder.CONFIG_NAME = 'default'
-builder.DEBUG = true
-builder.MACHINE = 'X64'
-builder.MSVC_VERSION = '14.35.32215'
-builder.PLATFORM = 'WINDOWS'
-builder.TOOLCHAIN = 'MSVC'
+
+function createMingw() {
+    const gcc = new Gcc()
+    gcc.EXECUTE_AR = ''
+    gcc.EXECUTE_GCC = ''
+    gcc.EXECUTE_RL = ''
+    gcc.EXECUTE_WR = ''
+    const builder = new Builder()
+    builder.CONFIG_NAME = 'mingw'
+    builder.DEBUG = true
+    builder.MACHINE = 'X64'
+    builder.PLATFORM = 'WINDOWS'
+    builder.TOOLCHAIN = 'GCC'
+    builder._TOOLCHAIN_IMPL = gcc
+    return builder
+}
+
+function createClang() {
+    const clang = new Clang()
+    clang.EXECUTE_AR = ''
+    clang.EXECUTE_CLANG = ''
+    clang.EXECUTE_LR = ''
+    clang.EXECUTE_RL = ''
+    const builder = new Builder()
+    builder.CONFIG_NAME = 'clang'
+    builder.DEBUG = true
+    builder.MACHINE = 'X64'
+    builder.PLATFORM = 'WINDOWS'
+    builder.TOOLCHAIN = 'CLANG'
+    builder._TOOLCHAIN_IMPL = clang
+    return builder
+}
+
+const builder = createMsvc()
 const config = {}
 const projectMap = new Map<string, Project>()
 const targetMap = new Map<string, Target>()
@@ -104,7 +144,7 @@ async function loadProject(projectPath: string) {
                         const source = new Source()
                         source._COMPILE_OPTION_LIST = compileOptionList
                         source._DEFINITION_LIST = definitionList
-                        source._OBJECT_PREFIX = join('obj', (parse1.dir + '/' + parse1.name).replaceAll('/', '_'))
+                        source._OBJECT_PREFIX = join(target.TARGET_NAME + '.dir', parse1.dir, parse1.name)
                         source._SOURCE_PATH = join(projectPath, projectFile)
                         switch (parse1.ext.toLowerCase()) {
                             case '.asm':
@@ -139,22 +179,36 @@ async function loadProject(projectPath: string) {
             }
         }
         if (!target.OUTPUT_NAME) {
-            if (builder.PLATFORM === 'WINDOWS') {
-                if (target.LIBRARY) {
-                    target.OUTPUT_NAME = target.TARGET_NAME + '.lib'
-                } else if (target.SHARED) {
-                    target.OUTPUT_NAME = target.TARGET_NAME + '.dll'
-                } else {
-                    target.OUTPUT_NAME = target.TARGET_NAME + '.exe'
-                }
-            } else {
-                if (target.LIBRARY) {
-                    target.OUTPUT_NAME = target.TARGET_NAME + '.a'
-                } else if (target.SHARED) {
-                    target.OUTPUT_NAME = target.TARGET_NAME + '.so'
-                } else {
-                    target.OUTPUT_NAME = target.TARGET_NAME + '.o'
-                }
+            switch (builder.PLATFORM) {
+                case 'WINDOWS':
+                    switch (target.TARGET_TYPE) {
+                        case 'EXECUTE':
+                            target.OUTPUT_NAME = target.TARGET_NAME + '.exe'
+                            break
+                        case 'SHARED':
+                            target.OUTPUT_NAME = target.TARGET_NAME + '.dll'
+                            break
+                        case 'STATIC':
+                            target.OUTPUT_NAME = target.TARGET_NAME + '.lib'
+                            break
+                    }
+                    target._LINK_NAME = join(target.OUTPUT_PATH, target.TARGET_NAME + '.lib')
+                    break
+                case 'DARWIN':
+                case 'LINUX':
+                    switch (target.TARGET_TYPE) {
+                        case 'EXECUTE':
+                            target.OUTPUT_NAME = target.TARGET_NAME
+                            break
+                        case 'SHARED':
+                            target.OUTPUT_NAME = target.TARGET_NAME + '.so'
+                            break
+                        case 'STATIC':
+                            target.OUTPUT_NAME = target.TARGET_NAME + '.a'
+                            break
+                    }
+                    target._LINK_NAME = join(target.OUTPUT_PATH, target.TARGET_NAME + '.a')
+                    break
             }
         }
         if (!targetMap.has(target.TARGET_NAME)) {
@@ -209,11 +263,11 @@ async function buildTarget(target: Target) {
 
 async function buildTargetReal(target: Target) {
     await buildTargetList(target._DEPENDENCY_TARGET_LIST)
-    await mkdir(target.OUTPUT_PATH + '/obj', { recursive: true })
     for (const source1 of target._SOURCE_LIST) {
-        await msvc.compileSource(builder, target, source1)
+        await mkdir(dirname(join(target.OUTPUT_PATH, source1._OBJECT_PREFIX)), { recursive: true })
+        await builder._TOOLCHAIN_IMPL.compileSource(builder, target, source1)
     }
-    await msvc.buildTarget(builder, target)
+    await builder._TOOLCHAIN_IMPL.buildTarget(builder, target)
 }
 
 try {
