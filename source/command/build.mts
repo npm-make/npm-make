@@ -1,13 +1,13 @@
-import { Msvc } from './toolchain/msvc.mjs'
-import { Builder } from './project/builder.mjs'
-import { Source } from './project/source.mjs'
-import { Target } from './project/target.mjs'
-import { Project } from './project/project.mjs'
+import { Msvc } from '../toolchain/msvc.mjs'
+import { Builder } from '../project/builder.mjs'
+import { Source } from '../project/source.mjs'
+import { Target } from '../project/target.mjs'
+import { Project } from '../project/project.mjs'
 import { join, parse, dirname } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { opendir, mkdir, readFile, realpath } from 'node:fs/promises'
-import { Gcc } from './toolchain/gcc.mjs'
-import { Clang } from './toolchain/clang.mjs'
+import { Gcc } from '../toolchain/gcc.mjs'
+import { Clang } from '../toolchain/clang.mjs'
 
 function createMsvc() {
     const msvc = new Msvc()
