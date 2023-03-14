@@ -1,3 +1,4 @@
+import { parse, join } from 'node:path'
 import { executeProcess } from '../executeTool.mjs'
 import { Builder } from '../project/builder.mjs'
 import { Source } from '../project/source.mjs'
@@ -77,7 +78,7 @@ export class Msvc implements Toolchain {
             flagList.push('/I' + includePath)
         }
         for (const dependency of target._DEPENDENCY_TARGET_LIST) {
-            for (const includePath of target._EXPORT_INCLUDE_PATH_LIST) {
+            for (const includePath of dependency._EXPORT_INCLUDE_PATH_LIST) {
                 flagList.push('/I' + includePath)
             }
         }
@@ -99,6 +100,10 @@ export class Msvc implements Toolchain {
                     flagList.push(source._OBJECT_PREFIX + '.obj')
                     break
             }
+        }
+        for (const dependency of target._DEPENDENCY_TARGET_LIST) {
+            const parse1 = parse(dependency.OUTPUT_NAME)
+            flagList.push(join(dependency.OUTPUT_PATH, parse1.name + '.lib'))
         }
         flagList.push('/NOLOGO')
         flagList.push('/OUT:' + target.OUTPUT_NAME)
@@ -241,7 +246,16 @@ export class Msvc implements Toolchain {
     }
 
     async execute(cwd, file, ...args) {
-        const result = await executeProcess({ cwd, env: this.ENVIRONMENT }, file, ...args)
-        console.log(file, args.join(' '), result)
+        let result = null
+        try {
+            result = await executeProcess({ cwd, env: this.ENVIRONMENT }, file, ...args)
+        } finally {
+            console.log(cwd)
+            console.log(file)
+            console.log(args.join(' '))
+            if (result) {
+                console.log(result)
+            }
+        }
     }
 }

@@ -10,18 +10,25 @@ export class Project {
     PROJECT_NAME: string
     PROJECT_PATH: string
     PROJECT_VERSION: string
+    _DEPENDENCY_LIST: string[]
     _PROJECT_FILE_LIST: string[]
     _PROJECT_MODULE: ProjectModule
     _TARGET_LIST: Target[]
 
     constructor() {
+        this._DEPENDENCY_LIST = []
         this._PROJECT_FILE_LIST = []
         this._TARGET_LIST = []
     }
 
-    createTarget(name: string, options?: object): Target {
-        const target = new Target(this.OUTPUT_PATH, this.PROJECT_PATH, name)
+    createTarget(targetName: string): Target {
+        const target = new Target(this.OUTPUT_PATH, this.PROJECT_PATH, targetName)
         this._TARGET_LIST.push(target)
-        return Object.assign(target, options)
+        return target
+    }
+
+    useProject(projectName: string): Project {
+        this._DEPENDENCY_LIST.push(projectName)
+        return this
     }
 }
