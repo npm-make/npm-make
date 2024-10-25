@@ -1,4 +1,4 @@
-import { execFile } from 'node:child_process'
+import childProcess from 'node:child_process'
 
 export class Executor {
     cwd
@@ -9,7 +9,7 @@ export class Executor {
 
     async executeReal(file, ...args) {
         return new Promise((resolve, reject) => {
-            execFile(file, args, this, (error, stdout, stderr) => {
+            childProcess.execFile(file, args, this, (error, stdout, stderr) => {
                 if (error) {
                     reject({ error, stdout, stderr })
                 } else {

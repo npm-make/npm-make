@@ -1,35 +1,28 @@
 export class Task {
-    children
-    callback
-    promise
+    #children = []
+    #callback
+    #promise
 
     constructor(callback) {
-        if (callback) {
-            this.callback = callback
-            this.children = []
-        } else {
-            throw new Error('Task callback cannot be null')
-        }
+        this.#callback = callback
     }
 
-    addChild(child) {
-        this.children.push(child)
+    depends(child) {
+        this.#children.push(child)
     }
 
     async execute() {
-        if (!this.promise) {
-            this.promise = this.executeReal()
+        if (!this.#promise) {
+            this.#promise = this.executeReal()
         }
-        return this.promise
+        return this.#promise
     }
 
     async executeReal() {
-        const promises = []
-        for (const child of this.children) {
-            const promise = child.execute()
-            promises.push(promise)
+        if (this.#children.length > 0) {
+            const promises = this.#children.map(child => child.execute())
+            await Promise.all(promises)
         }
-        await Promise.all(promises)
-        return this.callback()
+        return this.#callback()
     }
 }
