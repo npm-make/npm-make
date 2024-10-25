@@ -1,0 +1,10 @@
+[*]
+ij_html_attribute_wrap = off
+ij_javascript_enforce_trailing_comma = remove
+ij_javascript_force_quote_style = true
+ij_javascript_force_semicolon_style = true
+ij_javascript_use_double_quotes = false
+ij_javascript_use_semicolon_after_statement = false
+ij_javascript_spaces_within_imports = true
+ij_javascript_spaces_within_object_literal_braces = true
+indent_size = 4
