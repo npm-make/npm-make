@@ -2,7 +2,7 @@
     "name": "@npm-make/npm-make",
     "version": "1.0.0-alpha1",
     "devDependencies": {
-        "@types/node": "^22.7.9"
+        "@types/node": "22.8.1"
     },
     "publishConfig": {
         "registry": "https://registry.npmjs.com/",
