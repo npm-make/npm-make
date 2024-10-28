@@ -7,7 +7,7 @@ export class Queue {
         this.#limit = limit
     }
 
-    async executeReal(callback) {
+    async execute(callback) {
         try {
             if (this.#running >= this.#limit) {
                 await new Promise(resolve => this.#queue.push(resolve))

@@ -7,7 +7,7 @@ export class Executor {
     shell = false
     windowsHide = true
 
-    async executeReal(file, ...args) {
+    async execute(file, ...args) {
         return new Promise((resolve, reject) => {
             execFile(file, args, this, (error, stdout, stderr) => {
                 if (error) {

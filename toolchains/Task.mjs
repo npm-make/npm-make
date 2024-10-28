@@ -13,12 +13,12 @@ export class Task {
 
     async execute() {
         if (!this.#promise) {
-            this.#promise = this.executeReal()
+            this.#promise = this.#executeReal()
         }
         return this.#promise
     }
 
-    async executeReal() {
+    async #executeReal() {
         if (this.#children.length > 0) {
             const promises = this.#children.map(child => child.execute())
             await Promise.all(promises)

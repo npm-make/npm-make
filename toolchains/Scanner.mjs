@@ -1,9 +1,11 @@
+import { readdir } from 'node:fs/promises'
+
 export class Scanner {
-    fileList = []
+    #rootPath = ''
+    #fileList = []
 
-    async scanPath(root) {
-    }
-
-    matchFiles(pattern) {
+    async includePath(path) {
+        this.#rootPath = path
+        this.#fileList = await readdir(path, { recursive: true })
     }
 }
